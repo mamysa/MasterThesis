@@ -128,3 +128,59 @@ for m, h, t in matches{i-1}:
 if len(matches{i}) == 0: 
   return  matches{i} 
 ```
+
+
+TODO exit term
+
+
+
+## Matching in-hole
+In-hole pattern consists of two patterns. The term is traversed recursively trying to find a subterm that matches the second pattern. If such subterm is found, the term is copied from previously mentioned subterm all the way to the root and subterm is replaced with term `hole`. Copying is needed because original term must be left intact.
+
+For recursive term traversal a path from root of the term to possible subterm matching the second pattern is maintained. This allows for only copying terms/subterms that will be affected by `hole` substitution instead of copying the entire term.
+
+Due to possible non-determinism, `match` object must remain unmodified. For both patterns of `in-hole`, separate `Match` objects are created and initialized with appropriate meta-variables. Upon successful matching by both procedures, Cartesian product between matches of both lists is computed and results are inserted into a copy of initial `match` object. By construction, all meta-variables of `Match` objects are unique.
+
+```py
+def inhole(term, match, head, tail, path):
+	matches = []
+	inpat2match = Match(...)
+	pat2matches = pat2matchfunc(term, inpat2match, 0, 1)
+	if len(pat2matches) != 0:
+		inpat1match = Match(...)
+		tmp0 = path + [term]
+		tmp1 = copy_path_and_replace_last(tmp0, hole)
+		pat1matches = pat1matchfunc(tmp1, inpat1match, 0, 1)
+		if len(pat1matches) != 0:
+			tmp11 = head + 1
+			for m1, h1, t1 in pat1matches:
+				for m2, h2, t2 in pat2matches:
+					tmp2 = combine_matches(m1, m2)
+					tmp{i} = match.copy()
+					tmp{j} = tmp2.getbinding(...)              ; same for inpat2match
+					tmp{k} = tmp{i}.addtobinding(..., tmp{j})  ; same for inpat2match
+					tmp3 = matches.append((tmp{i}, tmp11, tail))
+	tmp4 = term.kind()
+	if tmp4 == Term.Sequence:
+		tmp5 = path.append(term)
+		tmp6 = term.length()
+		for tmp10 in range(tmp6):
+			tmp7 = term.get(tmp10)
+			tmp8 = inhole(tmp7, match, head, tail, path)
+			matches = matches + tmp8
+		tmp9 = path.pop()
+	return matches 
+```
+
+From Figure ?? above it can be seen that procedures matching `in-hole` patterns require an extra parameter `path`.  Thus, to conform to desired interface, additional wrapper procedure is created to call actual `in-hole` procedure with `path` being an empty list. 
+
+This is not all, however. Since `in-hole` patterns may also require constraint-checking, doing that in such wrapper function is good (TODO REPHRASE ME)
+
+(TODO add code snippet)
+(redex-match A (in-hole ((n ...) hole (n_2 ...)) (n_2 ...))  (term ((1 2 3) (5 6 7) (5 6 7))))
+
+## Top-level pattern matching procedures.
+
+Top-level pattern matching procedures have the following interface:
+
+`def matchfunc(match: Match) -> [Match]`
