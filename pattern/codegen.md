@@ -184,3 +184,78 @@ This is not all, however. Since `in-hole` patterns may also require constraint-c
 Top-level pattern matching procedures have the following interface:
 
 `def matchfunc(match: Match) -> [Match]`
+
+This procedure creates `Match` object, initializes it with assignable symbols seen in the actual pattern and calls appropriate matching procedure. `head` and `tail` parameters are set to zero and one, respectively. Since matching procedure returns a list of `(match, head ,tail)` tuples, `Match` objects are filtered out and returned.
+
+For example ... 
+
+## Is-A procedure.
+
+So called Is-A procedures have the following interface `isa(term: Term) -> boolean`. These procedures are generated for all built-in patterns excluding `(inhole pattern pattern)` as well as non-terminal symbols defined in `define-language` form.
+
+### Built-in patterns
+
+For most built-in patterns isa-procedures are generated in a way similar to matching literal terms, as explained above - by comparing the tag of a term against desired tags.  For example, for `number` pattern term can be tagged with either `Integer` or `Float`.
+
+```py
+tmp0 = term.kind()
+if tmp0 in [TermKind.Integer, TermKind.Float]:
+  return True
+return False
+```
+
+The only built-in pattern that has to be handled slighly differently is `variable-not-otherwise-mentioned` which also checks if value of a term tagged with `Variable` is not in the set of reserved symbols obtained during non-terminal resolution. Figure below demonstrates this.
+
+```py 
+tmp0 = term.kind()
+if tmp0 == TermKind.Variable:
+  tmp1 = term.value()
+  if tmp1 not in ['+', '-']:
+    return True
+return False
+```
+
+
+###Is-A procedures for non-terminals.
+
+```py
+(define-language Lc
+  (e ::= (e e) (+ e ...) (if e e e) v)
+  (v ::= (λ x e) n b x)
+  (n ::= number)
+  (b :: boolean)
+  (x ::= variable-not-otherwise-mentioned))
+```
+
+For each pattern defined by non-terminal, first generate matching procedure and top-level matching procedure, call top-level matching procedure and verify a list of matches is not empty. If it is not, immediately return `True`. Otherwise, try matching the next pattern in the list. If none of the patterns match the term, return False.
+
+Figure below shows sample `is-a` procedure for non-terminal `e`.
+
+```py
+def isa_e(term):
+	if match('(e e)', term):     return True
+	if match('(+ e ...)', term): return True
+	if match('(if e e e)', term): return True
+	if match('v', term):          return True
+	return False
+```
+
+Such generated code also shows the need for non-terminal cycle checking in [CHAPTER XXX]. For example given grammar the following `is-a` procedures will be generated for both non-terminal symbols. Infinite-recursion!
+
+```
+(x : n variable-not-otherwise-mentioned)
+(n : xnumber)
+
+def isa_x(term):
+	if match('n', term):     return True
+	if match('variable-not-otherwise-mentioned', term):     return True
+	return False
+
+def isa_n(term):
+	if match('x', term):     return True
+	if match('number', term):     return True
+	return False
+```
+
+## End
+This completes code generation for patterns.
