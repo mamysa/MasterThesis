@@ -45,6 +45,7 @@
 		- IsaMatching functions
 
 # Term generation.
+	- Compile time representation.
 	- Detecting inputs
 	- Code generation
 
