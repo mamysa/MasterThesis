@@ -62,3 +62,16 @@ This completes the description of the algorithm.
 
 
 <TODO provide example>
+
+
+# Rewriting Metafunction Applications 
+
+Since metafunction applications have the following shape - `(metafunction-name term-template ...)` these can be detected quite trivially given a list of defined metafunctions. More specifically, if given term-template is `TermSequence` and it's first element is `TermLiteral` with tag `Variable`, check of value of the variable is present in the list of known metafunctions. If it is, return `MetafunctionApplication` containing initial `TermSequence`. Otherwise, return `TermSequence`.
+
+Example of transformation ;(my-metafunction n x) -> (appy-mf (my-metaufnction n x))
+
+`TermSequence` may contain `InArg` and `MatchRead` annotations. These are handled in the following way.
+* `InArg` annotations are left intact. Signatures of both `TermSequence` and `ApplyMetafunctions` must match.
+* `MatchRead` annotations can be safely removed. None of such variable assignments are used to generate `TermSequence`.
+
+
