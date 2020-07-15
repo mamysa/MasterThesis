@@ -44,7 +44,7 @@ def gen_term('(x n) ...)', match):
 		seq.append(nterm)
 	return seq
 
-# InArg('x'), InArg('n')
+InArg('x'), InArg('n')
 def gen_term('(x n)', match, x, n):
   ...
 ```
@@ -64,7 +64,6 @@ gen_term(',(add(term n_1) (term n_2))', match):
 	n_1 = gen_term('n_1', match)
 	n_2 = gen_term('n_2', match)
 	return add(n_1, n_2)
-
 ```
 
 ## In-Hole
