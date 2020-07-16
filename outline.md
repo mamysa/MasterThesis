@@ -1,4 +1,5 @@
-# Introduction
+#
+Introduction
 	- PltRedex
 	- Goals - use PyPy RPython to make thing faster.
 
@@ -23,14 +24,16 @@
 		- Repetitions.
 			- non determinism in repetitions.
 		- Constraint checking.
-	- Preprocessing pattern in any context
+	- Pattern Preprocessing Passes
 		- Non-terminal resolution
-		- Ellipsis match mode.
-		- Assignable Symbol extraction
-	- Preprocessing define language
 		- Uniquify Identifiers 
-		- NtCycleChecking  ( this is wrong)
+		- NtCycleChecking 
 		- HoleReachability.
+		- InHole checker
+		- Constraint Check Insertion
+		- Assignable Symbol Extraction
+	- Preprocessing define language
+	- Preprocessing general patterns.
 	- Preprocessing patterns in define-reduction-relation/metafunction/etc
 	-Code generation
 		- Basic overview - match functions, isa functions.

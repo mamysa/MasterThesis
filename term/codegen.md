@@ -48,6 +48,8 @@ InArg('x'), InArg('n')
 def gen_term('(x n)', match, x, n):
   ...
 ```
+
+
 First, note that our TermSequence-template has two annotation `ReadMatch('x', 'x')` and `ReadMatch('n', 'n')`. These assignments are generated in the obvious way on lines 3-4. Furthermore, since `Repeat` contain `ForEach('x')` and `ForEach('n')` annotations, it implies that both `x` and `n` are lists containing terms. Thus, child term-template of `Repeat` (that is, `gen_term('(x n)')`)  has to be called for each element in `x` and `n`. This implies that both lists have to be equal in size. `assert_list_sizes_match` procedure take any number of terms as an input and ensures their lengths are equal, otherwise it throws an exception. 
 
 
