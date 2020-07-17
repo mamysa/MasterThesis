@@ -1,5 +1,4 @@
-#
-Introduction
+#Introduction
 	- PltRedex
 	- Goals - use PyPy RPython to make thing faster.
 
