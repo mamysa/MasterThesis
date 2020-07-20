@@ -61,7 +61,6 @@ def visit_graph(graph):
 		V = set()
 		self.visit(U.get_random_element(), V, [])
 		U = U - V
-
 ```
 
 Note that the described algorithm does not report all the cycles in the graph but the first one it manages to find.
