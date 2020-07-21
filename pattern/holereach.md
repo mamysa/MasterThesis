@@ -52,7 +52,18 @@ Note that creating multiple `LeafHole` or `LeafNotHole` nodes is not necessary a
 
 ## Creation of inner-nodes and edges.
 
-The only top-level pattern kind that may contain inner nodes at this point is `Sequence`.
+The only top-level pattern kind that may contain inner nodes at this point is `Sequence` and thus they need to be visited. One thing that needs to be maintained is the stack `S` of outer-nodes where inner-nodes are to be stored.
 
+For each non-terminal definition `N` and each pattern `p_i`, if `p_i` is `PatSequence`, retrieve `M[p_i]` from the mapping and place on top of the stack S. For each subpattern q_i in p_i, visit `q_i`.
 
+* `p = PatSequence(pattern ....)`. Create outer-node `Sequence` `s` for `p`; create inner node `i`; add edge `i->s`. Retrieve parent outer-node `O` and add node `i` to it. Append `s` to the stack `S`. For each child pattern `c_i` of `p`, recursively visit each `c_i`. Pop topmost element off the stack `S`.
 
+* `p = Repeat(pattern)`. Create outer-node `Repeat` `r` for `p`, create inner node `i`, add edge `i->r`. Retrieve parent outer-node `O` and add node `i` to it. Append `r` to the stack `S`. Visit child pattern `c` of `p`. Pop topmost element off the stack `S`. 
+
+* `p = InHole(pattern1, pattern2)` Raise compilation error and quit.
+
+* `p = BuildInPattern(kind, symbol)`. Create inner node `i`. If kind is Hole then let s = LeafHole, otherwise s = LeafNotHole. Create edge `i->s`.  Retreieve parent outer-node `O` from the top of the stack and add node `i` to it.
+
+* `p = Nt(nt, symbol)` Create inner node `i`. For each pattern in non-terminal definition of `nt`, retrieve outer-node `o` from the mapping `M` and create edge `i->o`. Do the same for each non-terminal in the set `E_nt`. Retrieve outer-node `O` from the stack and append `i` to it.
+
+TODO need to figure out how to represent sequences in more mathy way. Outer nodes are supposed to be "sequences" but then in calculus sequences are basically functions ... Need to come up with notation that is similar to sets.

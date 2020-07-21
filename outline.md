@@ -12,9 +12,10 @@
 
 # PyPy rpython
 
-# Common 
+# Rpython Runtime 
 - Runtime representation of Terms.
 - Runtime representation of matches.
+- Parsing terms
 
 # Pattern Matching
 	- Basic features of pattern matching.
