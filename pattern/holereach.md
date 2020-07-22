@@ -67,3 +67,92 @@ For each non-terminal definition `N` and each pattern `p_i`, if `p_i` is `PatSeq
 * `p = Nt(nt, symbol)` Create inner node `i`. For each pattern in non-terminal definition of `nt`, retrieve outer-node `o` from the mapping `M` and create edge `i->o`. Do the same for each non-terminal in the set `E_nt`. Retrieve outer-node `O` from the stack and append `i` to it.
 
 TODO need to figure out how to represent sequences in more mathy way. Outer nodes are supposed to be "sequences" but then in calculus sequences are basically functions ... Need to come up with notation that is similar to sets.
+
+## Minimal/Maximal Value Representation and Arithmetic. 
+ 
+TODO this is not very mathlike but i feel like it should be.
+
+Minimum / maximum number of holes can be one of the following: `Zero`, `One`, `Many` (i.e. >= 2) and `Uninitialized` indicating said value should not be used for computation just yet.
+
+Furthermore, need to define three operators - `+`, `min`, `max`. These operators require two arguments. Given `a` and `b` results of these operators is summarized in the table below.
+
+* + Uninitialized Uninitialized  -> Uninitialized 
+* + Zero Uninitialized  -> Zero 
+* + One  Uninitialized  -> One 
+* + Many Uninitialized  -> Many 
+* + Uninitialized Zero -> Zero
+* + Uninitialized One  -> One 
+* + Uninitialized Many -> Many 
+* + Zero Zero -> Zero
+* + Zero One  -> One
+* + Zero Many -> Many 
+* + One  Zero -> One 
+* + One  One  -> Many 
+* + One  Many -> Many 
+* + Many Zero -> Many
+* + Many One  -> Many
+* + Many Many -> Many
+
+
+* min Uninitialized Uninitialized -> Uninitialized  
+* min Uninitialized Zero -> Zero
+* min Uninitialized One  -> One 
+* min Uninitialized Many -> Many 
+
+* min Zero Zero -> Zero
+* min Zero One  -> Zero
+....   todo how to represent this.
+
+
+## Computation of values.
+
+Min/max values are computed both for inner-nodes and outer-nodes. First, they have to be initialized.
+
+* Inner nodes are intialized with (Uninitialized, Uninitialized)
+* `Sequence` and `Repeat` outer nodes are initialized with (Uninitialized, Uninitialized)
+* `LeafHole` outer node is initialized with (One, One)
+* `LeafNotHole` outer node is initialized with (One, One)
+
+Given initial values min_inner, max_inner of some inner-node  and new values `v_1, v_2`, `min_inner = min(min_inner, v1)`, `max_inner = max(max_inner, v2)`.
+
+Given outer-node `o`, there are a few cases to consider.
+
+* `LeafHole` and `LeafNotHole` - its min/max values are never updated.
+* `Sequence` - `min_o = \sum_{i in inner(o)} min_i` and `max_o = \sum_{i in inner(o)} max_i`. Summation is described above.
+* `Repeat` - `min_o = Zero`, `max_o = Many if max_inner = One or max_inner = Many else Zero.
+
+## Hole Reachability Algorithm
+
+Before initiating graph traversal, should first verify if `LeafHole` node is actually in `V`. If there's no such node, that means the source pattern does not match any `hole` and thus each non-terminal should be annotated with `Zero,Zero` number of holes.
+
+Otherwise, the graph is traversed in reverse direction starting from nodes `LeafHole` and `LeafNotHole` using breath-first strategy. Maintain queue Q that initially stores all `LeafHole` and `LeafNotHole` nodes.
+
+The algorithm is as follows:
+
+* Remove outer node `o` from the queue `Q`. 
+
+* For each inner-node `i` such that `i->o`:
+	- if `parent(i) = o` then `update(i, o_min, o_max)` and `update(o)`. What this means that if inner node contains an edge to the outer-node `o` `i` is a child of, thus can be considered a "self-loop". The reason for doing this will be discussed later. (TODO is this actually needed aside from really degenerate patterns?)
+
+* For each inner-node `i` such that `i->o`:
+	- if `parent(i) != o`, update(i, o_min, o_max) and update(o). If values of `o_min, o_max` are different from ones before update operation, add `o` to the queue `Q`.
+
+* Repeat until queue `Q` is empty.
+
+## Computing Min/max values for non-terminal definition
+
+Given non-terminal definition `nt` and set of patterns `P` it matches, min_nt = max_nt = Uninitialized. Then, `min_nt = \min{i in P} min_i` and `max_nt = \max{i in P} max_i`.Note that some parrern `i` in `P` may be Nt, in which case `min_i` and `max_i` for non-terminal definition `i` first. By ensuring that language contains no non-terminal cycles, such recursive procedure s guaranteed to terminate.
+
+After completing all computations, each non-terminal definition `nt` is annotated with corresponding `min_nt, max_nt`.
+
+## Edge cases. 
+
+This algorithm doesn't one very specific thing - infinite terms and presense of `hole`. Consider the language below
+
+``` 
+(define-lagnuge Infinite
+     (P ::= (E))      
+     (E ::= P hole))
+```
+
+This language allows for expressing infinitely nested terms such as `((( ... )))` without `E` actually matching a `hole`. Edges of the loop should somehow enforce `min` value of some outer node corresponding to pattern `(E)` but it doesn't.
