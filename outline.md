@@ -3,6 +3,8 @@
 	- Goals - use PyPy RPython to make thing faster.
 
 # Features of PLtREdex
+	- Pattern Language
+	- Term    Language
 	- Define-lagnuage
 	- redex-match
 	- redex-let
@@ -10,20 +12,13 @@
 	- define-metafunction
 	- apply-reduction-relation
 
-# PyPy rpython
-
 # Rpython Runtime 
 - Runtime representation of Terms.
 - Runtime representation of matches.
 - Parsing terms
 
 # Pattern Matching
-	- Basic features of pattern matching.
-		- Pattern grammar.
-		- Pattern sequences
-		- Repetitions.
-			- non determinism in repetitions.
-		- Constraint checking.
+	- Pattern compile time representation.
 	- Pattern Preprocessing Passes
 		- Non-terminal resolution
 		- Uniquify Identifiers 
@@ -32,10 +27,7 @@
 		- InHole checker
 		- Constraint Check Insertion
 		- Assignable Symbol Extraction
-	- Preprocessing define language
-	- Preprocessing general patterns.
-	- Preprocessing patterns in define-reduction-relation/metafunction/etc
-	-Code generation
+	- Code generation
 		- Basic overview - match functions, isa functions.
 		- Matching functions
 			- Matching numbers/variables/etc.	
@@ -53,18 +45,24 @@
 	- Code generation
 
 # Other forms
+	- define-language
+		- Compile-time-representation
+		- Code generation for isa_functions for non-terminals
 	- define-reduction-relation
-		- Features
+		- Compile-time-representation
+		- Preprocessing reductioncase
+		- Preprocessing domain.
 		- Codegen
 	- define-metafunction 
-		- Features
+		- Compile-time-representation
+		- Handling contract.
 		- Codegen
 
 # Testing/Evaluation
 	- Testing forms (assert-equals etc)
 	- Unittesting.
+	- Correctness?
 
-
-# Evaluation
-
+# Conclusion
+	- Future work - non-determinism detection and non-deterministic to deterministic ellipsis promotion.
 
