@@ -216,46 +216,6 @@ return False
 ```
 
 
-###Is-A procedures for non-terminals.
-
-```py
-(define-language Lc
-  (e ::= (e e) (+ e ...) (if e e e) v)
-  (v ::= (λ x e) n b x)
-  (n ::= number)
-  (b :: boolean)
-  (x ::= variable-not-otherwise-mentioned))
-```
-
-For each pattern defined by non-terminal, first generate matching procedure and top-level matching procedure, call top-level matching procedure and verify a list of matches is not empty. If it is not, immediately return `True`. Otherwise, try matching the next pattern in the list. If none of the patterns match the term, return False.
-
-Figure below shows sample `is-a` procedure for non-terminal `e`.
-
-```py
-def isa_e(term):
-	if match('(e e)', term):     return True
-	if match('(+ e ...)', term): return True
-	if match('(if e e e)', term): return True
-	if match('v', term):          return True
-	return False
-```
-
-Such generated code also shows the need for non-terminal cycle checking in [CHAPTER XXX]. For example given grammar the following `is-a` procedures will be generated for both non-terminal symbols. Infinite-recursion!
-
-```
-(x : n variable-not-otherwise-mentioned)
-(n : xnumber)
-
-def isa_x(term):
-	if match('n', term):     return True
-	if match('variable-not-otherwise-mentioned', term):     return True
-	return False
-
-def isa_n(term):
-	if match('x', term):     return True
-	if match('number', term):     return True
-	return False
-```
 
 ## End
 This completes code generation for patterns.

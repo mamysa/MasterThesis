@@ -65,4 +65,5 @@
 
 # Conclusion
 	- Future work - non-determinism detection and non-deterministic to deterministic ellipsis promotion.
-
+	              - better error reporting
+				  - merging patterns?
