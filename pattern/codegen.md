@@ -76,6 +76,8 @@ for m, h, t in matches:
 return matches
 ```
 
+TODO maybe an example here ((n ...) ...) ??? showing increase-depth and decrease-depth step by step.
+
 ### Matching sequences.
 
 Matching pattern sequences is more involved. This assumes that subpatterns have been generated already and names of procedures are known. 
