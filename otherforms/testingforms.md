@@ -145,4 +145,34 @@ def genTermLetAssertEqual(actual_termtemplate, expected_termtemplate, assignment
 
 ```
 
-# apply-reduction-relation-once-assert-equal
+### apply-reduction-relation-assert-equal
+
+
+```
+apply-reduction-relation-assert-equal = 
+	(apply-reduction-relation-assert-equal reduction-relation-name term-template list-of-term-templates)
+```
+
+This form takes a term-template, applies reduction-relation (assuming reduction-relation is defined and thus `reduction-relation-name` is valid), and ensures that a list of matches after reduction equals to expected list of matches. The grammar can be seen above.
+
+As in case with `redex-match-assert-equal`, exception is raised when:
+
+1. Lengths of expected list and list produced by the matcher are not the same.
+2. Two terms at position `i` in both lists are not equal.
+
+Example: 
+
+```
+(apply-reduction-relation-assert-equal red (term (1 (+ 4 5) 3 (+ (+ 1 2) 4) 5))
+  ((term (1 1337 3 (+ (+ 1 2) 4) 5))
+   (term (1 (+ 4 5) 3 (+ 1337 4) 5))))
+```
+
+
+####Codegen 
+
+Generated code needs to do the following:
+
+1. Generate all term-templates that will be the part of the list.
+2. Generate term-template that will be fed into reduction-relation procedure.
+3. Call reduction-relation procedure.
