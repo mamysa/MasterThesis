@@ -15,6 +15,7 @@
 # Rpython Runtime 
 - Runtime representation of Terms.
 - Runtime representation of matches.
+- Fresh and arithmetic utils.
 - Parsing terms
 
 # Pattern Matching
