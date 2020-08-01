@@ -22,6 +22,7 @@ Since the `LeafNode` instance is created with `hello_world!` string, any other i
 
 TODO explain methods.
 `shallow_copy`
+`deep_copy` 
 `equals`
 `tostring`
 
