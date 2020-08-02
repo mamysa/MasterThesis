@@ -70,7 +70,7 @@ This method implements actual tokenization logic. The algorithm is as follows:
 	* If `match(DecimalRegex, s)` return (Float, s)
 	* If `match(IdentRegex  , s)` return (Ident, s)
 	* Otherwise, raise Exception - token kind is unknown
-* Goto step 1 until `c` is `end-of-string`.
+* Goto step 1 until `c` is `end-of-string`. Return None.
 
 ## Parsing
 
@@ -92,5 +92,34 @@ atom = integer
 
 TODO umldiagram?
 
+Simple recursive descent parser.
 
 
+* `iseof()` - returns true if end of the string has been reached.
+* `peek()` returns kind of the next token. 
+* `peekv()` returns kind of the next token along with it's value.
+* `expect(expectedkind, tok=None)`. 
+	* If `expectedkind != nexttoken.kind` raise Exception.
+	* If `tok != None`, additionally check if `tok=nexttoken.value`. Raise Exception if it is not.
+	*  Otherwise, call `tokenizer.next()` and assign it to `nexttoken` and return previous token. 
+
+* `parse_sequence` implements parsing of `term-sequence`. 
+	* Let `seq` be an empty list.
+	* The first token is expected to be `LParen`.
+	* While `peek()` is not `RParen`, if `peek()` is `LParen`, call `term-sequence` and append its result to `seq`, otherwise call `parse_atom` and append its result to seq.
+	* `expect(RParen)` 
+	* Return `Sequence(seq)`
+
+* `parse_atom` implements parsing of `atom`. 
+	* If `peek()` is Integer, return `Integer(expect(Integer))`
+	* If `peek()` is Float, return `Float(expect(Decimal))`
+	* If `peek()` is String, return `String(expect(String))`
+	* If `peek()` is Boolean, return `Boolean(expect(Boolean))`
+	* If `peek()` is Ident, then `peekv` to retrieve the value of the token. If value of token is `hole` return `Hole()`, otherwise Variable(self.expect(Ident)).
+
+### Potential Improvements.
+While usage of regular expressions to identify integers, decimal numbers and identifiers gets the job done, it feels very inconsistent with manual handling of comments, strings, parentheses and booleans. Repeatedly applying regular expression as described in `next()` section doesn't seem to be the most performant solution.
+
+Another problem is that regular expressions are constructed using library provided by `RPython` and their compilation takes a rather noticeable amount of time. 
+
+TODO compare performance on big terms
