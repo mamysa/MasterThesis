@@ -1,2 +1,291 @@
 \chapter{PyPltRedex Runtime}
-TODO
+
+This chapter goes over runtime. TODO
+
+\section{Runtime Representation of Terms}
+
+Terms are represented in the following way. 
+
+(TODO uml diagram?) 
+
+As one may notice, these classes are all very similar but due to RPython's type inference an attempt to merge them results in compile-time error:
+
+\begin{lstlisting}
+class LeafNode:
+    def __init__(self, kind, value):
+        self.kind = kind 
+        self.value = value
+
+def entrypoint():
+    p = LeafNode(1, 'hello world!')
+    q = LeafNode(2, 12.5)
+
+# UnionError:
+#  SomeString(const='hello world!', no_nul=True)
+#  SomeFloat(const=12.5)
+\end{lstlisting}
+
+Since the \texttt{LeafNode} instance is created with \texttt{helloworld!} string, any other instantiation of LeafNode expects it's second argument to be of type \texttt{string}. 
+
+TODO explain methods.
+
+\texttt{shallow\_copy}
+\texttt{deep\_copy} 
+\texttt{equals}
+\texttt{tostring}
+and procedures
+\texttt{copy\_path\_and\_replace\_last}
+
+\section{Runtime Representation of Matches}
+
+\texttt{Binding} class encapsulates a stack of terms and provides three methods for its manipulation:
+
+\begin{itemize}
+\item 
+\texttt{increase\_depth} pushes term \texttt{Sequence} onto the stack provided a term on top of the stack is also a \texttt{Sequence}, otherwise raises an error.
+
+\item
+\texttt{decrease\_depth} has the following behaviour:
+	\begin{enumerate}
+		\item
+        if stack is empty, raise exception
+		\item
+		if stack size is 1 and topmost element is not term \texttt{Sequence} raise exception.
+		\item
+		if stack size is 1 and topmost element is term \texttt{Sequence} do nothing.
+		\item
+        if stack size > 1, pop topmost element and append it to element below. ( works because increasedepth must be called beforehand)
+	\end{enumerate}
+
+\item
+\texttt{add(term)} has the following behaviour:
+	\begin{enumerate}
+		\item
+         if stack is empty, add value
+		\item
+         if stack is not empty and not a compoundarray, raise exception
+		\item
+        if stack is not empty and is compoundarray, add value to the array.
+		\item
+        if stack size > 1, pop topmost element and append it to element below. ( works because increasedepth must be called beforehand)
+	\end{enumerate}
+
+\item
+\texttt{add(term)} has the following behaviour:
+	\begin{enumerate}
+		\item
+         if stack is empty, add value
+		\item
+         if stack is not empty and not a compoundarray, raise exception
+		\item
+        if stack is not empty and is compoundarray, add value to the array.
+	\end{enumerate}
+\end{itemize}
+
+
+
+\texttt{Match} class stores a dictionary of strings to \texttt{Binding} instances and represent pattern-variable assignments. 
+
+\begin{itemize}
+\item
+\texttt{increase\_depth} calls \texttt{increase\_depth} method of relevant \texttt{Binding} instance.
+
+\item
+\texttt{decrease\_depth} calls \texttt{decrease\_depth} method of relevant \texttt{Binding} instance.
+
+\item
+\texttt{addtobinding} calls \texttt{add} method of relevant \texttt{Binding} instance with \texttt{term}.
+
+\item
+\texttt{comparekeys(key1, key2)} compares topmost terms on stacks of bindings assigned to key1 and key2.
+
+\item
+	\texttt{deepcopy} creates a new Match instance with all \texttt{Binding} and \texttt{Term} instances contained within copied recursively.
+\end{itemize}
+
+\section{Processing Input}
+
+Initially, input to PyPltRedex is read from the file and stored as a string. To be able to apply reduction-relation, the string needs to be analyzed. There are two parts:
+
+\begin{itemize}
+\item
+Lexical analysis that breaks up the string into individual tokens and decides which kind of token it is.
+\item
+Parsing - given a set of tokens, produce valid terms.
+\end{itemize}
+
+
+\subsection{Lexical Analysis}
+
+Most commonly tokens are described using regular expressions. Below is description of token kinds supported by PyPltRedex.
+\begin{itemize}
+\item
+	TODO maybe more visual regex display.
+\end{itemize}
+
+\subsection{Parsing}
+
+Parsing takes individual lexemes and creates structured data out of them. In this case, terms are produced. Terms have the following grammar:
+
+\begin{lstlisting}
+term = term-sequence atom
+term-sequence = (term ...) 
+atom = integer 
+	 | string
+	 | (-|+)?[0-9]+\.[0-9]+
+	 | #t
+	 | #f
+	 | identifier
+\end{lstlisting}
+
+
+\subsection{Implementation}
+
+UML diagram for Parser and Tokenizer can be seen below.
+
+TODO diagram
+
+
+Actual lexer implementation doesn't use all regular expressions as described above but implements their functionality programmatically. The following procedures are defined to detect whitespace, newline and reserved symbols.
+
+\begin{lstlisting}
+def is_whitespace(c):
+    return c == ' ' or c == '\t' or c == '\n' or c == '\r'
+
+def is_newline(c):
+    return c == '\n'
+
+def is_reserved(c): 
+    return c in ['(', ')', '[', ']', '{', '}', '\"', '\'', '`', ';', '#', '|', '\\']
+\end{lstlisting}
+
+
+\begin{itemize}
+\item
+\texttt{string} is the string that requires lexical analysis.
+
+\item
+\texttt{start} and \texttt{end} are indices indicating an interval within the \texttt{string}. The substring that ends with index \texttt{start} has already been analyzed. A substring between \texttt{start} and \texttt{end} is a potential token. Any substring after \texttt{end} requires analysis.
+
+\item
+\texttt{advance()} method increments \texttt{end} by one.
+
+\item
+\texttt{peek()} returns a character at index \texttt{end} of the \texttt{string}.
+\texttt{extract\_if\_contains(substring)} extracts substring \texttt{s} beginning at \texttt{start} and ending at \texttt{start+len(substring)} and compares it against provided \texttt{substring}. If both strings are equal, \texttt{start} and \texttt{end} indices are set to \texttt{start+len(substring)} and True is returned. Otherwise, False is returned.
+
+\item
+\texttt{extract()} extracts the string between \texttt{start} and \texttt{end}, sets \texttt{start=end} and returns the extracted string.
+
+\item
+\texttt{next()} returns the next token in the string. This method implements actual tokenization logic. The algorithm is as follows:
+\begin{enumerate}
+	\item
+	\texttt{peek} the character \texttt{c}.
+	
+	\item
+	If \texttt{is\_whitespace(c)} is True then \texttt{advance} and \texttt{extract}. This will essentially ignores the characters altogether.
+
+	\item
+	If \texttt{c} is semicolon, \texttt{advance} and consume any character until newline. \texttt{advance} to consume newline. The result of \texttt{extract} is discarded. If \texttt{end-of-file} is encountered, stop trying to consume characters.
+
+	\item
+	if \texttt{c} is one of opening parentheses, return pair \texttt{(LParen, extract())}
+
+	\item
+	if \texttt{c} is one of closing parentheses, return pair \texttt{(RParen, extract())}
+
+	\item
+	If \texttt{c} is double-quote, \texttt{advance}. Consume characters until matching double-quote is encountered. If during consumption backward slash is encountered, character that immediately follows must also be consumed (i.e. it is escaped character). If \texttt{end-of-string} character is encountered, raise exception as the string doesn't terminate. Return \texttt{(String, extract())}
+
+	\item
+	If \texttt{c} is pound symbol \texttt{\#}, call \texttt{extract\_if\_contains} twice with following arguments: \texttt{\#t}, \texttt{\#true} and \texttt{\#f}, \texttt{\#false}. Upon success return \texttt{(Boolean, \#t)} or \texttt{(Boolean, \#f)}. Otherwise, raise Exception.
+
+	\item
+	Otherwise, a token must be either an integer, decimal or identifier. To identify these regular expressions are used, but first they have to be extracted. Consume all characters \texttt{c} such that they are not \texttt{is\_whitespace(c)}, \texttt{is\_reserved(c)} or \texttt{end-of-string}. Let \texttt{s=extract()}. 
+	\begin{itemize}
+		\item
+		If \texttt{match(IntegerRegex, s)} return (Integer, s)
+		\item
+		If \texttt{match(DecimalRegex, s)} return (Float, s)
+		\item
+		If \texttt{match(IdentRegex  , s)} return (Ident, s)
+		\item
+		Otherwise, raise Exception - token kind is unknown
+
+
+	\end{itemize}
+	\item
+	raise Exception - token kind is unknown.
+\end{enumerate}
+\end{itemize}
+
+This completes description of the tokenizer. The parser is implemented as a very simple recursive descent parser. Below follows the description of its methods and their functionalities.
+
+\begin{itemize}
+\item
+\texttt{iseof()} returns true if end of the string has been reached.
+
+\item
+\texttt{peek()} returns kind of the next token. 
+
+\item
+\texttt{peekv()} returns kind of the next token along with it's value.
+
+\item 
+\texttt{expect(expectedkind, tok=None)} throws Exception when \texttt{currenttoken} is not the one expected. In particular,
+	\begin{itemize}
+		\item
+		If \texttt{expectedkind != nexttoken.kind} raise Exception.
+		\item
+		If \texttt{tok != None}, additionally check if \texttt{tok=nexttoken.value}. Raise Exception if it is not.
+		\item
+		Otherwise, call \texttt{tokenizer.next()} and assign it to \texttt{nexttoken} and return previous token. 
+	\end{itemize}
+
+\item 
+	\texttt{parse\_sequence} implements parsing of \texttt{term-sequence} from the grammar above
+	\begin{itemize}
+		\item
+		Let \texttt{seq} be an empty list.
+
+		\item
+		The first token is expected to be \texttt{LParen}.
+
+		\item
+		While \texttt{peek()} is not \texttt{RParen}, if \texttt{peek()} is \texttt{LParen}, call \texttt{term-sequence} and append its result to \texttt{seq}, otherwise call \texttt{parse\_atom} and append its result to seq.
+	
+		\item
+		\texttt{expect(RParen)} 
+
+		\item
+		Return \texttt{Sequence(seq)}
+	\end{itemize}
+
+\item
+\texttt{parse\_atom} implements parsing of \texttt{atom} from grammar.
+	\begin{itemize}
+	\item
+		If \texttt{peek()} is Integer, return \texttt{Integer(expect(Integer))}
+	\item
+		If \texttt{peek()} is Float, return \texttt{Float(expect(Decimal))}
+	\item
+
+		If \texttt{peek()} is String, return \texttt{String(expect(String))}
+	\item
+		If \texttt{peek()} is Boolean, return \texttt{Boolean(expect(Boolean))}
+	\item
+
+		If \texttt{peek()} is Ident, then \texttt{peekv} to retrieve the value of the token. If value of token is \texttt{hole} return \texttt{Hole()}, otherwise Variable(self.expect(Ident)).
+	\end{itemize}
+	
+
+\end{itemize}
+
+
+\subsection{Future Improvements}
+While usage of regular expressions to identify integers, decimal numbers and identifiers gets the job done, it feels very inconsistent with manual handling of comments, strings, parentheses and booleans. Repeatedly applying regular expression as described in \texttt{next()} section doesn't seem to be the most performant solution.
+
+Another problem is that regular expressions are constructed using library provided by \texttt{RPython} and their compilation takes a rather noticeable amount of time. 
+
+TODO compare performance on big terms

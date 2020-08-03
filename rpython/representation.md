@@ -25,7 +25,7 @@ Circled states are finite states that actually create AST nodes and append them 
 
 The code snippet below shows (a) piece of code being compiled; (b) direct AST construction; (c) using fluent interface.
 ```
-(a)
+#(a)
 a = 0
 for i in array:
 	a = a + i

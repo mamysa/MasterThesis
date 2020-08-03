@@ -1,3 +1,77 @@
 \chapter{PyPy and RPython}
 
+\section{Compile-Time Representation of RPython}
+
+PyPltRedex works with \textbf{abstract syntax trees} and then emits RPython source code by traversing the tree and emitting strings. Abstract syntax tree itself is a tree that represent constructs of the language such as arithmetic operations, assignments, loops, etc.
+
+In Python and other imperative languages, nodes of an abstract syntax tree can be split into two categories:
+
+\begin{enumerate}
+\item
+	Statements such as \texttt{while} and \texttt{for} loops, \texttt{if} statements, variable assignments.
+\item
+	Expressions such as arithmetic operations, array element access, literal values such as integers or strings, etc.
+\end{enumerate}
+
+However, creating trees can be quite annoying due to its recurive nature - to express expression \texttt{a = 1 + 2 + 3} several nodes have to be created - \texttt{Assign(a, Add( Add( Integer(1), Integer(2)), Integer(3)))}. 
+
+PyPltRedex's AST definition is modified to include \texttt{PyValue} - subset of expressions that includes only variables and literals. Remaining expressions are now required to use \texttt{PyValue}. This way, expression like \texttt{a = 1 + 2 + 3} cannot be expressed and one would have to introduce extra variables to express such statements - \texttt{b = 1 + 2; a = b + 3}. This makes it similar to typical three-address code intermediate representation that most compilers employ.
+
+UML diagram for statements, expressions and values can be seen below. 
+
 TODO
+
+\section{RPython Abstract Syntax Tree Creation}
+
+Manually creating AST can be tedious. PyPltRedex provides fluent interface for creation of AST nodes - \texttt{BlockBuilder}. The goal of the block-builder is to construct code blocks which may, for example, be a body of a function or body of the loop. 
+
+State diagram for the `BlockBuilder` can be seen below:
+TODO
+
+Circled states are finite states that actually create AST nodes and append them to the block. Rectangled states are class definitions. Edges annotated with `instantiate` indicate intermediate object creation; for example, calling `For` creates new `ForPhase1` object and initializes it with `*args`. 
+
+The code snippet below shows (a) piece of code being compiled; (b) direct AST construction; (c) using fluent interface.
+\lstset{language=python,linewidth=0.95\linewidth,breaklines=true,numbers=left, 
+basicstyle=\ttfamily,numberstyle=\tiny,escapeinside={//*}{\^^M},
+mathescape=true}
+\begin{lstlisting}[caption=oh no!]
+#(a)
+a = 0
+for i in array:
+	a = a + i
+
+a, i, array = PyId('a'), PyId('i'), PyId('array')
+
+# without any interfaces
+#(b)
+Assign(a, PyInt(0))
+forb = [ Assign(a, BinaryExpr('+', a, i)) ]
+ForStmt(i, array, forb)
+
+# with fluent interface.
+#(c)
+forb = BlockBuilder()
+forb.AssignTo(a).Add(a, i)
+
+bb = BlockBuilder()
+bb.AssignTo(a).PyInt(0)
+bb.For(i).In(array).Block(forb)
+\end{lstlisting}
+
+
+\section{Future Improvements}
+
+As one may have noticed, \texttt{BlockBuilder} doesn't handle variable creation. Initially it was not such a problem as most of the generated functions are quite small but it becomes more confusing when functions are decently sized. Code snippet from above could be rewritten in the following manner:
+
+\begin{lstlisting}[caption=Oh yes!]
+
+forb = BlockBuilder()
+a = forb.AssignTo().Add(a, i)
+
+bb = BlockBuilder()
+a = bb.AssignTo().PyInt(0)
+i = bb.Declare('i')
+bb.For(i).In(array).Block(forb)
+\end{lstlisting}
+
+ In addition, provide information about types and ensure code typechecks before generating source. TODO
