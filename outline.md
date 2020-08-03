@@ -1,18 +1,19 @@
 #Introduction
 	- PltRedex
 	- Goals - use PyPy RPython to make thing faster.
+	- Thesis outline.
 
 # Features of PLtREdex
-	- Pattern Language
-	- Term    Language
-	- Define-lagnuage
-	- redex-match
-	- redex-let
-	- define-reduction-relation
-	- define-metafunction
-	- apply-reduction-relation
+- Theory: term rewriting systems
+- PltRedex overwiew.
+- Theory: evaluation contexts.
 
-# Rpython Runtime 
+# RPython
+- What is it?
+- Compile-time representation.
+- AstCreation 
+
+# Runtime 
 - Runtime representation of Terms.
 - Runtime representation of matches.
 - Fresh and arithmetic utils.
