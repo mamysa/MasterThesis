@@ -1,0 +1,31 @@
+\section{Ellipsis Depth Checking}
+
+\subsection{Motivation}
+
+Pattern variables with the same symbol should be under consistent number of ellipses. For example, in pattern \texttt{(((n\_1 ...) n\_1) ...)} pattern variable \texttt{n\_1} is not under consistent number of ellipses (or \textit{ellipsis depth}). One occurence of \texttt{n\_1} has ellipsis depth of two while another has ellipsis depth of one. Such invalid patterns should be reported during compilation process.
+
+Additionally, ellipsis depth for each pattern variable is required to be able to generate terms. 
+
+\subsection{Algorithm}
+Two bits of information is needed to find out ellipsis depth of pattern variable :
+
+\begin{enumerate}
+\item
+\textbf{number of ellipses} on the path from root to some node which is changed with each ellipsis encountered during pattern traversal. Let $n$ be number of ellipses.
+\item 
+Association between pattern-variable and its ellipsis depth. Let E = \{\} be the set s.t. each element is tuple $(s \text{ is string }, n \in \mathbb{N})$.
+\end{enumerate}
+
+Pattern is traversed recurisively. The following patterns are of interest.
+
+\begin{itemize}
+\item 
+\Repeat Let $n=n+1$, recursively visit $p$, and then let $n=n-1$.
+
+\item
+\BuiltInPattern Check if $s$ is in the set $E$. If there is not, $E = E \cup \{ (s, n) \}$. Otherwise, let $(s, n\prime) \in E$. If $n \neq n\prime$, then $s$ has inconsistent ellipsis depth and error should be raised.
+\end{itemize}
+
+\subsection{Example}
+
+TODO
