@@ -61,3 +61,58 @@ All pattern above except \textit{hole} can be suffixed with underscore and ident
 \end{itemize}
 
 If patterns in the pattern-sequence are suffixed with the same identifier (e.g. \texttt{(number\_1 number\_1)})), then the match is contrained to terms that are equal. That means term \texttt{(1 1)} matches the pattern but \texttt{(1 2)} does not. For patterns in \textit{define-language} constraint checking is not performed. PltRedex provides other constraint checks but they will not be considered.
+
+\section{Compile-time Representation of Patterns}
+
+Throughout the report the following notation will be used to represent actual Python classes used to implement the pattern language. Actual Python source code can be seen on page (TODO-appendix reference). 
+
+(TODO finalize notation)
+
+\begin{align}
+	L &= \{ Integer, Decimal, String, Boolean, Variable \} \\ 
+	T &= \{ Number, Integer, Float, Natural, String, Boolean, Variable, Hole \} \\ 
+	P &= 
+	\begin{cases}
+	PatternSequence(p_0, p_1, ..., p_n), p_i \in P \text { for } i=0,...,n \\ 
+	Repeat(p), p \in P \\
+	Nt(nt, s), s \text{ and } nt \text{ are strings} \\
+	BuiltInPattern(t, s), t \in T \text{ and } s \text{ is string } \\
+	InHole(p_1, p_2), p_1 \in P \text{ and } p_2 \in P \\
+	Literal(l, v), l \in L \\
+	CheckConstraint(s_1, s_2), s_1 \text{ and } s_2 \text{ are strings}
+	\end{cases}
+\end{align}
+
+
+\newcommand{\PatternSequence}{$PatternSequence(p_0, p_1, ..., p_n)$ }
+\newcommand{\Repeat}{$Repeat(p)$ }
+\newcommand{\Nt}{$Nt(nt, s)$ }
+\newcommand{\BuiltInPattern}{$BuiltInPattern(t, s)$ }
+\newcommand{\InHolePattern} {$InHole(p_1, p_2)$ }
+\newcommand{\LiteralPattern}{$Literal(l, v)$ }
+\newcommand{\CheckConstraint}{$CheckConstraint(s_1, s_2)$ }
+\begin{itemize}
+\item
+\PatternSequence represents `pattern-sequence` clause of the pattern language and may contain zero or more child patterns $p_i$.
+
+\item 
+\Repeat represents pattern $p$ under ellipsis.
+
+\item 
+\Nt represents non-terminal. $nt$ is a non-terminal symbol, while $s$ is the symbol used for binding terms. For example, given pattern \texttt{e\_1} $s$ is \texttt{e\_1} and $nt$ is \texttt{e}.
+
+\item
+\BuiltInPattern represents various built-in patterns such as \texttt{number} or \texttt{string}. $t$ is the tag and must be picked from set $T$. $s$ is the symbol used for binding terms.
+
+\item
+\InHolePattern represents \texttt{in-hole} pattern, $p_1$ and $p_2$ must be patterns.
+
+\item 
+\LiteralPattern represents a literal values in patterns. Since literal values can be of many types, a tag $l$ must be provided from set $T$. $v$ is actual literal value.
+
+\item
+\CheckConstraint is used for equality checking of terms. Terms bound to $s_1$ and $s_2$ are checked for equality.
+
+\end{itemize}
+
+
