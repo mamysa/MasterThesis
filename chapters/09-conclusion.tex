@@ -1,2 +1,31 @@
 \chapter{Conclusion} 
+
+\section{Future Work}
+\subsection{Ellipsis Determinism}
+In Chapter < Pattern codegen > an algorithm for deterministic matching of patterns under ellipsis was described but careful reader might notice the report doesn't describe how such patterns are made deterministic. In fact, PyPltRedex provides a transformation pass called \texttt{EllipsisMatchModeRewriter} that analyzes patterns under ellipses and decides if given ellipsis can be matched deterministically but current algorithm is flawed and doesn't work correctly for all patterns. 
+
+
+\subsection{\texttt{define-metafunction} and \texttt{define-reduction-relation} pattern merging.}
+
+Algorithms for application of reduction-relation and metafunctions match each pattern separately. However, it may be the case that patterns in reduction-cases are similar and bind terms to same identifiers in the same position within the pattern.
+
+\begin{lstlisting}
+(M_1  (in-hole P x (+ n_1 n_2)))
+(M_1  (in-hole P n (- n_1 n_2)))
+\end{lstlisting}
+
+Two patterns above are an example - both patterns contain pattern-variable $M\_1$ in the first position within the sequence. This means at this point there needs to be a single $Match$ object containing $M\_1$. Since $in-hole$ patterns are different, after matching $M\_1$ $Match$ object can be copied to contain terms matches by each $in-hole$. Diagram can be seen below - 
+
 TODO
+
+
+Furthermore, the first pattern in both \texttt{in-hole} patterns is the same - $P$. Since both \texttt{in-hole} patterns are at the second position within respective pattern sequences, instead of using multiple term traversals to find child terms matching \texttt{(+ n\_1 n\_2)} and \texttt{(- n\_1 n\_2)}, one travesal would be sufficient. This could be done by introducing a new pattern, say, $InHoleMulti(pattern1, pattern2 ...)$ that accepts multiple patterns. Diagram for this can be seen below:
+
+TODO
+
+
+However, since since matches may have been split before, this introduces additional complexity of \texttt{Match} object management.
+
+\subsection{More evaluation}
+
+I was not able to explore performance of the system w.r.t. larger terms.
