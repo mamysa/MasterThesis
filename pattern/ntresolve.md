@@ -17,5 +17,7 @@ Resolution algorithm proceeds in the following manner. The pattern is traversed 
 * Prefix is found in the list of non-terminal symbols defined by the language, replace unresolved symbol with `Nt(symbol)`.
 * Finally, check that symbol contains no underscores. Redex only allows underscores after non-terminal symbols and built-in patterns. Abort compilation if that is the case. Otherwise, replace unresolved symbol with `Lit(Variable, symbol)` and and the symbol to the set of literal variables defined in the language.
 
+Finally, after finishing pattern traversal, annotate `DefineLanguage` with `V`.
+
 
 Todo example? show pattern-tree before and after. 

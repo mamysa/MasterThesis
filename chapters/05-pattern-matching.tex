@@ -79,6 +79,7 @@ Throughout the report the following notation will be used to represent actual Py
 	BuiltInPattern(t, s), t \in T \text{ and } s \text{ is string } \\
 	InHole(p_1, p_2), p_1 \in P \text{ and } p_2 \in P \\
 	Literal(l, v), l \in L \\
+	UnresolvedSymbol(s), s \text{ is } string \\
 	CheckConstraint(s_1, s_2), s_1 \text{ and } s_2 \text{ are strings}
 	\end{cases}
 \end{align}
@@ -90,7 +91,10 @@ Throughout the report the following notation will be used to represent actual Py
 \newcommand{\BuiltInPattern}{$BuiltInPattern(t, s)$ }
 \newcommand{\InHolePattern} {$InHole(p_1, p_2)$ }
 \newcommand{\LiteralPattern}{$Literal(l, v)$ }
+\newcommand{\UnresolvedSymbol}{$UnresolvedSymbol(s)$ }
 \newcommand{\CheckConstraint}{$CheckConstraint(s_1, s_2)$ }
+
+
 \begin{itemize}
 \item
 \PatternSequence represents `pattern-sequence` clause of the pattern language and may contain zero or more child patterns $p_i$.
@@ -110,9 +114,12 @@ Throughout the report the following notation will be used to represent actual Py
 \item 
 \LiteralPattern represents a literal values in patterns. Since literal values can be of many types, a tag $l$ must be provided from set $T$. $v$ is actual literal value.
 
+\item 
+\UnresolvedSymbol used to represent symbols that are initially unknown to be non-terminal or literal, $s$ is the symbol.
+
 \item
 \CheckConstraint is used for equality checking of terms. Terms bound to $s_1$ and $s_2$ are checked for equality.
 
 \end{itemize}
 
-
+\input{chapters/05-pattern-matching-symbol-resolution.tex}

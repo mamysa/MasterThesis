@@ -19,6 +19,13 @@
 - Fresh and arithmetic utils.
 - Parsing terms
 
+Alternate outline - add extra chapter
+# Compile-Time Representation of PltRedex
+- Top-level forms
+- Patterns
+- Terms
+
+
 # Pattern Matching
 	- Pattern compile time representation.
 	- Pattern Preprocessing Passes

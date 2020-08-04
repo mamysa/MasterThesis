@@ -1,0 +1,48 @@
+\section{Transformation: Symbol Resolution}
+
+\subsection{Algorithm}
+
+Immediately after parsing Redex specification, it is unknown whether certain elements of pattern are built-in patterns or non-terminal symbols or just literals. These elements will be represented with \UnresolvedSymbol instances. Given $DefineLanguage df$, let $Nts(df)$ be the set of all non-terminal symbols of the language. By analyzing $s$ in \UnresolvedSymbol using $Nts(df)$ and buildin pattern names (TODO) it is possible to termine if given \UnresolvedSymbol is either \Nt, \BuiltInPattern, or \LiteralPattern.
+
+The symbol is analyzed in the following way: locate first underscore character. If there are no underscore characters, simply return the symbol, otherwise return all characters before the underscore. If underscore is the first character of the symbol, raise an `Exception` because Redex doesn't consider such symbols valid. Resulting symbol will be refered to as \textit{prefix}.
+
+Let $V = \{\}$ be the set of all variables defined in the language.
+Resolution algorithm proceeds in the following manner. The pattern is traversed recurisely. When coming across \UnresolvedSymbol node, extract prefix from the symbol $s$.  
+
+\begin{itemize}
+\item
+Prefix is \texttt{number}, replace \UnresolvedSymbol with  \BuiltInPattern with $t=Number$ and $s$ defined above.
+
+\item
+Prefix is \texttt{integer}, replace \UnresolvedSymbol with  \BuiltInPattern with $t=Integer$ and $s$ defined above.
+
+\item
+Prefix is \texttt{real}, replace \UnresolvedSymbol with  \BuiltInPattern with $t=Real$ and $s$ defined above.
+
+\item
+Prefix is \texttt{natural}, replace \UnresolvedSymbol with  \BuiltInPattern with $t=Natural$ and $s$ defined above.
+
+\item
+Prefix is \texttt{string}, replace \UnresolvedSymbol with  \BuiltInPattern with $t=String$ and $s$ defined above.
+
+\item
+Prefix is \texttt{boolean}, replace \UnresolvedSymbol with  \BuiltInPattern with $t=Boolean$ and $s$ defined above.
+
+\item
+Prefix is \texttt{variable-not-otherwise-mentioned}, replace \UnresolvedSymbol with  \BuiltInPattern with $t=Variable$ and $s$ defined above.
+
+\item
+* Prefix is \texttt{hole}, replace \UnresolvedSymbol with  \BuiltInPattern with $t=Variable$ and $s$ defined above. PltRedex does not allow underscores for \texttt{hole} patterns and thus raise Exception if prefix $\neq s$.
+
+\item
+Prefix $p$ is found in the list of non-terminal symbols defined by the language, replace unresolved symbol with \Nt with $nt=p$ and $s$ defined above.
+
+\item
+Finally, check that symbol contains no underscores. Redex only allows underscores after non-terminal symbols and built-in patterns. Abort compilation if that is the case. Otherwise, replace unresolved symbol with \LiteralPattern with $l=Variable$, $v=s$ and $V = V \cup \{s\}$.
+
+\end{itemize}
+
+Finally, after finishing pattern traversal, annotate $DefineLanguage$ with $V$.
+
+\subsection{Example}
+TODO graphical example of before and after.
