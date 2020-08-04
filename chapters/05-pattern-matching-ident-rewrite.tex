@@ -1,0 +1,15 @@
+\section{Transformation: Identifier Rewriting}
+
+\subsection{Motivation}
+
+Recall that for any pattern in $DefineLanguage$ constraint-checking is not performed. This means that the suffix is not relevant - one can write pattern \texttt{(+ e e)} as \texttt{(+ e\_1 e\_1)} or \texttt{(e\_1 e\_2)}. However, since `Match` objects cannot store more than one assignment for pattern variable, patterns like \texttt{(+ e e)} have to rewritten. PyPltRedex solves this problem by first stripping the suffix and then generating a fresh one for each pattern variable.
+
+\subsection{Algorithm}
+Pattern is visited recursively.
+
+\begin{itemize}
+\item Given \BuiltInPattern, let $p=prefix(s)$, and then $fresh(p)$.
+\item Given \Nt, $fresh(nt)$
+\end{itemize}
+
+\subsection{Example}
