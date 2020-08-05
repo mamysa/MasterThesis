@@ -1,0 +1,60 @@
+\section{Additional Testing Forms}
+
+PyPltRedex provides a number of additional forms that provide testing functionality. The goal is to be able to run individual components of PyPltRedex such as pattern matcher and term generator and compare results against expected ones. 
+
+\subsection{ \texttt{redex-match-assert-equal} }
+
+This form is based on \texttt{redex-match} form provided by PltRedex but additionally it also requires a list of matches to compare results of matching against. The grammar for this form can be seen below.
+
+\begin{lstlisting}
+redex-match-assert-equal = (redex-match-assert-equal language pattern term-template match-list)
+match-list = ( match ... )
+match = (match bindings ...)
+bindings = (bind ident term-template)
+\end{lstlisting}
+
+This form accepts the term, matches it against a pattern with non-terminal symbols from \texttt{language}, and resulting list of matches is compared against expected list of matches. Order of expected matches in the list is important. Exception is raised if 
+
+\begin{enumerate}
+\item
+of expected list and list produced by the matcher are not the same.
+\item
+ Two matches at position i in both lists are not the same; that is, given two matches `m\_1` and `m\_2` Sym(m\_1) intersection Sym(m\_2) = Sym(m\_1) and Sym(m\_1) intersection Sym(m\_2) = Sym(m\_2) (all symbols that are present in m\_1 are also present in m\_2) and for any symbol `s` in Sym(m\_1), Term(m\_1, s) = Term(m\_2, s) (terms bound to `s` must be identical). (TODO this should be runtime-match section)
+\end{enumerate}
+
+Match is essentially a list of tuples containing pattern-variable and term-template. 
+
+Example of usage of this form can be seen below: 
+
+\begin{lstlisting}
+(redex-match-assert-equal Lc (n_1 ... n_2 ...) (term (1 2 3))
+  ((match (bind n_1 ())      (bind n_2 (1 2 3)))
+   (match (bind n_1 (1))     (bind n_2 (2 3)))
+   (match (bind n_1 (1 2))   (bind n_2 (3)))
+   (match (bind n_1 (1 2 3)) (bind n_2 ()))))
+\end{lstlisting}
+
+
+
+\subsection{\texttt{term-let-assert-equal}}
+
+Given a list of pattern-variable assignments, replaces all pattern-variables in term-template with provided terms and then asserts that resulting term is equal to the expected one. The grammar for this can be seen below. 
+
+\begin{lstlisting}
+term-let-assert-equals = (term-let-assert-equal (assignment-list ...) term-template term-template)
+assignment-list ::= (pattern-variable integer term-template)
+\end{lstlisting}
+
+While this form is based off `term-let` form provided by PltRedex, the way assignments are specified is different. In PltRedex, assignment is `(pattern term)` (i.e. term is matched against the pattern and terms bound by the match are then used to replace appropriate pattern-variables), whereas PyPltRedex bypasses matching step. 
+
+`integer` in assignment represents ellipis depth of the pattern-variable and assumes that related term is well-formed with respect to ellipsis depth. That is, `(n 1 (term (1 2 3)))` is valid but `(n 1 (term ((1) (2) (3))))` is not.
+
+
+
+
+\begin{lstlisting}
+type MatchAssignment = MatchAssignment($s$: string, $t$: Term)
+type Match = Match($a_1$: MatchAssignment, ..., $a_n"$: MatchAssignment)
+
+type TopLevelForm = RedexMatchAssertEqual($l$: string, $p$: Pattern, $t$: Term, $m_1$: Match, ..., $m_n$: Match)
+\end{lstlisting}
