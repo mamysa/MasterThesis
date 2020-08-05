@@ -1,5 +1,55 @@
 \chapter{Compile-Time PLT Redex Representation}
 
+This chapter describes how PyPltRedex represents constructs of PLT Redex described in Chapter 02 and establishes notation to be used throughout the report. Additionally, forms that are not part of PLT Redex are also introduced.
+
+\section{Define Language}
+
+This form defines languages.
+
+\begin{lstlisting}
+define-language ::= (define-language language-name non-terminal-definition ... +)
+non-terminal-definition ::= (non-terminal-name ::= pattern ... +)
+\end{lstlisting}
+
+
+Compile-time representation of `define-language` follows the grammar defined above closely. More specifically, 
+
+\begin{itemize}
+\item
+`DefineLanguage(name, ntdef)` represents `define-language` form. 
+\item
+`NtDefinition(sym, patterns)` represents `non-terminal-definition` inside `define-language`
+\end{itemize}
+
+\section{Metafunctions}
+Supported subset of `define-metafunction` grammar is as follows:
+
+\begin{lstlisting}
+(define-metafunction language-name
+  metafunction-contract
+  metafunction-case ...)
+
+metafunction-contract =	id : pattern-sequence ... -> pattern 
+metafunction-case =  [(name pattern ...) term] 
+\end{lstlisting}
+
+A metafunction is a function on terms. The define-metafunction form builds a metafunction according to the pattern and right-hand-side expressions. The first argument indicates the language used to resolve non-terminals in the pattern expressions. Each of the rhs-expressions is implicitly wrapped in term. (TODO rewrite this)
+
+TODO example metafunction definition.
+
+\section{Reduction Relation}
+
+\begin{lstlisting}
+reduction-relation ::= (reduction-relation language domain reduction-case ...)
+reduction-case     ::= (-> pattern term reduction-case-name)
+domain ::= #:domain pattern
+\end{lstlisting}
+
+This form had to be modified. Example of this modification can be seen in Figure ??? below. Since PyPltRedex does not interpret Racket in any capacity, introducing `(define id expr)` form (which evaluates `expr` and assigns it to `id`) would have resulted in additional unnecessary complexity; more specifically, keeping track of forms that are not allowed to be used with `define` form such as `define-language`. Thus, `define` and `reduction-relation` were collapsed into a single form `define-reduction-relation`. In addition, use of `define` form to define reduction-relations seems to be inconsistent with respect to `define-language` and `define-metafunction` forms.
+
+
+`domain` optional parameter provides contract for reduction relation. When `reduction-relation` is applied to a term, it has to satisfy the contract; that is the term must match provided pattern otherwise it is an error. Similarly, after applying reduction relation to the term, resulting term(s) also have to sastisfy said contract; that is each term has to match the pattern provided by `domain`.
+
 \section{Pattern Language}
 
 This section describes subset of PltRedex's pattern specification language supported by \texttt{PyPltRedex}. Grammar for the pattern language can be seen below, in EBNF notation. 
@@ -64,24 +114,31 @@ If patterns in the pattern-sequence are suffixed with the same identifier (e.g. 
 
 Throughout the report the following notation will be used to represent actual Python classes used to implement the pattern language. Actual Python source code can be seen on page (TODO-appendix reference). 
 
-(TODO finalize notation)
+\begin{lstlisting}
+type LiteralKind = Integer 
+		 | Float 
+		 | String 
+		 | Boolean 
+		 | Variable 
 
-\begin{align}
-	L &= \{ Integer, Decimal, String, Boolean, Variable \} \\ 
-	T &= \{ Number, Integer, Float, Natural, String, Boolean, Variable, Hole \} \\ 
-	P &= 
-	\begin{cases}
-	PatternSequence(p_0, p_1, ..., p_n), p_i \in P \text { for } i=0,...,n \\ 
-	Repeat(p), p \in P \\
-	Nt(nt, s), s \text{ and } nt \text{ are strings} \\
-	BuiltInPattern(t, s), t \in T \text{ and } s \text{ is string } \\
-	InHole(p_1, p_2), p_1 \in P \text{ and } p_2 \in P \\
-	Literal(l, v), l \in L \\
-	UnresolvedSymbol(s), s \text{ is } string \\
-	CheckConstraint(s_1, s_2), s_1 \text{ and } s_2 \text{ are strings}
-	\end{cases}
-\end{align}
+type BuiltInPatternKind = Number 
+			| Integer 
+			| Float 
+			| Natural 
+			| String 
+			| Boolean 
+			| Variable 
+			| Hole
 
+type Pattern = PatternSequence($p_1$: Pattern, ..., $p_n$: Pattern)
+             | Repeat($p$: Pattern)
+             | Nt($nt$: string, $s$: string)
+             | BuiltInPattern($t$: BuiltInPatternKind, $s$: string)
+             | InHole($p_1$: Pattern, $p_2$: Pattern)
+             | Literal($l$: LiteralKind, $v$: Any)
+             | UnresolvedSymbol($s$: string)
+             | CheckConstraint($s_1$: string, $s_2$: string)
+\end{lstlisting}
 
 
 
@@ -94,7 +151,6 @@ Throughout the report the following notation will be used to represent actual Py
 
 \item 
 \Nt represents non-terminal. $nt$ is a non-terminal symbol, while $s$ is the symbol used for binding terms. For example, given pattern \texttt{e\_1} $s$ is \texttt{e\_1} and $nt$ is \texttt{e}.
-
 \item
 \BuiltInPattern represents various built-in patterns such as \texttt{number} or \texttt{string}. $t$ is the tag and must be picked from set $T$. $s$ is the symbol used for binding terms.
 
@@ -111,4 +167,9 @@ Throughout the report the following notation will be used to represent actual Py
 \CheckConstraint is used for equality checking of terms. Terms bound to $s_1$ and $s_2$ are checked for equality.
 
 \end{itemize}
+
+TODO UML diagram
+
+\input{chapters/05-compiletime-racket-representation-term.tex}
+\input{chapters/05-compiletime-racket-representation-testing-forms-2.tex}
 

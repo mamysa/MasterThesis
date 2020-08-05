@@ -1,0 +1,6 @@
+\section{Terms}
+
+Compile-time representation of terms is very different from runtime representation described previously. The reason for that is the necessity to handle ellipses; or, more specifically substitution of pattern variables under ellipses - `PltRedex` handles this dynamically and erroneous ellipses aren't detected until term creation time.
+(FIXME is this factual?)
+We want to handle ellipsis depth checking of pattern variables at compile time to be able to provide compile time error messages. Doing this allows for complete elimination of ellipses from the runtime (with variable `...` being a reserved symbol that throws an exception). In addition, this also allows for detection of metafunction applications statically.
+

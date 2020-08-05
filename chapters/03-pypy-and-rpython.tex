@@ -31,9 +31,7 @@ TODO
 Circled states are finite states that actually create AST nodes and append them to the block. Rectangled states are class definitions. Edges annotated with `instantiate` indicate intermediate object creation; for example, calling `For` creates new `ForPhase1` object and initializes it with `*args`. 
 
 The code snippet below shows (a) piece of code being compiled; (b) direct AST construction; (c) using fluent interface.
-\lstset{language=python,linewidth=0.95\linewidth,breaklines=true,numbers=left, 
-basicstyle=\ttfamily,numberstyle=\tiny,escapeinside={//*}{\^^M},
-mathescape=true}
+
 \begin{lstlisting}[caption=oh no!]
 #(a)
 a = 0
