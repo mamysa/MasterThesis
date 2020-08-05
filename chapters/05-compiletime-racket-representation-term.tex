@@ -4,3 +4,78 @@ Compile-time representation of terms is very different from runtime representati
 (FIXME is this factual?)
 We want to handle ellipsis depth checking of pattern variables at compile time to be able to provide compile time error messages. Doing this allows for complete elimination of ellipses from the runtime (with variable `...` being a reserved symbol that throws an exception). In addition, this also allows for detection of metafunction applications statically.
 
+The grammar for terms can be found below. To differentiate between runtime terms, compile-time representation of terms will be called \textbf{term-templates}.
+
+\begin{lstlisting}
+term-template = pattern-variable 
+              | (term-sequence *)
+              |,(functionname term*) 
+              |(in-hole term term)
+              | hole
+	          | integer
+	          | float
+	          | string
+	          | boolean 
+term-sequence = term
+              | term ... ; literal ellipsis
+              | ,@(function term *)
+              | ,@(function term *) ...; literal ellipsis FIXME is this the case?
+\end{lstlisting}
+
+\begin{itemize}
+\item 
+\lstinline{pattern-variable}  represents pattern variables.
+\item
+\lstinline{,(functionname term*)} calls user-implemented RPython function with zero or more terms as arguments.
+\item
+\lstinline{,@(functionname term*)} calls user-implemented RPython function with zero or more terms as arguments that must return a list. Contents of the returned list are then inserted into term-sequence at that position. 
+\item
+\lstinline{(in-hole term term)} locates \lstinline{hole} in the first term and replaces it with the second term.
+\item
+\lstinline{hole} represents term \lstinline{hole}
+\item
+\lstinline{integer} represents any literal integer.
+\item
+\lstinline{float} represents any literal floating point number.
+\item
+\lstinline{string}  represents any literal string.
+\item
+\lstinline{boolean}  represents any literal boolean.
+\item
+\lstinline{term-sequence} represents a list of term.  Each individual term within the sequencecan be suffixed with ...(literal ellipsis) indicating ellipsis depth of the term-template.
+\end{itemize}
+
+\section{Compile-time Representation of Term-Templates}
+
+Throughout the report the following notation will be used to represent actual Python classes used to implement the term-templates. Actual Python source code can be seen on page (TODO-appendix reference). 
+
+
+\begin{lstlisting}
+type TermLiteralKind = Variable
+                     | Integer 
+                     | Float 
+                     | String
+                     | Boolean
+                     | Hole
+
+type PyCallMode = Normal | Splice  
+
+type TermTemplate = PatternSequence($t_1$: TermTemplate, ..., $t_n$: TermTemplate)
+                  | Repeat($t$: TermTemplate)
+                  | InHole($t_1$: TermTemplate, $t_2$: TermTemplate)
+                  | PythonCall($m$: PyCallMode, $t_1$: TermTemplate, ..., $t_n$: TermTemplate)
+                  | Literal($l$: TermLiteralKind, $v$: Any)
+                  | PatternVariable($s$: string)
+                  | UnresolvedSymbol($s$: string)
+\end{lstlisting}
+
+\begin{itemize}
+\item \TermSequence represents term sequences and may contain zero or more child term-templates $t_i$.
+\item \TermRepeat represents term sequence under ellipsis.
+\item \TermInHole represents \lstinline{in-hole} term template
+\item \PythonCall represents \lstinline{,(functionname term*)} and \lstinline{,@(functionname term*)} term-template. Variable $m$ is used to indicate which case it actually is - $m$ is set to \lstinline{Normal} if it is the first, otherwise \lstinline{Splice}.
+\item \TermLiteral - represents any literal in term-template. It is initialized with appropriate tag.
+\item \PatternVariable - represents all pattern variables.
+\item \TermUnresolvedSymbol - represents unresolved symbols. Initially it is unknown if some symbol is pattern-variable or a literal.
+\end{itemize}
+
