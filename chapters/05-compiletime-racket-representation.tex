@@ -1,4 +1,4 @@
-\chapter{Pattern Matching}
+\chapter{Compile-Time PLT Redex Representation}
 
 \section{Pattern Language}
 
@@ -38,7 +38,6 @@ pattern-sequence : pattern
 
 \item
 \textit{boolean} matches any boolean - \texttt{\#t} or \texttt{\#f}.
-
 \item
 \textit{variable-not-otherwise-mentioned} matches any symbol that is not used as a literal in language definition. For example, if language definition contains pattern \texttt{(+ number number)} \textit{variable-not-otherwise-mentioned} will not match symbol \texttt{+}.
 
@@ -56,7 +55,6 @@ All pattern above except \textit{hole} can be suffixed with underscore and ident
 \textit{(in-hole pattern pattern)} traverses the term trying to match the second pattern; upon successful match the term matching the second pattern is replaced with term `hole` and then the first pattern is matched. First pattern must match exactly one hole.
 
 \item
-
 \textit{pattern-sequence} pattern matches a term list, where each pattern-sequence element matches an element of the list. Each individual pattern within the sequence can be suffixed with \texttt{...} (literal ellipsis) and that will match zero or more terms matching the pattern.
 \end{itemize}
 
@@ -85,14 +83,6 @@ Throughout the report the following notation will be used to represent actual Py
 \end{align}
 
 
-\newcommand{\PatternSequence}{$PatternSequence(p_0, p_1, ..., p_n)$ }
-\newcommand{\Repeat}{$Repeat(p)$ }
-\newcommand{\Nt}{$Nt(nt, s)$ }
-\newcommand{\BuiltInPattern}{$BuiltInPattern(t, s)$ }
-\newcommand{\InHolePattern} {$InHole(p_1, p_2)$ }
-\newcommand{\LiteralPattern}{$Literal(l, v)$ }
-\newcommand{\UnresolvedSymbol}{$UnresolvedSymbol(s)$ }
-\newcommand{\CheckConstraint}{$CheckConstraint(s_1, s_2)$ }
 
 
 \begin{itemize}
@@ -122,7 +112,3 @@ Throughout the report the following notation will be used to represent actual Py
 
 \end{itemize}
 
-\input{chapters/05-pattern-matching-symbol-resolution.tex}
-\input{chapters/05-pattern-matching-ident-rewrite.tex}
-\input{chapters/05-pattern-matching-ellipsis-depth-check.tex}
-\input{chapters/05-pattern-matching-nt-cycle.tex}
