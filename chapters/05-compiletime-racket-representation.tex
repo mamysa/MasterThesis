@@ -114,32 +114,7 @@ If patterns in the pattern-sequence are suffixed with the same identifier (e.g. 
 
 Throughout the report the following notation will be used to represent actual Python classes used to implement the pattern language. Actual Python source code can be seen on page (TODO-appendix reference). 
 
-\begin{lstlisting}
-type LiteralKind = Integer 
-		 | Float 
-		 | String 
-		 | Boolean 
-		 | Variable 
-
-type BuiltInPatternKind = Number 
-			| Integer 
-			| Float 
-			| Natural 
-			| String 
-			| Boolean 
-			| Variable 
-			| Hole
-
-type Pattern = PatternSequence($p_1$: Pattern, ..., $p_n$: Pattern)
-             | Repeat($p$: Pattern)
-             | Nt($nt$: string, $s$: string)
-             | BuiltInPattern($t$: BuiltInPatternKind, $s$: string)
-             | InHole($p_1$: Pattern, $p_2$: Pattern)
-             | Literal($l$: LiteralKind, $v$: Any)
-             | UnresolvedSymbol($s$: string)
-             | CheckConstraint($s_1$: string, $s_2$: string)
-\end{lstlisting}
-
+\includegraphics[scale=0.175]{class-diagram-pattern.png}
 
 
 \begin{itemize}
