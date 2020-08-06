@@ -1,5 +1,7 @@
 \documentclass[mscthesis, 11pt]{usiinfthesis}
 \usepackage{lipsum}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{0.5em}
 
 
 \usepackage{listings}
@@ -33,6 +35,23 @@ mathescape=true}
 \newcommand{\TermUnresolvedSymbol}{\lstinline[mathescape]!UnresolvedSymbol($s$: string)! } 
 \newcommand{\PythonCall}{\lstinline[mathescape]!PythonCall($m$: PyCallMode, $t_1$: TermTemplate, ..., $t_n$: TermTemplate)! } 
 \newcommand{\ApplyMetafunction}{\lstinline[mathescape]!ApplyMetafunction($n$: string, $t$: TermTemplate)! } 
+
+
+\newcommand{\DefineLanguage}{\lstinline[mathescape]!DefineLanguage($name$: string, \[$nt_1, ..., nt_n$\]: NtDefinition)! } 
+\newcommand{\NtDefinition}{\lstinline[mathescape]!NtDefinition($nt$: Nt, \[$p_1, ..., p_n$\]: Pattern)! } 
+
+\newcommand{\DefineMetafunction}{\lstinline[mathescape]!DefineMetafunction($name$: string, $domain$: Pattern, $codomain$: Pattern, \[$c_1, ..., c_n$\]: MetafunctionCase)! } 
+\newcommand{\MetafunctionCase}{\lstinline[mathescape]!MetafunctionCase($p$: Pattern, $t$: Term)! } 
+
+\newcommand{\DefineReductionRelation}{\lstinline[mathescape]!DefineReductionRelation($name$: string, $languagename$: string, $domain$: Pattern?, \[$r_1, ..., r_n$\]: ReductionCase)! } 
+\newcommand{\ReductionCase}{\lstinline[mathescape]!ReductionCase($p$: Pattern, $t$: Term, $n$: string)! } 
+
+\newcommand{\Match}{\lstinline[mathescape]!Match($[(s_1, t_1), ..., (s_n, t_n)]$: Tuple(string, Term)?)! }
+\newcommand{\RedexMatchAssertEqual}{\lstinline[mathescape]!RedexMatchAssertEqual($l$: string, $p$: Pattern, $t$: Term, $[e_1, ..., e_n]$: Term)! } 
+
+\newcommand{\TermLetAssertEqual}{\lstinline[mathescape]!TermLetAssertEqual([$(v_1, n_1, t_1), ..., (v_n, t_n, t_n)$]: Tuple(string, natural, Term)?, $p$: Pattern, $t$: Term, $e$: Term)! }
+\newcommand{\ApplyReductionRelationAssertEqual}{\lstinline[mathescape]!ApplyReductionRelationAssertEqual($r$: string, $t$: Term, $[e_1, ..., e_n]$: Term?)! }
+
 
 \newcommand{\Visit}[1]{$\texttt{visit}($#1$)$ }
 
