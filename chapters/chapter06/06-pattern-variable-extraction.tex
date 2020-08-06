@@ -1,2 +1,29 @@
 \section{Pattern: Pattern Variable Extraction}
+
+Due to how code generation works, certain pattern elements require information about pattern-variables in child patterns rooted at that pattern. The algorithm traverses the pattern, locates all pattern-variables and annotates required nodes accordingly.
+\subsection{Annotation}
+
+New annotation kind is introduced: PatternVariableSymbols.
+
+\subsection{Algorithm}
+
+The pattern is visited recursively. Every time a set $S$ containing pattern variables is returned.
+
+\begin{itemize}
+\item 
+\Nt and \BuiltInPattern: Return $\{ s \}$.
+
+\item
+\LiteralPattern Return empty set.
+
+\item $p_{in}$ = \PatternSequence  Let $pv_i^{\prime}$ be the set of pattern variables after recursively visiting $p_i$. The set of pattern variables for $p_{in}$, $pv_{in}$ is computed in the following way: $pv_{in} = \bigcup_{i=1}^{n}pv_i^{\prime}$
+
+\item $p_{in}$ = \Repeat let $pv_i$ be the set of pattern variables after \Visit{$p$} . Annotate $p_{in}$ with $pv_i$.
+
+\item $p_{in}$ = \InHolePattern. Let $pv_{in}=$ \Visit{$p_1$} $\cup$ \Visit{$p_2$}. Annotate $p_{in}$ with $pv_{in}$.
+\end{itemize}
+
+This completes pattern traversal. Let $p$ the topmost pattern element (i.e. it has no parent) and let $pv=$ \Visit{$p$}. Annotate $p$ with $pv$.
+
+\section{Example}
 TODO
