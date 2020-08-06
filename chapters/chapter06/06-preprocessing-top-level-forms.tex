@@ -6,13 +6,14 @@ Identify three strategies for processing patterns.
 
 NtRewriter -> IdRewriter -> NtCycleChecker -> HoleReachabilitySolver -> AssignableSymbolExtractor for define-language. These accept \lstinline{define-language} form as input and apply described transformations for each pattern in non-terminal definitions.
 
-NtRewriter -> IdRewriter -> InHoleChecker -> AssignableSymbolExtractor for domain / contract checks
+\includegraphics[scale=0.32]{pipeline-pattern-strat-1.png}
 
-NtRewriter -> EllipsisDepthCheck -> InHoleChecker -> ConstraintCheckInserter -> AssignableSymbolExtractor for any other pattern 
+\includegraphics[scale=0.32]{pipeline-pattern-strat-2.png}
 
-EllipsisDepthChecker -> MetafunctionApplicationRewriter for terms
+\includegraphics[scale=0.32]{pipeline-pattern-strat-3.png}
 
-TODO replace with diagrams
+\includegraphics[scale=0.32]{pipeline-term-strat.png}
+
 
 Notice that non-terminal resolution occurs with respect to some \lstinline{define-language} form. Similarly, during "Metafunction Application Rewriting" pass requires set $Mf$ containing all meta-functions defined until this point. We need to maintain a symbol table for:
 
