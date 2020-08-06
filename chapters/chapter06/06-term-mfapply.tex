@@ -1,0 +1,19 @@
+\section{Term-Template: Rewriting Metafunction Applications}
+
+Since metafunction applications have the following shape - `(metafunction-name term-template ...)` these can be detected quite trivially given a list of defined metafunctions. 
+
+\subsection{Algorithm}
+Term-template is visited recursively. Let $Mf$ be the set of metafunction names. When visiting $t_{in}=\text{\TermSequence}$, check if $t_1$ is \TermLiteral where $l=\text{Variable}$ and $v \in Mf$. Return \ApplyMetafunction with $n=v$ and $t=t_{in}$.
+
+$t_{in}$ contains InArg and MatchRead annotations. These are handled in the following way:
+
+\begin{itemize}
+\item
+InArg annotations are left intact. Signatures of both `TermSequence` and `ApplyMetafunctions` must match.
+* MatchRead annotations can be safely removed. None of such variable assignments are used to generate $t_{in}$.
+\end{itemize}
+
+
+
+\subsection{Example}
+Example of transformation ;(my-metafunction n x) -> (appy-mf (my-metaufnction n x))

@@ -21,51 +21,44 @@
 
 Alternate outline - add extra chapter
 # Compile-Time Representation of PltRedex
-- Top-level forms
 - Patterns
 - Terms
+- Top-level forms
 
-
-# Pattern Matching
-	- Pattern compile time representation.
-	- Pattern Preprocessing Passes
-		- Non-terminal resolution
-		- Uniquify Identifiers 
-		- NtCycleChecking 
-		- HoleReachability.
-		- InHole checker
-		- Constraint Check Insertion
-		- Assignable Symbol Extraction
-	- Code generation
-		- Basic overview - match functions, isa functions.
-		- Matching functions
-			- Matching numbers/variables/etc.	
-			- Matching Literals.
-			- Matching repetitions.
-				- deterministic / non-deterministic
-			- Matching pattern sequences.
-			- Matching in-hole
-		- TopLevel matching functions
-		- IsaMatching functions
-
-# Term generation.
-	- Compile time representation.
+# Analysis/Transformation Passes
+- Pattern Preprocessing Passes
+	- Non-terminal resolution
+	- Uniquify Identifiers 
+	- NtCycleChecking 
+	- HoleReachability.
+	- InHole checker
+	- Constraint Check Insertion
+	- Assignable Symbol Extraction
+- Term Preprocessing Passes
 	- Detecting inputs
-	- Code generation
+	- Mf-apply
+-Tlfrom preprocessing passes
+	- definelang
+	- metafunctions
+	- apply-red
+	- testing forms.
 
-# Other forms
-	- define-language
-		- Compile-time-representation
-		- Code generation for isa_functions for non-terminals
-	- define-reduction-relation
-		- Compile-time-representation
-		- Preprocessing reductioncase
-		- Preprocessing domain.
-		- Codegen
-	- define-metafunction 
-		- Compile-time-representation
-		- Handling contract.
-		- Codegen
+# Code Generation
+* Patterns: 
+	- Basic overview - match functions, isa functions.
+	- Matching functions
+		- Matching numbers/variables/etc.	
+		- Matching Literals.
+		- Matching repetitions.
+			- deterministic / non-deterministic
+		- Matching pattern sequences.
+		- Matching in-hole
+	- TopLevel matching functions
+	- IsaMatching functions
+* Terms:
+	- Code generation
+* Other forms:
+	-Codegen
 
 # Testing/Evaluation
 	- Testing forms (assert-equals etc)

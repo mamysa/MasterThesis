@@ -1,0 +1,58 @@
+\section{Term Template: Ellipsis Depth Checking}
+
+As mentioned before, our goal is to resolve all ellipses at compile time by ensuring that there are no patterns under ellipses that do not have at least a single pattern variable. In addition, unresolved symbols must be resolved based on variables assigned in `Match` object. 
+
+\subsection{Annotation}
+At this stage, since pattern variables will need to be replaced with terms, inputs to term-templates are detected. This is done by annotating term-templates. The following annotations are introduced:
+
+\begin{itemize}
+\item
+InArg(parameter\_name) - some pattern variable term-template or any of its child term-templates is replaced with term (or subterm) assigned to `parameter\_name`. 
+\item
+* `ReadMatch(parameter\_name, sym)` takes a term from `Match[sym]` and assigns in to `parameter\_name`. If there happens to be some child term-template containing pattern variable with value `sym`, this means that all term-templates on the path to that specific child term-template will be annotated with `InArg(parameter-name)`.
+\item
+* `ForEach(parameter\_name)` annotation is added to \TermRepeat term-templates and means that every element of the term sequence assigned to `parameter\_name` must be plugged in child term-template assuming the term has compatible ellipsis depth.
+\end{itemize}
+
+Explanation of `parameter\_name` is needed. These are used to prevent name collisions ... (TODO exammple)
+
+\subsection{Algorithm}
+
+To perform annotation, a path of term-templates must be maintained to be able to count all ellipsis on the path to the root term-template. A structure of `Match` object (i.e. a list of variables and ellipsis depth of matched terms) is also known (from chapter???). Given all, start recursive term-traversal.
+
+When any term-template is visited, it is added to the top of the path stack. When term-template and its child term-templates have been visited, top-most element is popped from the stack. Now we consider term-templates that may be visited.
+\begin{itemize}
+
+\item
+\TermUnresolvedSymbol. First, check if symbol is present in `Match` object. If it isn't then the symbol cannot be `PatternVariable` but `TermLiteral.Variable`. Otherwise, it is a pattern variable and thus number of ellipsis on the path must be greater or equal to the expected ellipsis depth. There are multiple cases to consider.
+	\begin{itemize}
+	\item
+	Expected ellipsis depth is zero. Let `n` be a fresh symbol containing pattern variable symbol (e.g. if symbol is `e` then freshsymbol could be `e1`)  `PatternVariable` is then annotated with `MatchRead(n, sym)` and returned.
+	\item
+	Expected ellipsis depth is greater that zero. Annotate pattern variable with `InArg(n)`. Initialize actual ellipsis depth to zero. We need to inspect the contents of the path to be able to determine actual ellipsis depth of the pattern variable. Top-most element of the path stack is `UnresolvedSymbol` and is ignored. Iterate over the path in reverse order. 
+		\begin{enumerate}
+		\item
+		If current element is `TermSequence` or `InHole` and actual depth not equal expected depth add `InArg(n)` annotation.
+		\item
+		If current element is `TermSequence` or `InHole` and actual depth is equal to expected depth add `ReadMatch(n, sym)` annotation and return `PatternVariable`.
+		\item
+		If current element is `Repeat` then add `ForEach(n)` annotation and increment actual ellipsis depth.
+		\end{enumerate}
+
+	  Othewise, we have iterated through the entire path and failed to consume expected number of ellipses. Raise exception. Note that path does not contain `PythonCall`. Reasons for this will be explained later.
+	\end{itemize}
+\item
+\TermRepeat First, recursively visit child term-template. Check if `Repeat` is annotated with `ForEach`. If it is not, then it means there are no pattern variables in child term-template and thus `Repeat` is not well-formed. Raise exception.
+\item
+\TermSequence Recursively visit each child template and return `TermSequence`. There is nothing left to do here.
+\item
+\TermInHole Recurisvely visit both child patterns and return `InHole`.
+\item
+\PythonCall Recall that `PythonCall` accepts a sequence of term-templates and calls Python function with resulting terms as arguments. These child term-templates must be visited recursively but path must be emptied out and then restored after visiting child term-template. The reason for that is because term-templates such as `(,(add (term n\_1) (term n\_2)) ...), with terms bound to `n\_1` and `n\_2` both having ellipsis depth of two, are invalid. This is also the reason why `PythonCall` is never encountered while iterating over the path while processing `UnresolvedSymbol`.
+\end{itemize}
+
+
+\subsection{Example}
+TODO
+
+
