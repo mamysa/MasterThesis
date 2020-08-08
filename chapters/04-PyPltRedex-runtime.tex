@@ -282,12 +282,44 @@ This completes description of the tokenizer. The parser is implemented as a very
 
 \end{itemize}
 
+\subsection{Implementation: Unforseen Complications}
+As mentioned mentioned, lexical analysis of integers, floats and identifiers is performed through repeated application of regular expressions which RPython provides support for. The library is perfectly compatible with CPython and regular expression application always succeeds. However, while attempting to feed PyPltRedex-generated code to \texttt{rpython} toolchain results in the following compilation error:
+
+\begin{lstlisting}
+[translation:ERROR] AttributeError: 'FrozenDesc' object has no attribute 'pycall'
+Processing block:
+ block@1149[_choice5_0...] is a <class 'rpython.flowspace.flowcontext.SpamBlock'> 
+ in (rpython.rlib.parsing.regexparse:1495)RegexParser._charclass 
+ containing the following operations: 
+       v1 = simple_call((type set), v0) 
+       v2 = simple_call((builtin_function range), (97), (123)) 
+       v3 = newlist() 
+       v4 = iter(v2) 
+       v5 = hint(v3, v2, ({'maxlength': True})) 
+\end{lstlisting}
+
+Seems like RPython's \texttt{RegexParser} functionality has a bug. After attempting to investigate, I decided (TODO passive voice) to implement these regular expressions manually instead of relying on the library. This decision was made also because construction of those regular expressions was rather slow.
+
+In addition to character recognizer procedures seen above, the following were added:
+
+\begin{lstlisting}
+def is_digit(c):
+    return c in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+
+def is_plusminus(c):
+    return c in ['-', '+']
+
+def is_delimeteter(c):
+    return is_reserved(c) or c == '\0' or is_whitespace(c)
+\end{lstlisting}
+
+State machine for the whole lexical analysis stage can be seen below. Every state in the state machine corresponds to a Python function. First statement in the body of the function consumes a character that satisfies the predicate the incoming edge to the state is labeled with. Accepting states do not consume any input but return desired <tokenkind, tokenvalue> pair.
+
+
+TODO graphics
+
 
 \subsection{Future Improvements}
-While usage of regular expressions to identify integers, decimal numbers and identifiers gets the job done, it feels very inconsistent with manual handling of comments, strings, parentheses and booleans. Repeatedly applying regular expression as described in \texttt{next()} section doesn't seem to be the most performant solution.
-
-Another problem is that regular expressions are constructed using library provided by \texttt{RPython} and their compilation takes a rather noticeable amount of time. 
-
 TODO compare performance on big terms
 
 
@@ -338,3 +370,4 @@ Initialize \texttt{i=1} and \texttt{j=1}. \texttt{N[0]} is -1. Let \texttt{n} be
 \item
 The end of the list is reached and \texttt{Variable(v+i)} is returned.
 \end{itemize}
+
