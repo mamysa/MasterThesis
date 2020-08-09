@@ -1,0 +1,36 @@
+\section{Define-Language}
+
+The only required thing here is to generate a \texttt{isa} function for each non-terminal definition of the language. For each \NtDefinition:
+\begin{enumerate}
+\item Generate matching function for pattern $p_i$. Let $f_i$ be top-level matching function.
+\item Call $f_i$ with \texttt{term} as argument. If $f_i$ returns true, return true.
+\item If none of $f_i$ return True, none of the patterns $p_i$ match the term and thus false is returned.
+\end{enumerate}
+
+
+
+\section{Define-Metafunction}
+
+Given \DefineMetafunction, related function accepts a term.
+
+\begin{enumerate}
+\item generate matching function $f_d$ for $domain$ pattern.
+\item generate matching function $f_c$ for $codomain$ pattern.
+\item Call $f_d$ with term, if resulting set of matches is empty raise Exception.
+\item For each $c_i =$ \MetafunctionCase, generate function $f_{c_i}$, passing term as an argument.
+\begin{enumerate}
+	\item Generate matching function $f_{p}$ for pattern $p$
+	\item Generate term-creation function $f_t$ for term-tempalate $t$.
+	\item Call $f_p$ with the term passed as argument. If resulting list of matches is empty then return empty list.
+	\item Otherwise, for each match $m_i$ call $f_t$. Store resulting $t_i^\prime$.
+	\item Have to ensure that all $t_i^\prime$ are the same term. For each $t_i^\prime$ and $t_{i+1}^\prime$, they must be pairwise equal. If they are not, raise Exception.
+	\item Return a single term.
+\end{enumerate}
+\item If $f_{c_i}$ returns a term, call $f_c$ with it as argument. If resulting list of matches is empty, raise Exception, otherwise return the term.
+\item If $f_{c_i}$ doesn't return anything, continue with next metafunction case $f_{c_{i+1}}$
+\item If none of metafunction cases were matched, throw Exception.
+\end{enumerate}
+
+\section{Define-Reduction-Relation}
+Given \DefineReductionRelation, generate function accepting a single term. The function returns a list of terms.
+
