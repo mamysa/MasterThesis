@@ -49,6 +49,34 @@ def gen_term('(x n)', match, x, n):
   ...
 ```
 
+if t.mode == term.PyCallInsertionMode.Append:
+                    tmp0, tmp1 = rpy.gen_pyid_temporaries(2, symgen)
+                    fb.AssignTo(tmp0).FunctionCall(funcname, tmatch, *tparameters)
+                    fb.AssignTo(tmp1).MethodCall(lst, 'append', tmp0)
+                else:
+                    # tmp0 = genterm(...)
+                    # tmp1 = tmp0.kind()
+                    # if tmp1 != TermKind.Sequence:
+                    #  raise Exception(...)
+                    # tmp4 = tmp0.length()
+                    # for tmp5 in range(tmp4):
+                    #   tmp2 = tmp0.get(tmp5)
+                    #   tmp3 = lst.append(tmp2)
+                    tmp0, tmp1, tmp2, tmp3, tmp4, tmp5 = rpy.gen_pyid_temporaries(6, symgen)
+
+                    ifb = rpy.BlockBuilder()
+                    ifb.RaiseException('term is not Sequence!')
+
+                    forb = rpy.BlockBuilder()
+                    forb.AssignTo(tmp2).MethodCall(tmp0, TermMethodTable.Get, tmp5)
+                    forb.AssignTo(tmp3).MethodCall(lst, 'append', tmp2)
+
+                    fb.AssignTo(tmp0).FunctionCall(funcname, tmatch, *tparameters)
+                    fb.If.NotIsInstance(tmp0, 'Sequence').ThenBlock(ifb)
+                    fb.AssignTo(tmp4).MethodCall(tmp0, TermMethodTable.Length)
+                    fb.For(tmp5).InRange(tmp4).Block(forb)
+
+
 
 First, note that our TermSequence-template has two annotation `ReadMatch('x', 'x')` and `ReadMatch('n', 'n')`. These assignments are generated in the obvious way on lines 3-4. Furthermore, since `Repeat` contain `ForEach('x')` and `ForEach('n')` annotations, it implies that both `x` and `n` are lists containing terms. Thus, child term-template of `Repeat` (that is, `gen_term('(x n)')`)  has to be called for each element in `x` and `n`. This implies that both lists have to be equal in size. `assert_list_sizes_match` procedure take any number of terms as an input and ensures their lengths are equal, otherwise it throws an exception. 
 

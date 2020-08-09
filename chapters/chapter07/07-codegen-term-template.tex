@@ -1,0 +1,53 @@
+\section{Term-Templates}
+
+\subsection{Function Signature and Match Reads}
+
+Recall that `Term\_EllipsisDepthChecker` annotates term template with three kinds of annotations:
+\begin{itemize}
+\item
+* `InArg(paramname)` is used to generate a signature of term-building procedure; value of `paramname` is included as parameter to the procedure. All term-generating functions include `match` parameter at position one.
+
+\item
+* `ReadMatch(paramname, matchsym) indicates that there's a sequence of child term-building procedures that require a term assigned to `matchsym` in `Match` object. This means that that term-generating function must include assignment of \texttt{match.getbinding(matchsym)} to \texttt{paramname}.
+
+\end{itemize}
+
+\subsection{Literal Terms}
+
+Given \TermLiteral, create new term based on $l$ and initialize it with $v$.
+
+
+\subsection{Pattern Variables}
+
+Given $t =$ \PatternVariable, one of two scenarios may happen. 
+\begin{itemize}
+\item $t$ has InArg(paramname) annotation, function simply returns paramname.
+\item $t$ has ReadMatch annotation, meaning value of match.getbinding(sym) must be returned.
+\end{itemize}
+
+\subsection{Term Sequence}
+
+* First, for each `ReadMatch` annotation, produce assignment as described above. Now, we need to call term-building procedures of each element in the term-sequence-template. There are a few cases to consider here. 
+
+\begin{itemize}
+	\item
+	Element is \TermRepeat. Generate code for term-template $t$ and let $f$ be resulting function.  Retrieve ForEach(param) annotations. Ensure that terms bound to each param are term sequences that have the number of elements $n$. 
+	For each term $param_1$, $param_2$, ..., $param_n$, retrieve term at position $i$ and call function $f$. Returned term is appended to the term sequence.
+	\item
+	Element is \PythonCall. Recursively generate code for it and let $f$ be resulting functrion. Then, there are two cases to consider. (TODO generating arguments?)
+	\begin{enumerate}
+	\item Insertion mode is normal. Simply call $f$ with required arguments and append results to the sequence.
+	\item Insertion mode is splice. Call $f$ with required arguments and let $s$ be the term produced by $f$. Ensure that $s$ is a sequence by raising an Exception if it is not. Append each term $s_{child} \in s$ to the sequence.
+	\end{enumerate}
+	\item Otherwise, simply generate function $f$ for any other term and call $f$ with appropriate arguments. 
+	\end{itemize}
+
+
+\subsection{InHole}
+Generate procedures for both term-templates. After calling them with appropriate arguments, `plughole` function is called. It locates `hole` in the first term and replaces it with the second term and returns resulting term.
+
+\subsection{Python Function Calls}
+Given \PythonCall generate functions $f_1$, ..., $f_n$ for $t_1$, ..., $t_n$. Call procedures $f_1$, ..., $f_n$ with appropriate arguments and let $o_1$, ..., $o_n$ be resulting terms. Call $function$ with $o_1$, ..., $o_n$.
+
+\subsection{Metafunction Application}
+Given \ApplyMetafunction, generate function $f$ for term-template $t$. Call $f$ with appropriate arguments, and feed results of $f$ into metafunction with name $n$.

@@ -129,7 +129,12 @@ TODO REWRITE THIS
 \end{enumerate}
 
 \subsection{Match Function: InHole pattern}
-TODO
+In-hole pattern consists of two patterns. The term is traversed recursively trying to find a subterm that matches the second pattern. If such subterm is found, the term is copied from previously mentioned subterm all the way to the root and subterm is replaced with term `hole`. Copying is needed because original term must be left intact.
+
+For recursive term traversal a path from root of the term to possible subterm matching the second pattern is maintained. This allows for only copying terms/subterms that will be affected by `hole` substitution instead of copying the entire term.
+
+Due to possible non-determinism, `match` object must remain unmodified. For both patterns of `in-hole`, separate `Match` objects are created and initialized with appropriate meta-variables. Upon successful matching by both procedures, Cartesian product between matches of both lists is computed and results are inserted into a copy of initial `match` object. By construction, all meta-variables of `Match` objects are unique.
+
 
 \subsection{Top-Level Matching Function}
 
