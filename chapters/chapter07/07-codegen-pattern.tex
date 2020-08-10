@@ -101,8 +101,6 @@ Return \texttt{matches}
 \end{enumerate}
 
 
-\subsection{Ellipsis: Example}
-TODO?
 
 
 \subsection{Matching Function: PatternSequence}
@@ -127,6 +125,9 @@ Matching pattern sequences is more involved. This assumes that subpatterns have 
 
 TODO REWRITE THIS 
 \end{enumerate}
+
+\subsection{Ellipsis: Example}
+\input{chapters/chapter07/07-ellipsis-example.tex}
 
 \subsection{Match Function: InHole pattern}
 In-hole pattern consists of two patterns. The term is traversed recursively trying to find a subterm that matches the second pattern. If such subterm is found, the term is copied from previously mentioned subterm all the way to the root and subterm is replaced with term `hole`. Copying is needed because original term must be left intact.
