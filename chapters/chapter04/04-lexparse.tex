@@ -52,6 +52,15 @@ def is_newline(c):
 
 def is_reserved(c): 
     return c in ['(', ')', '[', ']', '{', '}', '\"', '\'', '`', ';', '#', '|', '\\']
+
+def is_digit(c):
+    return c in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+
+def is_plusminus(c):
+    return c in ['-', '+']
+
+def is_delimeteter(c):
+    return is_reserved(c) or c == '\0' or is_whitespace(c)
 \end{lstlisting}
 
 
@@ -73,46 +82,54 @@ def is_reserved(c):
 \texttt{extract()} extracts the string between \texttt{start} and \texttt{end}, sets \texttt{start=end} and returns the extracted string.
 
 \item
-\texttt{next()} returns the next token in the string. This method implements actual tokenization logic. The algorithm is as follows:
+\texttt{next()} returns the next token in the string. This method implements actual tokenization logic. All regular expressions are implemented directly instead of using RPython's regular expression library (for reasons why see below). State machine representing this method can be seen below.
+
+Edges of the graph represent calls to \texttt{peek()} and ensuring the character satisfies a predicate an edge is labeled with. Taking a transition does not consume any characters. Predicates are described above.
+
+The state machine has different node types with different character consumption strategies.
+\begin{itemize}
+\item states that return tokens annotated with their types, highlighted in green. After moving to this state no input is consumed.
+\item states that raise Exceptions highlighted in red. After moving to this state no input is consumed.
+\item \texttt{If} states are essentially \texttt{if} statements. They consume no characters.
+\item Circled blue states actually consume characters. They also may have self-loops indicating consumption of one or more characters satisfying given predicate.
+\item Circled yellow states are conceptually identical to blue states but are handled differently as explained below.
+\end{itemize}
+
+The state machine proceeds in the following manner
+
 \begin{enumerate}
-	\item
-	\texttt{peek} the character \texttt{c}.
-	
-	\item
-	If \texttt{is\_whitespace(c)} is True then \texttt{advance} and \texttt{extract}. This will essentially ignores the characters altogether.
+\item First ensure end of the string has not been reached, otherwise return (Eof)
+\item Then, if current character whitespace, go to the state $s1$ that consumed all whitespace characters. Go back to the beginning and perform "end of the string" check.
+\item After moving to state $if3$ and if current character is semicolon indicating beginning of comment, go to state $s2$ that consumes anything that is not a newline or end-of-the-string. Comment is then discarded and state machine transitions either to $if1$ or $eof$ returning (Eof).
+\item Next two If statements detect closing and opening parantheses/braces/brackets and return (Lbrace) or (Rprace) accordingly.
+\item If current character starts with pound sign indicating possible boolean, goto state $s3$. These yellow states do not consume input character by character but utilize \texttt{extract\_if\_contains} peek and consume multiple characters at once. This method is called in following manner:
+\begin{itemize}
+\item
+if \texttt{extract\_if\_contains("\#t")} return (Boolean "\#t)
+\item
+if \texttt{extract\_if\_contains("\#f")} return (Boolean "\#f)
+\item
+if \texttt{extract\_if\_contains("\#true")} return (Boolean "\#t)
+\item
+if \texttt{extract\_if\_contains("\#false")} return (Boolean "\#f)
+\end{itemize}
 
-	\item
-	If \texttt{c} is semicolon, \texttt{advance} and consume any character until newline. \texttt{advance} to consume newline. The result of \texttt{extract} is discarded. If \texttt{end-of-file} is encountered, stop trying to consume characters.
+\item If current character is double quote, consume any character until closing double quote is found. Escape sequences are supported expecting a single character after backward slash. If end-of-string is encountered prematurely, Exception is raised. Otherwise, (String, \texttt{self.extract()}) is returned.
 
-	\item
-	if \texttt{c} is one of opening parentheses, return pair \texttt{(LParen, extract())}
+\item Finally, at this point a token can only be an integer, float, or identifier. This state machine is more complex.
 
-	\item
-	if \texttt{c} is one of closing parentheses, return pair \texttt{(RParen, extract())}
+\begin{itemize}
+\item After arriving into state $1$, next character can either be (1) plus or minus thus moving to state 2;  (2) digit thus moving to state 3; (3) any other symbol that is not a delimeter this moving to state 6; and (4) delimiter thus moving to Exception state.
+\item After arriving to state $2$ and consuming \texttt{+} or \texttt{-}, next character can either be (1) digit -> 3; (2) delimeter -> returning (Identifier, \texttt{extract()}) as \texttt{-} or \texttt{+} are valid identifiers in Racket; (3) Any other symbol that is not delimeter -> 6.
+\item After arriving to state 3 and consuming a digit, next character can either be (1) a digit -> 3 (implemented as \texttt{while} loop); (2) delimeter thus returning (Integer, extract()); (3) fullstop symbol -> 4 indicating potential floating point number; (4) character that is neither a delimeter/number/nor fullstop -> 6.
+\item After arriving to state 4 and consuming fullstop, next character can either be (1) delimeter -> raise Exception because fractional part of the float is missing; (2) digit -> 5; (3)neither a digit or delimeter -> 6.
+\item After arriving to state 5 and consuming a digit, next character can either be (1) digit -> 5 (again, implemented as \texttt{while} loop); (2) delimeter -> return (Float, extract()) (3) neither a digit nor delimeter -> 6.
+\item After arriving to state 6 and consuming some character, next character can either be (1) delimeter - return (Ident, extract()); (2) not delimeter -> 6.
 
-	\item
-	If \texttt{c} is double-quote, \texttt{advance}. Consume characters until matching double-quote is encountered. If during consumption backward slash is encountered, character that immediately follows must also be consumed (i.e. it is escaped character). If \texttt{end-of-string} character is encountered, raise exception as the string doesn't terminate. Return \texttt{(String, extract())}
-
-	\item
-	If \texttt{c} is pound symbol \texttt{\#}, call \texttt{extract\_if\_contains} twice with following arguments: \texttt{\#t}, \texttt{\#true} and \texttt{\#f}, \texttt{\#false}. Upon success return \texttt{(Boolean, \#t)} or \texttt{(Boolean, \#f)}. Otherwise, raise Exception.
-
-	\item
-	Otherwise, a token must be either an integer, decimal or identifier. To identify these regular expressions are used, but first they have to be extracted. Consume all characters \texttt{c} such that they are not \texttt{is\_whitespace(c)}, \texttt{is\_reserved(c)} or \texttt{end-of-string}. Let \texttt{s=extract()}. 
-	\begin{itemize}
-		\item
-		If \texttt{match(IntegerRegex, s)} return (Integer, s)
-		\item
-		If \texttt{match(DecimalRegex, s)} return (Float, s)
-		\item
-		If \texttt{match(IdentRegex  , s)} return (Ident, s)
-		\item
-		Otherwise, raise Exception - token kind is unknown
-
-
-	\end{itemize}
-	\item
-	raise Exception - token kind is unknown.
+\end{itemize}
+This completes state machine description
 \end{enumerate}
+
 \end{itemize}
 
 This completes description of the tokenizer. The parser is implemented as a very simple recursive descent parser. Below follows the description of its methods and their functionalities.
@@ -177,8 +194,8 @@ This completes description of the tokenizer. The parser is implemented as a very
 
 \end{itemize}
 
-\subsection{Implementation: Unforseen Complications}
-As mentioned mentioned, lexical analysis of integers, floats and identifiers is performed through repeated application of regular expressions which RPython provides support for. The library is perfectly compatible with CPython and regular expression application always succeeds. However, while attempting to feed PyPltRedex-generated code to \texttt{rpython} toolchain results in the following compilation error:
+\subsection{Implementation: Difficulties}
+Initial lexical analysis implementation relied on regular expression library provided by RPython for identifying integers, floating point numbers and identifiers using regular expressions described in section TODO. While library works fine while running the lexer using \texttt{python2.7}, attempting to compile lexer code using \texttt{rpython} toolchain results in the following compilation error:
 
 \begin{lstlisting}
 [translation:ERROR] AttributeError: 'FrozenDesc' object has no attribute 'pycall'
@@ -194,25 +211,6 @@ Processing block:
 \end{lstlisting}
 
 Seems like RPython's \texttt{RegexParser} functionality has a bug. After attempting to investigate, I decided (TODO passive voice) to implement these regular expressions manually instead of relying on the library. This decision was made also because construction of those regular expressions was rather slow.
-
-In addition to character recognizer procedures seen above, the following were added:
-
-\begin{lstlisting}
-def is_digit(c):
-    return c in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-
-def is_plusminus(c):
-    return c in ['-', '+']
-
-def is_delimeteter(c):
-    return is_reserved(c) or c == '\0' or is_whitespace(c)
-\end{lstlisting}
-
-State machine for the whole lexical analysis stage can be seen below. Every state in the state machine corresponds to a Python function. First statement in the body of the function consumes a character that satisfies the predicate the incoming edge to the state is labeled with. Accepting states do not consume any input but return desired <tokenkind, tokenvalue> pair.
-
-
-TODO graphics
-
 
 \subsection{Future Improvements}
 TODO compare performance on big terms. 
