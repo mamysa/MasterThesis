@@ -49,9 +49,9 @@ mathescape=true}
 \newcommand{\ReductionCase}{\lstinline[mathescape]!ReductionCase($p$: Pattern, $t$: Term, $n$: string)! } 
 
 \newcommand{\Match}{\lstinline[mathescape]!Match($[(s_1, t_1), ..., (s_n, t_n)]$: Tuple(string, Term)?)! }
-\newcommand{\RedexMatchAssertEqual}{\lstinline[mathescape]!RedexMatchAssertEqual($l$: string, $p$: Pattern, $t$: Term, $[e_1, ..., e_n]$: Term)! } 
+\newcommand{\RedexMatchAssertEqual}{\lstinline[mathescape]!RedexMatchAssertEqual($l$: string, $p$: Pattern, $t$: Term, $[m_1, ..., m_n]$: Match?)! } 
 
-\newcommand{\TermLetAssertEqual}{\lstinline[mathescape]!TermLetAssertEqual([$(v_1, n_1, t_1), ..., (v_n, t_n, t_n)$]: Tuple(string, natural, Term)?, $p$: Pattern, $t$: Term, $e$: Term)! }
+\newcommand{\TermLetAssertEqual}{\lstinline[mathescape]!TermLetAssertEqual([$(v_1, n_1, t_1), ..., (v_n, t_n, t_n)$]: Tuple(string, natural, Term)?, $t$: Term, $e$: Term)! }
 \newcommand{\ApplyReductionRelationAssertEqual}{\lstinline[mathescape]!ApplyReductionRelationAssertEqual($r$: string, $t$: Term, $[e_1, ..., e_n]$: Term?)! }
 
 

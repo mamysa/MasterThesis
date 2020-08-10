@@ -32,5 +32,62 @@ Given \DefineMetafunction, related function accepts a term.
 \end{enumerate}
 
 \section{Define-Reduction-Relation}
-Given \DefineReductionRelation, generate function accepting a single term. The function returns a list of terms.
+Given \DefineReductionRelation, generate function accepting a single term. The function returns a list of terms. Code generation algorithm works in the following manner:
 
+\begin{enumerate}
+\item Generate function $f_d$ for $domain$, if $domain$ is present.
+\item For each $r_i= $ \ReductionCase
+	\begin{enumerate}
+	\item Generate function $f_p$ for pattern $p$.
+	\item Generate function $f_t$ for term-template $t$.
+	\item Generate function $f_{r_i}$ for reduction case $r$ that accepts term as argument. Call $f_p$ and if resulting list of matches $m$ is not empty, let $t_i^\prime=f_t(m_i)$. If $domain$ is present, assert that $f_d(t_i^\prime)$ is not empty, otherwise raise Exception. Return a list containing $t_0^\prime, ..., t_n^\prime$, possibly empty.
+	\end{enumerate}
+\item Generate function for $rr$ accepting a single term. Let $ts^\prime$ be the list containing all the terms after applying reduction cases. Concatenate results of $f_{r_i}(term)$ with $ts^\prime$. Return $ts^\prime$.
+\end{enumerate}
+
+\section{Redex-Match-Assert-Equal}
+Given \RedexMatchAssertEqual code generation proceeds in the following manner.
+
+\begin{enumerate}
+\item First, generate a list of expected matches $m$. For each $m_i =$ \Match, 
+\begin{enumerate}
+
+\item generate function $f_{t_i}$ for $t_i$. 
+\item Let resulting term be $tt_i = f_{t_i}(Match())$ 
+\item Create empty \texttt{Match} instance $match$, call $match$.\texttt{AddBinding}$(s_i)$ and $match$.\texttt{AddToBinding}$(tt_i)$. 
+\item Append $match$ to $m$.
+\end{enumerate}
+\item Generate top-level matching function $f_p$ for pattern $p$.
+\item Generate top-level matching function $f_t$ for pattern $t$.
+\item Let $ms^\prime = f_p(f_t())$
+\item Call \texttt{assert\_compare\_match\_lists}$(ms^\prime, m)$.
+\end{enumerate}
+
+\section{Term-Let-Assert-Equal}
+
+Given \TermLetAssertEqual code generation proceeds in the following manner.
+
+\begin{enumerate}
+\item First, need to produce $Match()$ instance containing all pattern-variable $v_i$ assignments. Let $m=Match()$. For each $(v_i, n_i, t_i)$
+	\begin{enumerate}
+	\item Generate $f_{t_i}$ function for term $t_i$.
+	\item $m$.\texttt{AddBinding}$(v_i)$ and $m$.\texttt{AddToBinding}$(v_i, f_{t_i}(Match()))$
+	\end{enumerate}
+\item Generate $f_t$ for term-template $t$ and $f_e$ for term-template $e$.
+\item Call \texttt{asserttermsequal}$(f_t(m), f_e(Match()))$.
+\end{enumerate}
+
+
+\section{Apply-Reduction-Relation-Assert-Equal}
+
+Given \ApplyReductionRelationAssertEqual
+\begin{enumerate}
+\item First, need to generate a list of expected terms $e$.
+	\begin{enumerate}
+	\item Generate function $f_{e_i}$ for term template $e_i$.
+	\item Concatenate $f_{e_i}(Match())$ to $e$.
+	\end{enumerate}
+\item Generate function $f_t$ for term-template $t$.
+\item Let $f_{red}$ be a function generated after visiting \texttt{define-reduction-relation} with name $r$. Let $a=f_{red}(f_t())$ be the list of terms after applying reduction relation.
+\item Call $asserttermlistsequal(a, e)$.
+\end{enumerate}
