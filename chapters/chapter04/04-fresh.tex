@@ -1,0 +1,48 @@
+\section{Fresh Variable Generation}
+PltRedex provides a very convinient form \texttt{(variables-not-in t p)}. Term \texttt{p} is expected to contain a single variable \texttt{v} such as \texttt{(term a)}. Given term \texttt{t}, \texttt{variables-not-in} form produces a term containing fresh variable \texttt{v\_out} with prefix \texttt{p\_out} and some suffix \texttt{s\_out} such that there's no variable \texttt{v\_prime} in \texttt{t} with \texttt{v\_out = v\_prime}; or \texttt{v\_out not in Variables(t)} where \texttt{Variables(t)} is the set of all variables in \texttt{t}. Suffix \texttt{s\_out} may contain only digits or otherwise be empty. 
+
+For example, variable \texttt{abc1xyz123} is decomposed into prefix \texttt{abc1xyz} and suffix \texttt{123}.
+
+\subsection{Algorithm}
+\begin{itemize}
+\item
+Initialize an empty dictionary.
+
+\item
+For each \texttt{v\_prime in Variables(t)}, try to decompose \texttt{v\_prime} into \texttt{p\_prime} and \texttt{s\_prime} interpreted as a number. 
+
+	\begin{itemize}
+	\item
+	If such decomposition is possible, insert \texttt{(p\_prime, s\_prime)} into the dictionary. If \texttt{p\_prime} is not in the dictionary, initialize it to be an empty list and append \texttt{s\_prime} to it.
+
+	\item
+		Otherwise, insert \texttt{(v\_prime, -1)} into the dictionary \texttt{d}. If \texttt{v\_prime} is not in the dictionary, initialize it to be an empty list and append string -1 to it. Special value of -1 is used to indicate that \texttt{v\_prime} does not have a suffix.
+	\end{itemize}
+
+\item
+Decompose \texttt{v} into prefix \texttt{p} and suffix \texttt{s}.
+
+	\begin{itemize}
+	\item
+	If decomposition is not possible, check if \texttt{v} is in dictionary \texttt{d} and return \texttt{Variable(v)} if it is not - this means term \texttt{v} is not in Variables(t).
+	\item
+	if decomposition is possible, check if \texttt{p} is in dictionary \texttt{d} and return \texttt{Variable(v+s)} if it not. Additionally, check if suffix \texttt{s} is in \texttt{d[p]}. If it is not, return \texttt{Variable(v+s)}. This is done to return \texttt{a00} given \texttt{Variables(t) = \{a, a0\}} and \texttt{v=a00}, for example. Otherwise, let \texttt{v=p}.
+	\end{itemize}
+
+\item
+Otherwise, algorithm resorts to searching for unique suffix by interpreting each suffix in \texttt{d[v]} as a number. Let \texttt{N} be list containing prefixes interpreted as a number and sorted in ascending order.  The goal is to find smallest number \texttt{i > 0} that is not in \texttt{N}. If first \texttt{N[0]} is not \texttt{-1}, then \texttt{v} is not in \texttt{Variables(t)} and is already fresh. Return \texttt{Variable(v)}.
+
+\item
+Initialize \texttt{i=1} and \texttt{j=1}. \texttt{N[0]} is -1. Let \texttt{n} be the length of the list \texttt{N}. While \texttt{j<n}:
+	\begin{itemize}
+		\item
+		If \texttt{i < N[j]} return \texttt{Variable(v+i)}.
+		\item
+		If \texttt{i > N[j]} then increment \texttt{j} by one. This case only happens when 0 is in \texttt{N}.
+		\item
+		If \texttt{i = N[j]} then increment both \texttt{i} and \texttt{j} by 1.
+	\end{itemize}
+\item
+The end of the list is reached and \texttt{Variable(v+i)} is returned.
+\end{itemize}
+

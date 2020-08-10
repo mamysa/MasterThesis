@@ -1,0 +1,33 @@
+\section{Runtime Representation of Terms}
+
+Terms are represented in the following way. 
+
+(TODO uml diagram?) 
+
+As one may notice, these classes are all very similar but due to RPython's type inference an attempt to merge them results in compile-time error:
+
+\begin{lstlisting}
+class LeafNode:
+    def __init__(self, kind, value):
+        self.kind = kind 
+        self.value = value
+
+def entrypoint():
+    p = LeafNode(1, 'hello world!')
+    q = LeafNode(2, 12.5)
+
+# UnionError:
+#  SomeString(const='hello world!', no_nul=True)
+#  SomeFloat(const=12.5)
+\end{lstlisting}
+
+Since the \texttt{LeafNode} instance is created with \texttt{helloworld!} string, any other instantiation of LeafNode expects it's second argument to be of type \texttt{string}. 
+
+TODO explain methods.
+
+\texttt{shallow\_copy}
+\texttt{deep\_copy} 
+\texttt{equals}
+\texttt{tostring}
+and procedures
+\texttt{copy\_path\_and\_replace\_last}
