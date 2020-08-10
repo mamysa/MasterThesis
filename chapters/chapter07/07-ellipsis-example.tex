@@ -1,23 +1,32 @@
 Given pattern `((number ...) ...)` and term `((1 2 3)())`, the matching algorithm should return `Match` instance with `number = ((1 2 3)())`, i.e. the pattern matches the term exactly. The diagram below shows how using `increasedepth` and `decreasedepth` methods provided by `Match` facilitate the matching. 
 
-\begin{figure}[H]
-\begin{subfigure}{1.0\linewidth}
-	\includegraphics[scale=0.11]{ellipsis-example-fig-a.png}
-	\caption{Before matching the pattern.}
-	\label{ellipsis-example-fig-a}
-\end{subfigure}
-\begin{subfigure}{1.0\linewidth}
-	\includegraphics[scale=0.11]{ellipsis-example-fig-a.png}
-	\caption{Before matching the pattern.}
-	\label{ellipsis-example-fig-a}
-\end{subfigure}
-
-\caption{Hello}
+\begin{figure}[!htbp]
+\includegraphics[scale=0.22]{ellipsis-example-fig-a.png}
+\caption{Before matching the pattern.}
+\label{ellipsis-example-fig-a.png}
 \end{figure}
+
 In Figure \ref{ellipsis-example-fig-a} one can see the state of the Match object before pattern matching. On the left the pattern and the term can be seen. Shadowed areas identify (terms being matches) TODO.  Stack of match object is empty.
+
+\begin{figure}[!htbp]
+\includegraphics[scale=0.22]{ellipsis-example-fig-a.png}
+\caption{Before matching the pattern.}
+\end{figure}
+
+
+\begin{figure}[!htbp]
+\includegraphics[scale=0.22]{ellipsis-example-fig-a.png}
+\caption{Before matching the pattern.}
+\end{figure}
+
+
 
 Figure (b) shows state of the Match object after calling \texttt{increasedepth("n")} when matching \texttt{(n ...) ...}. New \texttt{TermSequence} instance is pushed onto the stack.
 
+\begin{figure}[!htbp]
+\includegraphics[scale=0.22]{ellipsis-example-fig-a.png}
+\caption{Before matching the pattern.}
+\end{figure}
 Figure (c) shows state of the Match object after calling \texttt{increasedepth("n")} when matching \texttt{n ...}. New \texttt{TermSequence} instance is pushed onto the stack.
 
 Inner ellipsis now begins matching individual \texttt{n} terms. Figure (d) shows the state of the match after calling \texttt{addtobinding("n", Integer(1))}. Since topmost term on the stack is \texttt{TermSequence}, \texttt{Integer(1)} is appended.
