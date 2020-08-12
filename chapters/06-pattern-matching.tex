@@ -1,6 +1,19 @@
 \chapter{Preprocessing Patterns, Terms, and Top-Level Forms}
 
 
+
+\section{Preprocessing Patterns: Introduction}
+PyPltRedex mostly builds pattern trasformations and analyses on top of \texttt{PatternVisitor} class described in previous section and come in two varieties:
+
+\begin{enumerate}
+\item Ones that given a single pattern transform or analyze it.
+\item Ones that given a \texttt{define-language} form perform transformation / analyses on all patterns in the form. This design decision allows for implementing passes not based on \texttt{PatternVisitor}
+\end{enumerate}
+
+TODO UML?
+
+
+
 \input{chapters/06-pattern-matching-symbol-resolution.tex}
 \input{chapters/06-pattern-matching-ident-rewrite.tex}
 \input{chapters/06-pattern-matching-ellipsis-depth-check.tex}

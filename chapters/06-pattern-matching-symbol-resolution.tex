@@ -1,4 +1,4 @@
-\section{Transformation: Symbol Resolution}
+\section{Transformation: Pattern Variable Resolution}
 
 \subsection{Algorithm}
 
@@ -6,8 +6,10 @@ Immediately after parsing Redex specification, it is unknown whether certain ele
 
 The symbol is analyzed in the following way: locate first underscore character. If there are no underscore characters, simply return the symbol, otherwise return all characters before the underscore. If underscore is the first character of the symbol, raise an `Exception` because Redex doesn't consider such symbols valid. Resulting symbol will be refered to as \textit{prefix}.
 
-Let $V = \{\}$ be the set of all variables defined in the language.
+This transformation is applicable to all patterns as well as \texttt{define-language} form. In case of \texttt{define-language}, need to maintain variables used in patterns in order to make \texttt{variables-not-otherwise-mentioned} pattern work. Let $V = \{\}$ be the set of all variables defined in the language. 
+
 Resolution algorithm proceeds in the following manner. The pattern is traversed recurisely. When coming across \UnresolvedSymbol node, extract prefix from the symbol $s$.  
+
 
 \begin{itemize}
 \item
@@ -42,7 +44,15 @@ Finally, check that symbol contains no underscores. Redex only allows underscore
 
 \end{itemize}
 
-Finally, after finishing pattern traversal, annotate $DefineLanguage$ with $V$.
+If transformation was performed on \texttt{define-language}, annotate $DefineLanguage$ with $V$.
+
 
 \subsection{Example}
-TODO graphical example of before and after.
+
+\begin{figure}[H]
+\includegraphics[scale=0.11]{transformation-pattern-resolvesym.png}
+\caption{Pattern before and after pattern variable resolution.}
+\label{transformation-pattern-resolvesym}
+\end{figure}
+
+Figure \ref{transformation-pattern-resolvesym} shows an effect of transformation on pattern \texttt{(number\_1 helloworld (in-hole ((n\_1 ...) hole (n\_2 ...)) (n\_1 ...)) string\_2)}. Assume related \texttt{define-language} has a single non-terminal \texttt{n}. Initially the pattern has six unresolved symbols - \texttt{number\_1}, \texttt{helloworld}, \texttt{n\_1}, \texttt{n\_2}, \texttt{hole} and \texttt{string\_2}. \texttt{number\_1}, \texttt{string\_2} and \texttt{hole} become \texttt{BuiltInPattern} with appropriate tags,  \texttt{n\_1} and \texttt{n\_2} turn into non-terminals because prefix \texttt{n} is in the set of non-terminal symbols of given \texttt{define-language} and \texttt{helloworld} becomes a \texttt{LiteralPattern} with tag \texttt{Variable}. If this pattern were a part of \texttt{define-language}, \texttt{helloworld} would have been included into set $V$.
