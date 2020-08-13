@@ -5,12 +5,38 @@
 Recall that for any pattern in $DefineLanguage$ constraint-checking is not performed. This means that the suffix is not relevant - one can write pattern \texttt{(+ e e)} as \texttt{(+ e\_1 e\_1)} or \texttt{(e\_1 e\_2)}. However, since `Match` objects cannot store more than one assignment for pattern variable, patterns like \texttt{(+ e e)} have to rewritten. PyPltRedex solves this problem by first stripping the suffix and then generating a fresh one for each pattern variable.
 
 \subsection{Algorithm}
-Pattern is visited recursively.
+Givem $DefineLanguage$, each pattern in $NtDefinition$ is visited recursively.
 
 \begin{itemize}
-\item Given \BuiltInPattern, let $p=prefix(s)$, and then $fresh(p)$.
-\item Given \Nt, $fresh(nt)$
+\item Given \BuiltInPattern, let $p=prefix(s)$, and then return new \BuiltInPattern with $s= fresh(p)$.
+\item Given \Nt, return new $\Nt$ with $s=fresh(nt)$
 \end{itemize}
 
 \subsection{Example}
-TODO
+
+Figure \ref{id-rewrite-example} shows an example of the transformation on \DefineLanguage form. To all non-terminals \texttt{e}, \texttt{n} and built-in pattern \texttt{number} numerical suffixes are added.
+
+\begin{figure}[h]
+	\begin{minipage}{0.5\linewidth}
+		\centering
+		\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{Racket}
+(define-language L
+	(e ::= (+ |\colorbox{identbefore}{e} \colorbox{identbefore}{e}|) 
+	       (* |\colorbox{identbefore}{e} \colorbox{identbefore}{e}|) |\colorbox{identbefore}{n}|)
+	(n ::= |\colorbox{identbefore}{number}|))
+		\end{minted}
+	\end{minipage}
+	\begin{minipage}{0.5\linewidth}
+		\centering
+		\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{Racket}
+(define-language L
+	(e ::= (+ |\colorbox{identafter}{e\_0} \colorbox{identafter}{e\_1}|) 
+	       (* |\colorbox{identafter}{e\_2} \colorbox{identafter}{e\_3}|) |\colorbox{identafter}{n\_0}|)
+	(n ::= |\colorbox{identafter}{number\_0}|))
+		\end{minted}
+	\end{minipage}
+	\caption{\texttt{define-language} before and afte renaming of identifiers.}
+	\label{id-rewrite-example}
+\end{figure}
+
+
