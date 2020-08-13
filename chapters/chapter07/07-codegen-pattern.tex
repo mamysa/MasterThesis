@@ -67,14 +67,21 @@ Generated code does the following:
 \end{enumerate}
 
 
-\begin{lstlisting}
-tmp0 = isafunction(term)
-if tmp0 == True:
-  tmp1 = match.addtobinding(sym, term) 
-  head = head + 1
-  return [(match, head, tail)]
+\begin{minted}[tabsize=1,obeytabs,escapeinside=||,mathescape=true,linenos,fontsize=\small]{python}
+|$f_p$| = Symgen("match_pattern")
+|$isa_p$| = codegen_IsA(term)
+emit <<
+def |$f_p$|(match, term, head, tail):
+	tmp0 = |$isa_p$|(term)
+	if tmp0 == True:
+		tmp1 = match.addtobinding(|$s$|, term) 
+		head = head + 1
+		return [(match, head, tail)]
 return []
-\end{lstlisting}
+>>
+return |$f_p$|
+
+\end{minted}
 
 \subsection{Matching Function: Ellipsis}
 Repeat Recall that patterns under ellipsis match lists of terms and can only be contained in pattern sequences and thus \texttt{term} argument is always to be expected to be \PatternSequence. Non-deterministic matching repetition of terms is handled in the following way. Given \Repeat, let $pattern-variables(p)$ be the set of pattern-variables in pattern $p$. It is obtained from reading annotation TODO, as described in Chapter/Section TODO. 
@@ -130,12 +137,90 @@ TODO REWRITE THIS
 \input{chapters/chapter07/07-ellipsis-example.tex}
 
 \subsection{Match Function: InHole pattern}
-In-hole pattern consists of two patterns. The term is traversed recursively trying to find a subterm that matches the second pattern. If such subterm is found, the term is copied from previously mentioned subterm all the way to the root and subterm is replaced with term `hole`. Copying is needed because original term must be left intact.
+Given pattern \InHolePattern, let $f_p^{impl}$ name of the function for \texttt{in-hole} pattern. Recall that \texttt{in-hole} pattern is annotated with pattern-variables during "Pattern Variable Extraction" pass described in Section TODO. Let $pv_i^{(p_1)}$ and $pv_i^{(p_2)}$ be annotations for $p_1$ and $p_2$. Finally, generate functions for $p_1$ and $p_2$ and let them be $f_{p_1}$ and $f_{p_2}$ respectively. 
 
-For recursive term traversal a path from root of the term to possible subterm matching the second pattern is maintained. This allows for only copying terms/subterms that will be affected by `hole` substitution instead of copying the entire term.
+Notice that this function contains extra parameter \texttt{path}, which is used to keep track of path to possible \texttt{hole}. To conform to established interface, a wrapper function will be generated later.
 
-Due to possible non-determinism, `match` object must remain unmodified. For both patterns of `in-hole`, separate `Match` objects are created and initialized with appropriate meta-variables. Upon successful matching by both procedures, Cartesian product between matches of both lists is computed and results are inserted into a copy of initial `match` object. By construction, all meta-variables of `Match` objects are unique.
+Since $p_1$ and $p_2$ are self-contained patterns with possible non-deterministic behaviour, \texttt{match} cannot be passed to $f_{p_1}$ and $f_{p_2}$ as is. Instead, create special \texttt{Match} instances to be passed to $f_{p_1}$ and $f_{p_2}$ that are initialized with $pv_i^{(p_1)}$ or $pv_i^{(p_2)}$ accordingly.
 
+First, call $f_{p_2}$ with appropriate match, if resulting list of matches is non-empty, do the following: (1) append current term to the path; (2) call path copying function thus replacing the term with \texttt{hole} and (3) call $f_{p1}$ with appropriate match. If resulting set of matches is not empty, increment \texttt{head} (without overwriting it!) by one signalling successful matching of \texttt{in-hole} pattern, combine resulting matches of $f_{p_1}$ and $f_{p_2}$ with initial \texttt{match} as explained in Section TODO, and append to \texttt{matches}.
+
+If given \texttt{term} is \texttt{Sequence}, continue matching \texttt{in-hole} pattern. Each element of the sequence is added to the path, $f_p^{impl}$ is called with said element, resulting matches are added to \texttt{matches} and topmost term in the \texttt{path} is popped. Resulting \texttt{matches} are returned.
+
+%\setlength\LTleft{-65pt}% 2.5cm into the left margin
+\begin{tabular}{|c|p{0.97\textwidth}|}
+\hline 
+\cellcolor{blue}1 & 
+\begin{minted}[tabsize=1,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
+def codegenInHole(inhole):
+	|$f_p^{impl}$| = symgen("match_pattern_impl")
+	|$pv_1^{(p_1)}, ..., pv_n^{(p_1)}$| = |$p_1$|.getannotation(PatternVariables)
+	|$pv_1^{(p_2)}, ..., pv_m^{(p_2)}$| = |$p_2$|.getannotation(PatternVariables)
+	|$f_{p_1}, f_{p_2}$| = codegen(|$p_1$|), codegen(|$p_2$|)
+\end{minted} 
+\\
+\hline 
+\cellcolor{red}2 &
+\begin{minted}[tabsize=1,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
+def |$f_p$|(term, match, head, tail, path):
+	matches = []
+	p2match = Match([|$pv_1^{(p_2)}, ..., pv_m^{(p_2)}$|])
+	p2ms = |$f_{p_2}$|(term, p2match, 0, 1)
+	if len(p2ms) != 0:
+		p1match = Match(|$pv_1^{(p_1)}, ..., pv_n^{(p_1)}$|)
+		npath = path + [term]
+		nterm = copy_path_and_replace_last(tmp0, hole)
+		p1ms = |$f_{p_1}$|(nterm, p1match, 0, 1)
+		if len(p1ms) != 0:
+			nhead = head + 1
+			ms = match_cartesian_product_add_binding_to(
+				p1ms, p2ms, match, nhead, tail)
+			matches = matches + ms
+\end{minted} 
+\\
+\hline
+\cellcolor{green}3 & 
+\begin{minted}[tabsize=1,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
+	if isinstance(term, Sequence):
+		path.append(term)
+		for i in range(term.length()):
+			childterm = term.get(i)
+			results= |$f_p^{impl}$|(childterm, match, 
+								    head, tail, path)
+			matches = matches + results 
+		path.pop()
+	 return matches 
+\end{minted} 
+\\
+\hline
+\end{tabular}
+
+%\end{adjustwidth}
+
+Finally, to get rid of \texttt{path} parameter from signature of $f_p^{impl}$, a wrapper function $f_p$ is generated. Additionally, it also handles constraint checks $c_i$ if applicable. Since constraint checks are optional, there are two cases to consider.
+
+\begin{enumerate}
+\item No constraint checks - simple return \texttt{matches}
+\item Constraint checks are present - for each constraint check generate a call to \texttt{Match.comparekeys} function. This is done for each match returned by calling $f_p^{impl}$.
+\end{enumerate}
+
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
+{% |$f_p$| = symgen("match_pattern") %}
+def |$f_p$|(match, head, tail):
+	matches = |$f_p^{impl}$|(match, head, tail, [])
+{% if constraintchecks != None %}
+		nmatches = []
+		for m, h, t in matches:
+	{% for |$c_i$ = \CheckConstraint| in |$c_1, ..., c_n$|: %}
+			if not m.comparekeys(|$s_1$|, |$s_2$|):
+				continue
+			nmatches.append((m, h, t))
+	{% endfor %}
+		return nmatches
+{% else %}
+		return matches
+{% endif %}
+\end{minted} 
 
 \subsection{Top-Level Matching Function}
 

@@ -9,9 +9,16 @@
 \usepackage{subcaption}
 \usepackage{changepage}
 \usepackage{xcolor}
+\usepackage{colortbl}
 \definecolor{identbefore}{HTML}{fce6e8}
 \definecolor{identafter}{HTML}{dbffde} 
-\usemintedstyle{xcode}
+\usemintedstyle{emacs}
+\AtBeginEnvironment{minted}{%
+  \renewcommand{\fcolorbox}[4][]{#4}}
+%\renewcommand{\arraystretch}{0.5}
+
+\BeforeBeginEnvironment{minted}{\vspace{0.1cm}}
+\AfterEndEnvironment{minted}{\vspace{-0.5cm}}
 
 
 \graphicspath{{figures/}}

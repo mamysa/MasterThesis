@@ -5,12 +5,13 @@ PltRedex disallows language definitions such as ones in Figure below.
 
 \begin{lstlisting}
 (define-language L
-	(e ::= n (e e))
-	(n ::= p (n n) number)
-	(p ::= e (p p) real))
+	(e ::= (e e) n)
+	(n ::= (n n) number p)
+	(p ::= (p p) real e))
+	(s ::= string)
 \end{lstlisting}
 
-The problem with the language above (aside from it being completely useless) is a cycle of non-terminals $n \rightarrow p \rightarrow e$. It is clear that in order to match $e$, $n$ has to matched first. To match $n$, $p$ has to matched first. To match $p$, $e$ has to be matched first. This results in infinite recursion. Thus, such cases need to be reported.
+The problem with the language above (aside from it being completely useless) is a cycle of non-terminals $n \rightarrow p \rightarrow e$. When testing if some term is a non-terminal, a term is matched against every pattern in non-terminal definition. For example, given term \texttt{String("hello world")} it is matched against non-terminal \texttt{e}. Since  the term doesn't match pattern \texttt{(e e)}, non-terminal \texttt{n} is then matched. Since the term doesn't match any patterns here either, non-terminal \texttt{p} is then matched. Similarly, the term doesn't match any patterns here either, \texttt{e} is then matched, but that's where the matching has started and thus \textit{infinite recursion} becomes an issue. Languages need to be analyzed for presence of non-terminal cycles.
 
 \subsection{Algorithm}
 To detect such cycles, \texttt{define-language} needs to be interpreted as directed graph and some cycle-detecting algorithm must be used. Graph is constructed in the following manner.
@@ -19,14 +20,10 @@ TODO fix notation here
 
 \begin{enumerate}
 \item
-For each non-terminal definition, create vertex in the graph labelled with non-terminal symbol $p$.
+For each \NtDefinition, create a vertex with label $s=nt$.
 \item
-For each pattern in non-terminal definition, if pattern is $Nt(q)$ then create edge $p->q$.
+For $p_1, ..., p_n$, if $p_i$ is $\Nt$ then create edge $s->nt$.
 \end{enumerate}
-
-
-For language above this graph would look like this:
-TODO graphics
 
 
 For cycle detection, depth-first-search is employed. Vertices in the graph can be assigned one of three colors:
@@ -48,7 +45,8 @@ Vertex coloring allows for detection of cycles; more specifically, if during dep
 
 To report a path of non-terminals that make up the cycle, a path of non-terminals has to be maintained. The path can be represented as a stack. The vertex is added to the stack when it changes color to $Grey$ and removed from the stack when it changes color to $Black$. Pseudocode for depth-first-traversal and cycle reporting can be seen below.
 
-\begin{lstlisting}
+
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,linenos]{python}
 def reportcycle(path, v):
 	idx = path.indexof(v)
 	cyclepath = path[idx:] + [v]
@@ -65,7 +63,7 @@ def visit_vertex(v, V, path):
 		path.pop()
 	if v.color == Discovered:
 		reportcycle(path, v)
-\end{lstlisting}
+\end{minted}
 
 Since resulting non-terminal graphs may be disjoint, we need to keep track of visited vertices during traversal. Let $V$ be a set of vertices whose $color(v)=Black$. Thus, every time vertex $v$ changes its color to $Black$, $V = V \cup \{v\} $. Let $U$ be a set of vertices whose $color(u)=White$; that is, it initially contains all the non-terminals. The algorithm proceeds as follows:
 
