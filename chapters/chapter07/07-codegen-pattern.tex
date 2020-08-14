@@ -68,9 +68,9 @@ Generated code does the following:
 
 
 \begin{minted}[tabsize=1,obeytabs,escapeinside=||,mathescape=true,linenos,fontsize=\small]{python}
-|$f_p$| = Symgen("match_pattern")
-|$isa_p$| = codegen_IsA(term)
-emit <<
+{% def codegenBuiltInPattern(p): %}
+	{% |$f_p$| = Symgen("match_pattern") %}
+	{% |$isa_p$| = selectIsa(p) %}
 def |$f_p$|(match, term, head, tail):
 	tmp0 = |$isa_p$|(term)
 	if tmp0 == True:
@@ -78,60 +78,146 @@ def |$f_p$|(match, term, head, tail):
 		head = head + 1
 		return [(match, head, tail)]
 return []
->>
-return |$f_p$|
+{% return |$f_p$| %}
+{% enddef %}
 
 \end{minted}
 
 \subsection{Matching Function: Ellipsis}
-Repeat Recall that patterns under ellipsis match lists of terms and can only be contained in pattern sequences and thus \texttt{term} argument is always to be expected to be \PatternSequence. Non-deterministic matching repetition of terms is handled in the following way. Given \Repeat, let $pattern-variables(p)$ be the set of pattern-variables in pattern $p$. It is obtained from reading annotation TODO, as described in Chapter/Section TODO. 
+Recall that patterns under ellipsis match lists of terms and can only be contained in pattern sequences and thus \texttt{term} argument is always to be expected to be \PatternSequence. Given $p=$ \Repeat pattern, non-deterministic matching repetition of terms is handled in the following way. Let $pv_1^{(p)}, ..., pv_n^{(p)}$ be a set pattern-variables assigned in $p_r$. These are read from \texttt{PatternVariables} annotation.  Let $f_p$ be matching function for $p$ with usual parameters. Generate  matching function for $p_r$, $f_{p_r}$.
 
 \begin{enumerate}
 \item
-For each symbol in $pv(p)$, call `increasedepth` method of `match` object. This will push an empty term sequence onto the stack. (see Match object design in Chapter ??)
+For each symbol in $pv_1^{p}$, call \texttt{match.increasedepth} method. Functionality of \texttt{increasedepth} was described in section TODO. 
 \item
-Create a list of matches to be returned later. It is initialized with initial `match`, `head`, `tail` procedure arguments.
-\item
-Initialize a queue of matches with same initial `match`, `head`, `tail` arguments. The reason why queue is needed to store usual `(match, head, tail)` tuples because $p$ may contain non-deterministic ellipsis matching and hence to obtain all desired matches a matching procedure under ellipsis also needs to be called on such matches.
-\item While queue is non-empty:
+Pack \texttt{match}, \texttt{head}, \texttt{tail} back into a tuple, and initialize lists \texttt{matches} and \texttt{queue} containing said tuple. \texttt{matches} will eventually contain all the matches produced by $f_p$. \texttt{queue} contains matches that are yet to be processed. Since $p_r$ can be non-deterministic, $f_{p_r}$ needs to applied for every match in \texttt{queue}. 
+\item The following is repeated until \texttt{queue} is empty. 
 	\begin{enumerate}
 	\item 
-	Remove `(match, head, tail)` from the queue. If `head` and `tail` are equal then it means all elements of the sequence have been matched and there's nothing left to do.  Otherwise, create a copy of `match` object (which will also copy terms stored in `match`)
+	Remove \texttt{(m, h, t)} from the queue. If \texttt{h == t} then all elements of the sequence have been matched and there's nothing left to do.  	
 	\item
-	Retrieve an element at index \texttt{head} of the term sequence and call matching procedure for pattern under ellipsis. Add newly obtained matches both to `matches` and queue.
+	Retrieve an element at index \texttt{head} of the term sequence and call $f_{p_r}$ with \texttt{m.deepcopy} passed as a match.
+	\item Append resulting list of matches to \texttt{matches} and \texttt{queue}.
 	\end{enumerate}
 
 \item
-* For each obtained `match` object call `decreasedepth` method. This completes matching the list of terms.
-\item
-Return \texttt{matches}
+For each obtained \texttt{(m, h, t)} in \texttt{matches} call \texttt{m.decreasedepth} method. This completes matching the list of terms. \texttt{matches} is returned.
 \end{enumerate}
 
-
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
+{% def codegenRepeat(p): %}
+	{% |$f_p$| = symgen("match_pattern") %}
+	{% |$pv_1^{(p)}, ..., pv_n^{(p)}$| = |$p$|.getannotation("PatternVariables") %}
+	{% |$f_{p_r}$| = codegen_matchfunc(|$p_r$|) %}
+def |$f_p$|(term, match, head, tail):
+	{% for |$pv_i^{p}$| in |$pv_1^{(p)}, ..., pv_n^{(p)}$| %}:
+	match.increasedepth(|$pv_i^{p}$|)
+	{% endfor %}
+	matchtuple = (match, head, tail)
+	matches, queue = [matchtuple], [matchtuple]
+	while len(queue) != 0:
+		m, h, t = queue.pop(0)
+		if h == t: continue
+		m = m.copy()
+		newmatches =|$f_{p_r}$|(term.get(h), m, h, t)
+	matches, queue = matches + newmatches, queue + newmatches 
+	{% for |$pv_i^{p}$| in |$pv_1^{(p)}, ..., pv_n^{(p)}$| %}:
+	for (m, h, t) in matches: 
+		m.decreasedepth(|$pv_i^{p}$|)
+	{% endfor %}
+	return matches
+{% enddef %}
+\end{minted}
 
 
 \subsection{Matching Function: PatternSequence}
-
-Matching pattern sequences is more involved. This assumes that subpatterns have been generated already and names of procedures are known. 
+Given $p = $\PatternSequence, generate matching functions $f_{p_1}, ..., f_{p_n}$ for patterns $p_1, ..., p_n$. Code generation for pattern sequences is more involved and a bit of setup is required. 
 
 \begin{enumerate}
 \item
-* First, given term must be a sequence. If it is not, an empty list is returned.
+First, need to ensure the \texttt{term} is indeed a \texttt{TermSequence}.  Then, the term has to be "entered" to be ready for matching; that is, to be able to use $f_{p_i}$ to match subterms new values for \texttt{head} and \texttt{tail} are required. Initialize `nhead=0` and set `ntail` to be length of the term sequence - these will be used to track which elements of the term haven't been matched yet. 
+\item Before matching elements of the term, need to ensure that number of said elements is greater or equal to the number of elements in the \texttt{PatternSequence} excluding patterns under ellipses and constraint checking nodes. 
+\item \texttt{TermSequence} is now ready to be matched - create an empty list of matches  and initialize it with \texttt{(match, ntail, nhead)} tuple. 
+\item 
+Depending on kind of pattern $p_i$ different matching strategies are required and are to be explained later. For now, assume all the patterns $p_i$ have been matched.
 \item
-* Then, the term has to be "entered" to be ready for matching; that is, to be able to use subpattern procedures to match subterms new values for `head` and `tail` are required. Initialize `nhead=0` and set `ntail` to be length of the term sequence - these will be used to track which elements of the term haven't been matched yet.
-\item
-* Before matching elements of the term, need to ensure that number of said elements is greater or equal to the number of elements in the pattern sequence excluding patterns under ellipses and constraint checking nodes. Terms with too few elements do not match the pattern. For example, term `(3)` does not match pattern `(n\_1 n\_2 ... n\_3)` as `n\_1` and `n\_3` have to be matched exactly.
-\item
-* Create an empty list of matches and initialize it with `(match, ntail, nhead)` pattern.
-\item
-* Now, we can start matching individual elements of the term according to the elements of the pattern sequence. There are few cases to consider here. Ellipses and constraint checks have to be handled separately from everything else.  Ellipses are handled in their own procedure and it must be provided the entire term; constraint checks do not actually match anything.
-\item
-* For each tuple `(m, h, t)` in the list of matches:
-\item
-* If given element `e` with offset `i` in pattern sequence is Ellipses (Repetition), simply call repetition procedure with arguments `(m, term, h, t)`. For each of obtained matches, we need to ensure number of unmatched elements in the term is greater or equal to number of non-optional patterns between `i` and length of the sequence. Matches not satisfying requirement above are discarded. If the list of matches after filtering is empty, given term does not match the pattern at all. Code snippet below demonstrates matching patterns under ellipses in pattern sequences.
-
-TODO REWRITE THIS 
+After matching all patterns $p_i$, \texttt{TermSequence} has to be "exited"; that is, original \texttt{head} and \texttt{tail} have to be restored. Let \texttt{matches\_m} be a list of matches after matching the last pattern $p_n$. For each resulting match tuple (m, h, t) in \texttt{matches\_m}, need to ensure that \texttt{h = t}, that is all terms in \texttt{TermSequence} have been matched. If that is the case, tuple \texttt{(m, head+1, tail)} is appended to the list of resulting matches, indicating that \texttt{TermSequence} itself has been matched.
 \end{enumerate}
+
+Figure todo demonstrates this.
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
+{% def codegenPatternSequence(p): %}
+	{% |$f_p$| = symgen("match_pattern") %}
+	{% |$f_{p_1}, ..., f_{p_n}$| = codegen(|$p_1$|), ...,  codegen(|$p_n$|) %}
+	{% |$n$| = p.get_number_of_nonoptional_matches_between(0, len(p)) %}
+def |$f_p$|(term, match, head, tail):
+	if not isinstance(term, Sequence): return []
+	subtail, subhead = 0, term.length()
+	if subtail - subhead < $n$ : return []
+	|$matches_0$|= [(match, subtail, subhead)]
+	{% for |$p_i$| in |$p_1, ..., p_n$|: %}
+		{% if isinstance (|$p_i$|, |\Repeat|) %}
+			#snip
+		{% elif isinstance (|$p_i$|, |\CheckConstraint|) %}
+			#snip
+		{% else %}
+			#snip
+		{% endif %}
+	outmatches = []
+	for m, h, t in matches_m:
+		if m == t:
+			outmatches.append((m, head+1, tail))
+	return outmatches
+{% enddef %}
+\end{minted}
+
+Now, different code is emitted for different kinds of $p_i$. 
+
+\begin{itemize}
+\item $p_i=$ \Repeat Matching function $f_{p_i}$ is called with \texttt{term} and for each \texttt{(m,h,t)} in $matches_{i-1}$. Results of matching is accumulated into list $matches_{i}$. Additionally, need to ensure remaining number of terms in \texttt{TermSequence} is greater than remaining number of patterns to be matched; that is $n-i$. Matches that pass this test are accumulated into list $matches_{i+1}$ Finally, ensure that $matches_{i+1}$ is non-empty, otherwise return empty list.
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
+{% if isinstance (|$p_i$|, |\Repeat|) %}
+	{% |$matches_i$| = symgen("matches") %}
+|$matches_i$| = []
+for m, h, t in |$matches_{i-1}$|:
+	|$matches_i$| = |$matches_i$| + |$f_{p_i}$|(term, m, h, t)
+	{% |$r$| = p.get_number_of_nonoptional_matches_between(|$i$|, |$n$|) %}
+	{% if r > 0 %}
+		{% |$matches_{i+1}$| = symgen("matches") %}
+|$matches_{i+1}$| = []
+for m, h, t in |$matches_{i}$|:
+	if tail - head >= $r$:
+		|$matches_{i+1}$|.append((m, h, t))
+if len(|$matches_{i+1}$|) == 0: return []
+	{% endif %}
+\end{minted}
+
+\item $p_i=$ \CheckConstraint. For each \texttt(m, h, t) in $matches_{i-1}$, ensure that \texttt{m.comparekeys} succeeds for $s_1$ and $s_2$ and accumulate succeding matches into $matches_{i}$. Additionally, check if list $matches_{i}$ is non-empty otherwise return
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
+{% elif isinstance (|$p_i$|, |\CheckConstraint|) %}
+	{% |$matches_i$| = symgen("matches") %}
+|$matches_i$| = []
+for m, h, t in |$matches_{i-1}$|:
+	if m.comparekeys(|$s_1$|, |$s_2$|):
+		|$matches_i$|.append((m, h, t))
+if len(|$matches_i$|) == 0: return []
+\end{minted}
+
+\item Any other pattern kind $p_i$, given list of matches $matches_{i-1}$, call $f_{p_i}$ for each \texttt{(m, h, t)} in $match_{i-1}$ with term at position \texttt{h} and accumulate resulting matches into new list $match_{i}$. If $match_{i}$ is empty, matching \texttt{TermSequence} has failed and empty list is returned.
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
+{% else %}
+{% |$matches_i$| = symgen("matches") %}
+|$matches_i$| = []
+for m, h, t in |$matches_{i-1}$|:
+	|$matches_i$| = |$matches_i$| + |$f_{p_i}$|(term.get(h), match, h, t)
+if len(|$matches_i$|) == 0: return []
+{% endif %}
+\end{minted}
+\end{itemize}
+
+
+
+
 
 \subsection{Ellipsis: Example}
 \input{chapters/chapter07/07-ellipsis-example.tex}
@@ -206,23 +292,50 @@ Finally, to get rid of \texttt{path} parameter from signature of $f_p^{impl}$, a
 
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
 {% |$f_p$| = symgen("match_pattern") %}
-def |$f_p$|(match, head, tail):
+def |$f_p$|(term, match, head, tail):
 	matches = |$f_p^{impl}$|(match, head, tail, [])
 {% if constraintchecks != None %}
-		nmatches = []
-		for m, h, t in matches:
+	nmatches = []
+	for m, h, t in matches:
 	{% for |$c_i$ = \CheckConstraint| in |$c_1, ..., c_n$|: %}
-			if not m.comparekeys(|$s_1$|, |$s_2$|):
-				continue
-			nmatches.append((m, h, t))
+	if not m.comparekeys(|$s_1$|, |$s_2$|):
+		continue
+	nmatches.append((m, h, t))
 	{% endfor %}
-		return nmatches
+	return nmatches
 {% else %}
-		return matches
+	return matches
 {% endif %}
 \end{minted} 
 
 \subsection{Top-Level Matching Function}
+Given some pattern $p$, generating top-level function for pattern involves the following steps: 
 
-This procedure creates `Match` object, initializes it with assignable symbols seen in the actual pattern and calls appropriate matching procedure. `head` and `tail` parameters are set to zero and one, respectively. Since matching procedure returns a list of `(match, head ,tail)` tuples, `Match` objects are filtered out and returned.
+\begin{itemize}
+\item Retrieve a set of pattern-variables $pv_1^{p}, ..., pv_n^{p}$ assigned in the pattern from annotation "PatternVariables".
+\item Retrieve a set of pattern-variables $pvr_1^{p}, ..., pvr_m^{p}$ that are to be removed after matching from annotation "PatConstraintCheckRemoveVars" (see TODO section).
+\item Let $f_p$ be the top-level function for pattern $p$.
+\item Generate matching function $fm_p$ for pattern $p$.
+\end{itemize}
 
+Now, we get to code-generation. Initialize \texttt{Match} object with pattern-variables $pv_i^{p}$ and call $f_p$ with said \texttt{Match} instance, \texttt{head} and \texttt{tail} set to zero and one, respectively. After a list of matches is returned, need to strip out resulting \texttt{Match} from \texttt{(Match, int, int)}  tuples as well as remove symbols $pvr_i^{p}$ from \texttt{Match} instances. Resulting \texttt{Match} instances are appended to an array. Said array is then returned.
+
+
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
+{% def codegen_toplevel(p): %}
+	{% |$f_p$| = symgen("match_pattern_toplevel") %}
+	{% |$pv_1^{(p)}, ..., pv_n^{(p)}$| = |$p$|.getannotation("PatternVariables") %}
+	{% |$pvr_1^{(p)}, ..., pvr_m^{(p)}$| = |$p$|.getannotation("PatConstraintCheckSymsToRemove") %}
+	{% |$fm_{p}$| = codegen_matchfunc(|$p$|) %}
+def $f_p$(term):
+	match = Match(|$pv_1^{p}, ..., pv_n^{p}$|)
+	matches = $fm_p$(term, match, 0, 1)
+	ret = []	
+	for m, h, t in matches:
+	{% for |$pvr_i^{p}$| in |$pvr_1^{(p)}, ..., pvr_m^{(p)}$| %}
+		m.removekey(|$pvr_i^{p}$|}
+		ret.append(m)
+	{% endfor %}
+	return ret
+{% enddef %}
+\end{minted} 
