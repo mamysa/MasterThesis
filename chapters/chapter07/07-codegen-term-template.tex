@@ -1,55 +1,191 @@
 \section{Term-Templates}
 
-\subsection{Function Signature and Match Reads}
+\subsection{Term-Templates: Function Signatures}
+All functions that generate terms also include \texttt{match} parameter of type \texttt{Match}, as defined in Section TODO
+Recall that \texttt{Term\_EllipsisDepthChecker} pass annotates term template with three kinds of annotations. For generating function signatures, we are interested in \texttt{InArg(paramname)} annotation. \texttt{paramname} will be added to the paramater list of the function. 
 
-Recall that `Term\_EllipsisDepthChecker` annotates term template with three kinds of annotations:
-\begin{itemize}
-\item
-* `InArg(paramname)` is used to generate a signature of term-building procedure; value of `paramname` is included as parameter to the procedure. All term-generating functions include `match` parameter at position one.
 
-\item
 * `ReadMatch(paramname, matchsym) indicates that there's a sequence of child term-building procedures that require a term assigned to `matchsym` in `Match` object. This means that that term-generating function must include assignment of \texttt{match.getbinding(matchsym)} to \texttt{paramname}.
 
-\end{itemize}
 
 \subsection{Literal Terms}
 
-Given \TermLiteral, create new term based on $l$ and initialize it with $v$.
+Given \TermLiteral, return new term instance based on \texttt{TermLiteralKind}, as defined in section TODO. Term-templates of this kind are guaranteed to not have \texttt{ForEach} and \texttt{InArg} annotations, by construction.
+
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
+{% def codegenTermLiteral(t): %}
+	{% |$f_t$| =  symgen("genterm") %}
+def |$f_t$|(match):
+	{% if l == Variable: %}
+	return Variable(|$v$|)
+	{% elif l == Integer: %}
+	return Integer(|$v$|)
+	{% elif l == Float: %}
+	return Float(|$v$|)
+	{% elif l == String: %}
+	return String(|$v$|)
+	{% elif l == Boolean: %}
+	return Boolean(|$v$|)
+	{% elif l == Hole: %}
+	return Hole()
+{% enddef %}
+\end{minted}
 
 
 \subsection{Pattern Variables}
 
-Given $t =$ \PatternVariable, one of two scenarios may happen. 
+Given $t =$ \PatternVariable, let $f_t$ be a term-generating function for $t$. One of two scenarios may happen:
 \begin{itemize}
-\item $t$ has InArg(paramname) annotation, function simply returns paramname.
-\item $t$ has ReadMatch annotation, meaning value of match.getbinding(sym) must be returned.
+\item $t$ has InArg(paramname) annotation, meaning that this pattern-variable originally must have been under ellipsis. 
+\item $t$ has ReadMatch annotation, meaning that this pattern-variable originally must have been under no ellipsis. Simply return term bound to pattern-variable $s$. 
 \end{itemize}
+
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
+{% def codegenPatternVariable(t): %}
+	{% |$f_t$| =  symgen("genterm") %}
+	{% |$arg_1$| = t.getannotation("InArg")
+	{% |$rm_1$| = t.getannotation("ReadMatch")
+	{% if |$arg_1$| != None}
+def |$f_t$|(match, |$arg_1$|):
+	return |$arg_1$|
+	{% else %}
+def |$f_t$|(match):
+	return match.getbinding(|$s(rm_1)$|)
+	{% endif %}
+{% enddef %}
+
+\end{minted}
 
 \subsection{Term Sequence}
 
-* First, for each `ReadMatch` annotation, produce assignment as described above. Now, we need to call term-building procedures of each element in the term-sequence-template. There are a few cases to consider here. 
+Given \TermSequence, recursively generate code for term-templates $t_i$. Let $f_t$ be a term-generating function for $t$. Let $arg_1, ..., arg_n$ be a list of parameters to $f_t$, acquired by reading \texttt{InArg} annotation. Let $mr_1, ..., mr_n$ be a list of \texttt{(id: str, s: str)} acquired by reading \texttt{ReadMatch} annotation. For each such tuple emit assignment to metavariable \texttt{id} the result of calling \texttt{match.getbinding(s)}.
+
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
+{% def codegenPatternVariable(t): %}
+	{% |$f_t$| =  symgen("genterm") %}
+	{% |$arg_1, ..., arg_n$| = t.getannotation("InArg") %}
+	{% |$rm_1, ..., rm_m$| = t.getannotation("ReadMatch") %}
+	{% |$f_{t_1}, ..., f_{t_n}$| = codegen(|$t_1$|), ..., codegen(|$t_n$|) %}
+def |$f_t$|(match, |$arg_1, ..., arg_n$|):
+	{% for |$rm_i$| in |$rm_1, ..., rm_m$| %}
+	|$id(rm_i)$| = match.getbinding(|$s(rm_i)$|)
+	{% endfor %}
+	sequence = Sequence()
+	{% for |$t_i$| in |$t_1, ..., t_n$|: %}
+		{% if isinstance(|$t_i$|, |\TermRepeat|) %}
+		# snip 
+		{% elif isinstance(|$t_i$|, |\PythonCall|) %}
+		# snip
+		{% else %}
+		# snip
+		{% endif %}
+	return sequence
+\end{minted}
+
+Further code is generated based on the type of $t_i$. There are few cases to consider.
 
 \begin{itemize}
-	\item
-	Element is \TermRepeat. Generate code for term-template $t$ and let $f$ be resulting function.  Retrieve ForEach(param) annotations. Ensure that terms bound to each param are term sequences that have the number of elements $n$. 
-	For each term $param_1$, $param_2$, ..., $param_n$, retrieve term at position $i$ and call function $f$. Returned term is appended to the term sequence.
-	\item
-	Element is \PythonCall. Recursively generate code for it and let $f$ be resulting functrion. Then, there are two cases to consider. (TODO generating arguments?)
-	\begin{enumerate}
-	\item Insertion mode is normal. Simply call $f$ with required arguments and append results to the sequence.
-	\item Insertion mode is splice. Call $f$ with required arguments and let $s$ be the term produced by $f$. Ensure that $s$ is a sequence by raising an Exception if it is not. Append each term $s_{child} \in s$ to the sequence.
-	\end{enumerate}
-	\item Otherwise, simply generate function $f$ for any other term and call $f$ with appropriate arguments. 
-	\end{itemize}
+\item
+Element is \TermRepeat.  Retrieve ForEach(param) annotation and let $fe_1, ..., fe_n$ be resulting set of pattern-variables. Note that these pattern-variables may be read from the match or simply passed as function parameter. First, need to ensure that terms that are assigned to these pattern-variables are \texttt{Sequence} instances with equal lengths. Exception is raised if the test fails. Otherwise, iterate over terms assigned to $fe_1, ..., fe_n$, retrieve term at position $i$ and call $f_{t_i}$.
 
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
+{% if isinstance(|$t_i$|, |\TermRepeat|): %}
+lengths = set([])
+	{% |$fe_1, ..., fe_n$| = |$t_i$|.getannotation("ForEach")
+	{% for |$fe_i$| in |$fe_1, ..., fe_n$|: %}
+assert isinstance(|$fe_i$|, Sequence)
+lengths = lengths.union(|$fe_i$|.length())
+assert len(lengths) == 1
+	{% endfor %}
+for j in range(list(lengths)[0]): # convert set to list 
+	{% for |$fe_i$| in |$fe_1, ..., fe_n$|: %}
+	|$fe_i^{j}$| = |$fe_i$|.get(j)
+	{% endfor %)
+	sequence.append(|$f_{t_i}$|(match, |$fe_1^{c}, ..., fe_1^{c}$|))
+\end{minted}
+\item
+Element is \PythonCall. Call $f_{t_i}$  to obtain the term $t^{\prime}$. Notice that arguments for $f_{t_i}$ are generated using "InArg" annotations of $f_{t_i}$. 
+	\begin{enumerate}
+	\item Insertion mode is normal. Append $t^{\prime}$ to the sequence.
+	\item Insertion mode is splice. Ensure that $t^{\prime}$ is \texttt{Sequence} and then append terms $t^{\prime}$ to \texttt{sequence}.
+	\end{enumerate}
+
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
+{% elif isinstance(|$t_i$|, |\PythonCall|) %}
+	{% |$a_1, ..., a_n$| = |$t_i$|.getannotation("InArg") %}
+	$t^{\prime}$ = |$f_{t_i}$|(match, |$a_1, ..., a_n$|)
+	{% if |$m$| == "Normal") %}
+	sequence.append()
+	{% else %}
+	assert isinstance($t^{\prime}$, Sequence)
+	for e in $t^{\prime}$:
+		sequence.append(e)
+	{% endif %}
+#snip
+\end{minted}
+
+\item Otherwise, simply call $f_{t_i}$ and append results to the sequence. Notice that arguments for $f_{t_i}$ are generated using "InArg" annotations of $f_{t_i}$. 
+
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
+{% else %}
+{% |$a_1, ..., a_n$| = |$t_i$|.getannotation("InArg") %}
+t = |$f_{t_i}$|(match, |$a_1, ..., a_n$|)
+sequence.append(t)
+{% endif %}
+\end{minted}
+\end{itemize}
+
+\subsection{Repeat}
+Given \TermRepeat, generate function $f_{t_r}$ for $t_r$. Since repetitions are handled in TermSequences, no special code generation is required here.
 
 \subsection{InHole}
-Generate procedures for both term-templates. After calling them with appropriate arguments, `plughole` function is called. It locates `hole` in the first term and replaces it with the second term and returns resulting term.
+Given $t=$ \TermInHole, generate $f_{p_1}$ and $f_{p_2}$ for term-templates $p_1$ and $p_2$. Call $f_{p_1}$ and $f_{p_2}$ with appropriate arguments and then call \texttt{plughole} function as described in Section TODO. 
+
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
+{% def codegenInHole(t): %}
+	{% |$f_t$| =  symgen("genterm") %}
+	{% |$arg_1, ..., arg_n$| = t.getannotation("InArg") %}
+	{% |$f_{t_1}, f_{t_2}$| = codegen(|$t_1$|), codegen(|$t_2$|) %}
+def |$f_t$|(match, |$arg_1, ..., arg_n$|):
+	{% |$a_1, ..., a_n$| = |$t_1$|.getannotation("InArg") %}
+	{% |$b_1, ..., b_n$| = |$t_2$|.getannotation("InArg") %}
+	$t_1^{\prime}$ = |$f_{t_1}$|(match, |$a_1, ..., a_n$|)
+	$t_2^{\prime}$ = |$f_{t_2}$|(match, |$b_1, ..., b_n$|)
+	return plughole($t_1^{\prime}$, $t_2^{\prime}$) 
+\end{minted}
+
 
 \subsection{Python Function Calls}
-Given \PythonCall generate functions $f_1$, ..., $f_n$ for $t_1$, ..., $t_n$. Call procedures $f_1$, ..., $f_n$ with appropriate arguments and let $o_1$, ..., $o_n$ be resulting terms. Call $function$ with $o_1$, ..., $o_n$.
+Given $t$ =\PythonCall generate functions $f_1$, ..., $f_n$ for $t_1$, ..., $t_n$. Call procedures $f_{t_1}$, ..., $f_{t_n}$ with appropriate arguments and let $t_1^{\prime}$, ..., $t_1^{\prime}$ be resulting terms. Call $function$ arguments $t_i^{\prime}$. Note that $t$ has neither InArg nor MatchRead annotations, by construction.
+
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
+{% def codegenPythonCall(t): %}
+	{% |$f_t$| =  symgen("genterm") %}
+	{% |$f_{t_1}, ..., f_{t_n}$| = codegen(|$t_1$|), ..., codegen(|$t_n$|) %}
+def |$f_t$|(match):
+	{% for |$f_{t_i}$| in |$f_{t_1}, ..., f_{t_n}$|: %}
+	|$t_i^{\prime}$| = |$f_{t_i}$|(match)
+	{% endfor %}
+	return |$pyfunction$|(|$t_1^{\prime},...,t_n^{\prime}$|) 
+{% enddef %}
+\end{minted}
+
+
 
 \subsection{Metafunction Application}
-Given \ApplyMetafunction, generate function $f$ for term-template $t$. Call $f$ with appropriate arguments, and feed results of $f$ into metafunction with name $n$.
+Metafunction application is very similar to python calls, except that there's only one term-template to be passed as an argument to the metafunction instead of many.
 
+Given Given term-template $t=$ \ApplyMetafunction, generate function $f_t$ for $t$. Then, generate function $f_{t_m}$ for term-template $t_m$. Call $f_{t_m}$ with appropriate arguments, and feed results of $f$ into metafunction with name $mf$.
+
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
+{% def codegenApplyMetafunction(t): %}
+	{% |$f_t$| =  symgen("genterm") %}
+	{% |$f_{t_r}$| = codegen(|$t_r$|) %]
+	{% |$arg_1, ..., arg_n$| = t.getannotation("InArg") %}
+def |$f_t$|(match):
+	|$t_r^{\prime}$| = |$f_{t_i}$|(match)
+	{% |$a_1, ..., a_n$| = |$t_r$|.getannotation("InArg") %}
+	return |$mf$|(match, |$a_1, ..., a_n$|) 
+{% enddef %}
+\end{minted}
 
