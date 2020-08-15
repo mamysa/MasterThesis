@@ -1,11 +1,26 @@
 \section{Define-Language}
-
-The only required thing here is to generate a \texttt{isa} function for each non-terminal definition of the language. For each \NtDefinition:
+Given \DefineLanguage, the only thing left to do here is to generate a \texttt{isa} function for each $nt_i$. For each \NtDefinition:
 \begin{enumerate}
-\item Generate matching function for pattern $p_i$. Let $f_i$ be top-level matching function.
-\item Call $f_i$ with \texttt{term} as argument. If $f_i$ returns true, return true.
-\item If none of $f_i$ return True, none of the patterns $p_i$ match the term and thus false is returned.
+\item Generate matching function $f_{p_i}$ for pattern $p_i$ and let $f_{p_i}^{top}$ be top-level matching function. 
+\item Call $f_{p_i}^{top}$ with \texttt{term} as argument. Resulting list of matches is non-empty return True. 
+\item Otherwise, none of patterns $p_i$ match the \texttt{term} and false is returned.
 \end{enumerate}
+
+
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
+{% def codegenNtDefinition(|$nt_i$|): %}
+	{% |$f_{nt_i}$| =  symgen("isa_nt") %}
+def |$f_{nt_i}$|(term):
+	{% for |$p_i$| in |$nt_i$|=|$p_1, ..., p_n$|: %}
+		{% |$f_{p_i}^{top}$| = codegenTopLevel($p_i$)
+	matches = |$f_{p_i}^{top}$|(term)
+	if len(matches) > 0:
+		return True
+	{% endfor %]
+	return False
+	{% return |$f_{nt_i}$| %}
+{% enddef %}
+\end{minted}
 
 
 
@@ -45,49 +60,3 @@ Given \DefineReductionRelation, generate function accepting a single term. The f
 \item Generate function for $rr$ accepting a single term. Let $ts^\prime$ be the list containing all the terms after applying reduction cases. Concatenate results of $f_{r_i}(term)$ with $ts^\prime$. Return $ts^\prime$.
 \end{enumerate}
 
-\section{Redex-Match-Assert-Equal}
-Given \RedexMatchAssertEqual code generation proceeds in the following manner.
-
-\begin{enumerate}
-\item First, generate a list of expected matches $m$. For each $m_i =$ \Match, 
-\begin{enumerate}
-
-\item generate function $f_{t_i}$ for $t_i$. 
-\item Let resulting term be $tt_i = f_{t_i}(Match())$ 
-\item Create empty \texttt{Match} instance $match$, call $match$.\texttt{AddBinding}$(s_i)$ and $match$.\texttt{AddToBinding}$(tt_i)$. 
-\item Append $match$ to $m$.
-\end{enumerate}
-\item Generate top-level matching function $f_p$ for pattern $p$.
-\item Generate top-level matching function $f_t$ for pattern $t$.
-\item Let $ms^\prime = f_p(f_t())$
-\item Call \texttt{assert\_compare\_match\_lists}$(ms^\prime, m)$.
-\end{enumerate}
-
-\section{Term-Let-Assert-Equal}
-
-Given \TermLetAssertEqual code generation proceeds in the following manner.
-
-\begin{enumerate}
-\item First, need to produce $Match()$ instance containing all pattern-variable $v_i$ assignments. Let $m=Match()$. For each $(v_i, n_i, t_i)$
-	\begin{enumerate}
-	\item Generate $f_{t_i}$ function for term $t_i$.
-	\item $m$.\texttt{AddBinding}$(v_i)$ and $m$.\texttt{AddToBinding}$(v_i, f_{t_i}(Match()))$
-	\end{enumerate}
-\item Generate $f_t$ for term-template $t$ and $f_e$ for term-template $e$.
-\item Call \texttt{asserttermsequal}$(f_t(m), f_e(Match()))$.
-\end{enumerate}
-
-
-\section{Apply-Reduction-Relation-Assert-Equal}
-
-Given \ApplyReductionRelationAssertEqual
-\begin{enumerate}
-\item First, need to generate a list of expected terms $e$.
-	\begin{enumerate}
-	\item Generate function $f_{e_i}$ for term template $e_i$.
-	\item Concatenate $f_{e_i}(Match())$ to $e$.
-	\end{enumerate}
-\item Generate function $f_t$ for term-template $t$.
-\item Let $f_{red}$ be a function generated after visiting \texttt{define-reduction-relation} with name $r$. Let $a=f_{red}(f_t())$ be the list of terms after applying reduction relation.
-\item Call $asserttermlistsequal(a, e)$.
-\end{enumerate}

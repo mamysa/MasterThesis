@@ -54,7 +54,7 @@ mathescape=true}
 \newcommand{\ApplyMetafunction}{\lstinline[mathescape]!ApplyMetafunction($mf$: string, $t_m$: TermTemplate)! } 
 
 
-\newcommand{\DefineLanguage}{\lstinline[mathescape]!DefineLanguage($name$: string, \[$nt_1, ..., nt_n$\]: NtDefinition)! } 
+\newcommand{\DefineLanguage}{\lstinline[mathescape]!DefineLanguage($name$: string, \[$nt_1, ..., nt_m$\]: NtDefinition)! } 
 \newcommand{\NtDefinition}{\lstinline[mathescape]!NtDefinition($nt$: Nt, \[$p_1, ..., p_n$\]: Pattern)! } 
 
 \newcommand{\DefineMetafunction}{\lstinline[mathescape]!DefineMetafunction($name$: string, $domain$: Pattern, $codomain$: Pattern, \[$c_1, ..., c_n$\]: MetafunctionCase)! } 
@@ -69,6 +69,7 @@ mathescape=true}
 \newcommand{\TermLetAssertEqual}{\lstinline[mathescape]!TermLetAssertEqual([$(v_1, n_1, t_1), ..., (v_n, t_n, t_n)$]: Tuple(string, natural, Term)?, $t$: Term, $e$: Term)! }
 \newcommand{\ApplyReductionRelationAssertEqual}{\lstinline[mathescape]!ApplyReductionRelationAssertEqual($r$: string, $t$: Term, $[e_1, ..., e_n]$: Term?)! }
 
+\newcommand{\ReadFromStdinAndApplyReductionRelation}{\lstinline[mathescape]!ReadFromStdinAndApplyReductionRelation($red$: string, $mf$: string)! }
 
 \newcommand{\Visit}[1]{$\texttt{visit}($#1$)$ }
 

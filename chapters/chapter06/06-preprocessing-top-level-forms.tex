@@ -49,6 +49,12 @@ $d =$ \DefineLanguage
 \item For each $r_i=$ \ReductionCase in $r$, apply strategy (3) to $p$ and apply the only term-processing strategy. $R = R \cup \{ (name, d) \}$.
 \end{enumerate}
 
+\item $tl=$ \ReadFromStdinAndApplyReductionRelation
+\begin{enumerate} 
+\item If $mf$ is present, ensure there exists tuple $(n, m) \in M$ s.t. $mf=n$, otherwise raise Exception.
+\item Ensure there exists tuple $(n, d) \in R$ such that $n=red$, otherwise raise Exception.
+\end{enumerate}
+
 
 \item 
 $r=$ \RedexMatchAssertEqual. 
