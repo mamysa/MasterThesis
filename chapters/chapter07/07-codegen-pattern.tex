@@ -321,15 +321,15 @@ Given some pattern $p$, generating top-level function for pattern involves the f
 Now, we get to code-generation. Initialize \texttt{Match} object with pattern-variables $pv_i^{p}$ and call $f_p$ with said \texttt{Match} instance, \texttt{head} and \texttt{tail} set to zero and one, respectively. After a list of matches is returned, need to strip out resulting \texttt{Match} from \texttt{(Match, int, int)}  tuples as well as remove symbols $pvr_i^{p}$ from \texttt{Match} instances. Resulting \texttt{Match} instances are appended to an array. Said array is then returned.
 
 
-\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
 {% def codegen_toplevel(p): %}
 	{% |$f_p$| = symgen("match_pattern_toplevel") %}
 	{% |$pv_1^{(p)}, ..., pv_n^{(p)}$| = |$p$|.getannotation("PatternVariables") %}
 	{% |$pvr_1^{(p)}, ..., pvr_m^{(p)}$| = |$p$|.getannotation("PatConstraintCheckSymsToRemove") %}
 	{% |$fm_{p}$| = codegen_matchfunc(|$p$|) %}
-def $f_p$(term):
+def |$f_p$|(term):
 	match = Match(|$pv_1^{p}, ..., pv_n^{p}$|)
-	matches = $fm_p$(term, match, 0, 1)
+	matches = |$fm_p$|(term, match, 0, 1)
 	ret = []	
 	for m, h, t in matches:
 	{% for |$pvr_i^{p}$| in |$pvr_1^{(p)}, ..., pvr_m^{(p)}$| %}
