@@ -4,22 +4,39 @@ Given \RedexMatchAssertEqual code generation proceeds in the following manner.
 \begin{enumerate}
 \item First, generate a list of expected matches $m$. For each $m_i =$ \Match, 
 \begin{enumerate}
+\item generate function $f_{t_i}$ for $t_i$ and let resulting term be $tt_i = f_{t_i}(Match())$ 
+\item Create empty \texttt{Match} instance $match$, call $match$.\texttt{AddBinding}$(s_i)$ and $match$.\texttt{AddToBinding}$(tt_i)$ and then Append $match$ to \texttt{matches}.
+\end{enumerate}
+\item Generate top-level matching function $f_p^{top}$ for pattern $p$ and term-generating function $f_t$ for term-template $t$.
+\item Let \texttt{actualmatches} = $f_p(f_t())$ and then call \texttt{assert\_compare\_match\_lists(expectedmatches, actualmatches)}.
+\end{enumerate}
 
-\item generate function $f_{t_i}$ for $t_i$. 
-\item Let resulting term be $tt_i = f_{t_i}(Match())$ 
-\item Create empty \texttt{Match} instance $match$, call $match$.\texttt{AddBinding}$(s_i)$ and $match$.\texttt{AddToBinding}$(tt_i)$. 
-\item Append $match$ to $m$.
-\end{enumerate}
-\item Generate top-level matching function $f_p$ for pattern $p$.
-\item Generate top-level matching function $f_t$ for pattern $t$.
-\item Let $ms^\prime = f_p(f_t())$
-\item Call \texttt{assert\_compare\_match\_lists}$(ms^\prime, m)$.
-\end{enumerate}
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
+{% def codegenRedexMatchAssertEqual(|$rm$|): %}
+	{% |$f_{rm}$| = symgen("redexmatchassertequal") %}
+	{% |$f_p^{top}$| = codegenTopLevelPattern(|$rm$|[|$p$|])
+	{% |$f_t$| = codegenTermTemplate(|$rm$|[|$t$|])
+def |$f_{rm}$|():
+	{% for |$m_i$| in |$rm$|[|$m_1, ..., m_n$|]: %}
+	|$mi_i$| = Match()
+		{% for $(s_i, t_i)$ in |$m_i$|[$(s_1, t_1), ..., (s_m, t_m)$]:
+			{% |$f_{t_i}$| = CodegenTermTemplate(|$t_i$|) %}
+	term = |$f_{t_i}$|(Match())
+	|$mi_i$|.addkey(|$s_i$|)
+	|$mi_i$|.addbinding(|$s_i$|, term)
+		{% endfor %}
+	{% endfor %}
+	expectedmatches = [|$mi_1, ..., mi_n$|]
+	term = |$f_t$|(Match())
+	actualmatches = |$f_p^{top}$|(term)
+	assert_compare_match_lists(actualmatches, expectedmatches)
+{% return |$f_{rm}$| %}
+{% enddef %}
+\end{minted} 
 
 \section{Term-Let-Assert-Equal}
 
-Given \TermLetAssertEqual code generation proceeds in the following manner.
-
+Given $tl=$ \TermLetAssertEqual code generation proceeds in the following manner.
 \begin{enumerate}
 \item First, need to produce $Match()$ instance containing all pattern-variable $v_i$ assignments. Let $m=Match()$. For each $(v_i, n_i, t_i)$
 	\begin{enumerate}
@@ -30,17 +47,51 @@ Given \TermLetAssertEqual code generation proceeds in the following manner.
 \item Call \texttt{asserttermsequal}$(f_t(m), f_e(Match()))$.
 \end{enumerate}
 
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
+{% def codegenTermLetAssertEqual(|$tl$|): %}
+	{% |$f_{tl}$| = symgen("termletassertequal") %}
+	{% |$f_t$| = codegenTermTemplate(|$tl$|[|$t$|])
+	{% |$f_e$| = codegenTermTemplate(|$tl$|[|$e$|])
+def |$f_{tl}$|():
+	match = Match()
+	{% for |$(v_i, n_i, t_i)$| in |$tl$|[|$(v_1, n_1, t_1)$|, ..., |$(v_n, n_n, t_n)$|]: %}
+		{% |$f_{t_i}$| = codegenTermTemplate(|$t_i$|)
+	term = |$f_{t_i}$|(Match())
+	match.addkey(|$v_i$|)
+	match.addtobinding(|$v_i$|, term)
+	{% endfor %}
+	expected = |$f_e$|(Match())
+	actual = |$f_t$|(match)
+	asserttermsequal(expected, actual)
+{% return |$f_{tl}$|  %}
+{% enddef %}
+\end{minted} 
+
 
 \section{Apply-Reduction-Relation-Assert-Equal}
 
 Given \ApplyReductionRelationAssertEqual
 \begin{enumerate}
-\item First, need to generate a list of expected terms $e$.
+\item First, need to generate a list of expected terms \texttt{expected}, potentially empty.
 	\begin{enumerate}
 	\item Generate function $f_{e_i}$ for term template $e_i$.
-	\item Concatenate $f_{e_i}(Match())$ to $e$.
+	\item Concatenate $f_{e_i}(Match())$ to \texttt{expected}.
 	\end{enumerate}
 \item Generate function $f_t$ for term-template $t$.
-\item Let $f_{red}$ be a function generated after visiting \texttt{define-reduction-relation} with name $r$. Let $a=f_{red}(f_t())$ be the list of terms after applying reduction relation.
-\item Call $asserttermlistsequal(a, e)$.
+\item Let $f_{red}$ be a function generated after visiting \texttt{define-reduction-relation} with name $r$. Let \texttt{actual} =$f_{red}(f_t())$ be the list of terms after applying reduction relation.
+\item Call \texttt{asserttermlistsequal(expected, actual)}
 \end{enumerate}
+
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
+{% def codegenApplyReductionRelationAssertEqual(|$ar$|): %}
+	{% |$f_{ar}$| = symgen("applyreductionrelationassertequal") %}
+	{% |$f_{red}$| = get_reduction_relation(|$ar$|[|$r$|]) %}
+	{% |$f_t$| = codegenTermTemplate(|$tl$|[|$t$|])
+	{% |$f_{e_1}, ..., f_{e_n}$| = codegenTermTemplates(|$tl$|[|$e_1, ..., e_n $|]) %}
+def |$f_{ar}$|():
+	expected = [|$f_{e_1}(Match()), ..., f_{e_n}(Match())$|]
+	actual = |$f_t$|(Match())
+	asserttermlistsequal(expected, actual)
+{% return |$f_{ar}$| %}
+{% enddef %}
+\end{minted} 
