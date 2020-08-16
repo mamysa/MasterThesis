@@ -1,0 +1,4 @@
+\section read-from-stdin-and-apply-reduction-relation
+
+Form ReadFromStdinAndApplyReductionRelation(reductionname: string, mfapply: string?) is rather self-explanatory - it reads a string from standard input or file, parses it into a term using logic outlined in Section TODO, and applies reduction-relation \texttt{reductionname}. Optionally, one can provide metafunction with name \texttt{mfapply} to apply to the parsed term. This allows to separate specification of "code" from everything else that is required to evaluate the "code" (such as model of the heap/stack, etc) TODO.
+
