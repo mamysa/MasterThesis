@@ -3,13 +3,24 @@
 \subsection{Motivation}
 PltRedex disallows language definitions such as ones in Figure below. 
 
-\begin{lstlisting}
+\begin{figure}[H]
+\begin{minipage}{0.45\linewidth}
+	\centering
+\begin{minted}[tabsize=1,obeytabs,escapeinside=||,mathescape=true,linenos,fontsize=\small]{racket}
 (define-language L
 	(e ::= (e e) n)
 	(n ::= (n n) number p)
 	(p ::= (p p) real e))
 	(s ::= string)
-\end{lstlisting}
+\end{minted}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+	\centering
+	\includegraphics[scale=0.18]{transformation-pattern-ntgraph.png}
+\end{minipage}
+	\caption{\texttt{define-language} and its non-terminal graph}
+	\label{dl-ntcyclegraph}
+\end{figure}
 
 The problem with the language above (aside from it being completely useless) is a cycle of non-terminals $n \rightarrow p \rightarrow e$. When testing if some term is a non-terminal, a term is matched against every pattern in non-terminal definition. For example, given term \texttt{String("hello world")} it is matched against non-terminal \texttt{e}. Since  the term doesn't match pattern \texttt{(e e)}, non-terminal \texttt{n} is then matched. Since the term doesn't match any patterns here either, non-terminal \texttt{p} is then matched. Similarly, the term doesn't match any patterns here either, \texttt{e} is then matched, but that's where the matching has started and thus \textit{infinite recursion} becomes an issue. Languages need to be analyzed for presence of non-terminal cycles.
 
@@ -45,26 +56,6 @@ Vertex coloring allows for detection of cycles; more specifically, if during dep
 
 To report a path of non-terminals that make up the cycle, a path of non-terminals has to be maintained. The path can be represented as a stack. The vertex is added to the stack when it changes color to $Grey$ and removed from the stack when it changes color to $Black$. Pseudocode for depth-first-traversal and cycle reporting can be seen below.
 
-
-\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,linenos]{python}
-def reportcycle(path, v):
-	idx = path.indexof(v)
-	cyclepath = path[idx:] + [v]
-	raise CompilationError(nt cycle {}.format(cyclepath))
-
-def visit_vertex(v, V, path):
-	if v.color == White:
-		path.append(v)
-		v.color = Grey 
-		for successor in v.successors:
-			self.visit(successor, V, path)
-		v.color = Black
-		V = V.union(v)
-		path.pop()
-	if v.color == Discovered:
-		reportcycle(path, v)
-\end{minted}
-
 Since resulting non-terminal graphs may be disjoint, we need to keep track of visited vertices during traversal. Let $V$ be a set of vertices whose $color(v)=Black$. Thus, every time vertex $v$ changes its color to $Black$, $V = V \cup \{v\} $. Let $U$ be a set of vertices whose $color(u)=White$; that is, it initially contains all the non-terminals. The algorithm proceeds as follows:
 
 \begin{enumerate}
@@ -74,18 +65,51 @@ Pick random vertex $u$ from set $U$. Create empty set $V$. Starting from $u$ per
 Continue until $U$ is empty.
 \end{enumerate}
 
-Pseudo-code for this procedure can be seen below.
+Code for this can be seen in Appendix TODO.
 
-\begin{lstlisting}
-def visit_graph(graph):
-	U = set(self.nts)
-	while len(U) != 0:
-		V = set()
-		self.visit(U.get_random_element(), V, [])
-		U = U - V
-\end{lstlisting}
 
+\subsection{Example}
+
+Figure \ref{ntcycle-dfs-example} demonstrates cycle searching using graph shown in Figure \ref{dl-ntcyclegraph} starting from non-terminal $s$. Initially $U=\{s,p,n,e\}$. Its color becomes \texttt{Grey} as seen in (a). Since it has no successor vertices, its color becomes \texttt{Black}, as seen in (b). 
+
+Since $V = \{ s \}$, $U=\{p,n,e\}$. Pick vertex $p$ for expansion and color it \texttt{Grey}. Then, visit the only successor of $s$, vertex $e$ and color it \texttt{Grey}. Visit the only successor of $e$, vertex $n$ and color it \texttt{Grey}. Finally, visit the only successor of $n$, vertex $p$. But since it is already colored \texttt{Grey}, the cycle  $p \rightarrow p \rightarrow n$ has been found and compilation error should be raised.
+
+\begin{figure}[H]
+\begin{subfigure}{0.32\linewidth}
+	\centering
+	\includegraphics[scale=0.18]{transformation-pattern-ntgraph-example-1.png}
+	\caption{}
+\end{subfigure}
+\begin{subfigure}{0.32\linewidth}
+	\centering
+	\includegraphics[scale=0.18]{transformation-pattern-ntgraph-example-2.png}
+	\caption{}
+\end{subfigure}
+\begin{subfigure}{0.32\linewidth}
+	\centering
+	\includegraphics[scale=0.18]{transformation-pattern-ntgraph-example-3.png}
+	\caption{}
+\end{subfigure}
+
+\begin{subfigure}{0.32\linewidth}
+	\centering
+	\includegraphics[scale=0.18]{transformation-pattern-ntgraph-example-4.png}
+	\caption{}
+\end{subfigure}
+\begin{subfigure}{0.32\linewidth}
+	\centering
+	\includegraphics[scale=0.18]{transformation-pattern-ntgraph-example-5.png}
+	\caption{}
+\end{subfigure}
+\begin{subfigure}{0.32\linewidth}
+	\centering
+	\includegraphics[scale=0.18]{transformation-pattern-ntgraph-example-6.png}
+	\caption{}
+\end{subfigure}
+\label{ntcycle-dfs-example}
+\caption{Cycle searching using DFS}
+\end{figure}
 \subsection{Improvements}
-Note that the described algorithm does not report all the cycles in the graph but the first one it manages to find.
+Note that the described algorithm does not report all the cycles in the graph but the first one it manages to find. §
 
 report all potential cycles in the graph
