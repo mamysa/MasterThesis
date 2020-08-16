@@ -34,7 +34,7 @@ Given $mf=$ \DefineMetafunction, generate a function $f_{mf}$ that accepts a sin
 \item For each $c_i =$ \MetafunctionCase, generate function $f_{c_i}$, passing term as an argument.
 \begin{enumerate}
 	\item Generate matching function $f_{p_i}$ for pattern $p_i$, and term-creation function $f_{t_i}$ for term-tempalate $t_i$. Let $f_{p_i}^{top}$ be top-level matching function for pattern $p_i$.
-	\item Call $f_{p_i}^{top}$ with the term passed as argument. If resulting list of matches \texttt{matches} is empty then return empty list. Otherwise, for each \texttt{match} in \texttt{matches}, call $f_{t_i}$ and accumulate resulting terms into list \texttt{terms}.
+	\item Call $f_{p_i}^{top}$ with the term passed as argument. For each \texttt{match} in \texttt{matches}, call $f_{t_i}$ and if result is not \texttt{None}, accumulate resulting terms into list \texttt{terms}. If resulting list of matches \texttt{matches} is empty then return empty list. Even though user-implemented Python functions are always expected to return \texttt{Term} instance, since currently there's no support for \texttt{side-condition} clauses, returning \texttt{None} thus is the only way to "emulate" \texttt{side-condition} clauses. 
 	\item Have to ensure that all terms in \texttt{terms} are the same term. Metafunctions allow for non-deterministic behaviour during pattern-matching but resulting \texttt{Match} instances must always produce the same term.  Call function \texttt{aretermsequalpairwise} with \texttt{terms} and raise \texttt{Exception} if False is returned. Otherwise, pick any term from \texttt{terms}, and return it.
 	This completes code generation of \MetafunctionCase.
 \end{enumerate}
@@ -71,9 +71,10 @@ def |$f_{mf}$|(term):
 def |$f_{c_i}$(term):
 	terms = []
 	matches = |$f_{p_i}^{top}$|(term)
-	if len(matches) == 0: return terms 
 	for match in matches:
+		if match is None: continue
 		terms.append(|$f_{t_i}$.|(match))
+	if len(terms) == 0: return terms 
 	if not aretermsequalpairwise(term):
 		raise Exception("produced multiple terms")
 	return [terms[0]]
