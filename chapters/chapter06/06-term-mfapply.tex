@@ -10,10 +10,16 @@ $t_{in}$ contains InArg and MatchRead annotations. These are handled in the foll
 \begin{itemize}
 \item
 InArg annotations are left intact. Signatures of both `TermSequence` and `ApplyMetafunctions` must match.
-* MatchRead annotations can be safely removed. None of such variable assignments are used to generate $t_{in}$.
+\item
+MatchRead annotations can be safely removed. None of such variable assignments are used to generate $t_{in}$.
 \end{itemize}
 
-
-
 \subsection{Example}
-Example of transformation ;(my-metafunction n x) -> (appy-mf (my-metaufnction n x))
+
+The example shown in Figure \ref{transformation-term-mfapply} displays transformation described above given a set of meta-function names only containing single \texttt{set-contains?}. Since the first element of \texttt{TermSequence} is \texttt{Variable} term-template with suitable name, additional \texttt{MetafunctionApplication} term is added.
+
+\begin{figure}[H]
+\includegraphics[scale=0.20]{transformation-term-mfapply.png}
+\caption{Term-template before and after applying metafunctions.}
+\label{transformation-term-mfapply}
+\end{figure}
