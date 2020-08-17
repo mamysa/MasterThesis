@@ -35,13 +35,16 @@ atom = integer
 
 
 \subsection{Implementation}
+Class diagram for both \texttt{Tokenizer} and \texttt{Parser} can be seen in Figure \ref{class-diagram-lexer-parser}.
 
-UML diagram for Parser and Tokenizer can be seen below.
+\begin{figure}[h]
+	\centering
+	\makebox[\textwidth][c] { \includegraphics[scale=0.30]{class-diagram-lexer-parser.png} }
+\caption{Class diagram for \texttt{Tokenizer} and \texttt{Parser}.}
+\label{class-diagram-lexer-parser}
+\end{figure}
 
-TODO diagram
-
-
-Actual lexer implementation doesn't use all regular expressions as described above but implements their functionality programmatically. The following procedures are defined to detect whitespace, newline and reserved symbols.
+Actual lexer implementation doesn't use regular expressions that were described above but implements their functionality using manually implemented state machine. The following functions are used to classify symbols:
 
 \begin{lstlisting}
 def is_whitespace(c):
@@ -61,6 +64,13 @@ def is_plusminus(c):
 
 def is_delimeteter(c):
     return is_reserved(c) or c == '\0' or is_whitespace(c)
+
+def is_leftparen(c):
+	return c in ['(', '[', '{']
+
+def is_rightparen(c):
+	return c in [')', ']', '}']
+
 \end{lstlisting}
 
 
@@ -82,7 +92,14 @@ def is_delimeteter(c):
 \texttt{extract()} extracts the string between \texttt{start} and \texttt{end}, sets \texttt{start=end} and returns the extracted string.
 
 \item
-\texttt{next()} returns the next token in the string. This method implements actual tokenization logic. All regular expressions are implemented directly instead of using RPython's regular expression library (for reasons why see below). State machine representing this method can be seen below.
+	\texttt{next()} returns the next token in the string. This method implements actual tokenization logic. All regular expressions are implemented directly instead of using RPython's regular expression library (for reasons why see below). State machine representing this method can be seen in Figure \ref{lexical-analysis-tokenize}.
+
+\begin{figure}[th!]
+	\centering
+	\makebox[\textwidth][c] { \includegraphics[scale=0.16]{lexical-analysis-tokenize.png} }
+\caption{State machine for lexical analysis.}
+\label{lexical-analysis-tokenize}
+\end{figure}
 
 Edges of the graph represent calls to \texttt{peek()} and ensuring the character satisfies a predicate an edge is labeled with. Taking a transition does not consume any characters. Predicates are described above.
 

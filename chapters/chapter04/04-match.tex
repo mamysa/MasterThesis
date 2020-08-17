@@ -1,5 +1,14 @@
 \section{Runtime Representation of Matches}
 
+To implement matches, two classes are defined - \texttt{Match} and \texttt{Binding}, as seen in Figure \ref{class-diagram-match-binding}.
+
+\begin{figure}[H]
+	\centering
+	\makebox[\textwidth][c] { \includegraphics[scale=0.25]{class-diagram-match-binding.png} }
+	\caption{Representation of matches.}
+\label{class-diagram-match-binding}
+\end{figure}
+
 \texttt{Binding} class encapsulates a stack of terms and provides three methods for its manipulation:
 
 \begin{itemize}
@@ -46,7 +55,7 @@
 
 
 
-\texttt{Match} class stores a dictionary of strings to \texttt{Binding} instances and represent pattern-variable assignments. 
+\texttt{Match} class associates pattern-variable with \texttt{Binding} instance.
 
 \begin{itemize}
 \item
@@ -62,5 +71,5 @@
 \texttt{comparekeys(key1, key2)} compares topmost terms on stacks of bindings assigned to key1 and key2.
 
 \item
-	\texttt{deepcopy} creates a new Match instance with all \texttt{Binding} and \texttt{Term} instances contained within copied recursively.
+	\texttt{deepcopy} creates a new Match instance with all \texttt{Binding} and \texttt{Term} instances contained within copied using \texttt{deepcopy}.
 \end{itemize}

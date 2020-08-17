@@ -1,10 +1,17 @@
 \section{Runtime Representation of Terms}
 
-Terms are represented in the following way. 
+All runtime terms are represented as shown in the class diagram in Figure <TODO>
 
-(TODO uml diagram?) 
+\begin{figure}[H]
+	\centering
+	\makebox[\textwidth][c] { \includegraphics[scale=0.25]{class-diagram-runtime-term.png} }
+\caption{Runtime term representation.}
+\label{class-diagram-runtime-term}
+\end{figure}
 
-As one may notice, these classes are all very similar but due to RPython's type inference an attempt to merge them results in compile-time error:
+As one may notice, these classes are all very similar and essentially just act as a wrapper for some primitive type. \texttt{Term} is the base class. Due to how RPython's type inference works creating a single class to represent all child classes such as \texttt{String} or \texttt{Float} results in the following compilation error.  Since the \texttt{LeafNode} instance is created with \texttt{helloworld!} string, any other instantiation of LeafNode expects it's second argument to be of type \texttt{string}. 
+
+One may notice that, for example, \texttt{String} and \texttt{Variable} could be merged into one class and additional \texttt{tag} field could be introduced to differentiate between strings and variables. However, since \texttt{isinstance} function is supported by RPython, such change would make term comparison logic more complex.
 
 \begin{lstlisting}
 class LeafNode:
@@ -13,21 +20,40 @@ class LeafNode:
         self.value = value
 
 def entrypoint():
-    p = LeafNode(1, 'hello world!')
-    q = LeafNode(2, 12.5)
+    p = LeafNode('hello world!')
+    q = LeafNode(12.5)
 
 # UnionError:
 #  SomeString(const='hello world!', no_nul=True)
 #  SomeFloat(const=12.5)
 \end{lstlisting}
 
-Since the \texttt{LeafNode} instance is created with \texttt{helloworld!} string, any other instantiation of LeafNode expects it's second argument to be of type \texttt{string}. 
+All the classes implement following methods.
+\begin{itemize}
+\item \texttt{shallow\_copy} returns exact copy of the term. This kind of copying is not recursive.
+\item
+\texttt{deep\_copy} copies the term recursively. In practice, it duplicates \texttt{shallow\_copy} for every term type except \texttt{Sequence} - each element is copied recursively instead.
 
-TODO explain methods.
-
-\texttt{shallow\_copy}
-\texttt{deep\_copy} 
-\texttt{equals}
-\texttt{tostring}
+\item
+\texttt{equals} compares two terms based on the type of the term and them on value.
+\item
+\texttt{tostring} returns a string representing the term. These are made to look like actual Racket expressions.
 and procedures
-\texttt{copy\_path\_and\_replace\_last}
+\end{itemize}
+ 
+In addition, the following utility functions are provided to make implementation of certain functionalities easier.
+
+\begin{itemize}
+\item
+	\texttt{copy\_path\_and\_replace\_last}. Given a path of terms $t_1, ..., t_n$ and term $t_n^{\prime}$, where terms $t_1, ..., t_{n-1}$ are expected to be of type \texttt{Sequence}, the path is copied using \texttt{shallow\_copy} up to $t_n$ and $t_n$ is replaced with $t_n^{\prime}$. All pointers to successor terms are also fixed up; that given two copied terms $t_i^{prime}$ and $t_{i+1}^{\prime}$, $t_i^{prime}$ will point to $t_{i+1}^{\prime}$ instead of $t_{i+1}$.
+\item
+	\texttt{locatehole} recursively traverses the term $t$ looking for term of type \texttt{Hole}. Each term on the path to \texttt{Hole} is recorded and upon successful search the path is returned.
+\item
+	\texttt{plughole}. Given two terms $t_1$ and $t_2$, first \texttt{locatehole} is called with $t_1$ as argument. If resulting path is non-empty, the result of \texttt{copy\_path\_and\_replace\_last} called with resulting path and $t_2$ is returned. Otherwise, $t_1$ is returned.
+\item
+	\texttt{asserttermsequal}. given two terms calls \texttt{equals} method and asserts that it returns \texttt{True}
+\item
+	\texttt{asserttermlistsequal}. given two lists of terms, calls for \texttt{asserttermsequal} for each pair of terms.
+\item 
+	\texttt{asserttermsequalpairwise}. Given a list of terms, asserts that each pair of terms in that list is equal, using \texttt{equals} method described previously.
+\end{itemize}
