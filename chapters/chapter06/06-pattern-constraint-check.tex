@@ -62,5 +62,14 @@ For any $q_i$ that is not in intersection add ${q_i: m2[q_i]}$ to the mapping.
 \end{itemize}
 
 \subsection{Example}
-TODO
+
+\begin{figure}[H]
+	\centering
+	\makebox[\textwidth][c] { \includegraphics[scale=0.15]{transformation-pattern-constraintcheck.png} }
+\caption{Applying transformation to pattern \texttt{((n\_1 ...) ... (in-hole ((n\_1 ...) hole (n\_1 ...)) (n\_1 ...)) ...)}}
+\label{transformation-pattern-constraintcheck}
+\end{figure}
+
+Figure \ref{transformation-pattern-constraintcheck} shows an effect of described transformation on pattern \texttt{((n\_1 ...) ... (in-hole ((n\_1 ...) hole (n\_1 ...)) (n\_1 ...)) ...)}. Notice that all occurences of \texttt{n\_1} have ellipsis depth of two. The first occurence of \texttt{n\_1} goes unmodified. Then, when processing the first pattern inside \texttt{in-hole} pattern, there are two occurences of \texttt{n\_1}. The first occurence is renamed to \texttt{n\_1\#1}, the second to \texttt{n\_1\#2}, and \texttt{CheckConstraint(n\_1\#1, n\_1\#2)} is appended to the \texttt{PatternSequence}. The final occurence of \texttt{n\_1} is seen in the second pattern of \texttt{in-hole} and is renamed to \texttt{n\_1\#3}. \texttt{CheckConstraint(n\_1\#2, n\_1\#3)} is then added to the \texttt{in-hole}. Finally after exiting \texttt{in-hole}, \texttt{CheckConstraint(n\_1, n\_1\#3)} is appended to \texttt{PatternSequence}.
+
 
