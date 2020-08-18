@@ -11,8 +11,16 @@ Initially, input to PltRedex is read from the file and stored as a string. To be
 Most commonly tokens are described using regular expressions. Below is description of token kinds supported by PyPltRedex.
 * Comments - `;.*\\n`  - matches semicolon followed by zero or more characters and ends with newline. Discared
 * Opening parentheses - `\[\{\(`
+[\[\{\(]
+
 * Closing parentheses - `\]\}\)`
 * Strings - `\"([^\"\\]|(\\"))*\"`  - TODO
+\"([^\"\\]|(\\[\s\S]))*\"
+(\+|\-)?[0-9]+
+(\+|\-)?[0-9]*\.[0-9]+
+([^ \(\)\[\]\{\}\"\'`;\#\n])*([^ \(\)\[\]\{\}\"\'`;\#0123456789\n])+([^ \(\)\[\]\{\}\"\'`;\#\n])*
+
+
 * Integers - `(\+|\-)?[0-9]+` Optional plus/minus + one or more digits. In most imperative programming languages minus sign would have been interpreted as an operation on the number. In Racket, minus sign is a part of a number - whitespace between minus sign and number is important (TODO expand)
 * Decimal numbers: `(\+|\-)?[0-9]*\.[0-9]+`. Plus/minus signs are optional, followed by zero or more digits, followed by the dot and more than one digits. 
 * Identifiers:  `([^ \(\)\[\]\{\}\"\'`;\#\n])*([^ \(\)\[\]\{\}\"\'`;\#0123456789\n])+([^ \(\)\[\]\{\}\"\'`;\#\n])*` Identifiers are not allowed to contain parentheses, quotes, pound signs and whitespace. To differentiate between identifier and number, identifier must contain at least one non-numerical character. Thus, regular expression has to contain three parts:  (1) Zero or more symbols matching anything but reserved symbols. (2) One or more symbols matching anything except reserved symbols and digits; (3) Zero or more symbols matching anything but reserved symbols.

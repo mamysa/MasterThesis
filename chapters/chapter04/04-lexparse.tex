@@ -1,38 +1,38 @@
 \section{Processing Input}
 
-Initially, input to PyPltRedex is read from the file and stored as a string. To be able to apply reduction-relation, the string needs to be analyzed. There are two parts:
 
-\begin{itemize}
-\item
-Lexical analysis that breaks up the string into individual tokens and decides which kind of token it is.
-\item
-Parsing - given a set of tokens, produce valid terms.
-\end{itemize}
+\subsection{Lexical Analysis and Parsing}
+
+Initially, input to PyPltRedex is read from the file and stored as a string. To be able to apply reduction-relation, the string needs to be analyzed. 
+
+Lexical analysis breaks up the string into individual tokens and decides which kind of token it is. Most commonly tokens are described using regular expressions. 
+
+Parsing takes individual lexemes and creates structured data out of them. In this case, \texttt{Term} instances are produced. 
+
+The grammar can be seen in Figure \ref{tok-lex-grammar}.
 
 
-\subsection{Lexical Analysis}
+\begin{figure}[h]
+\begin{minted}[tabsize=2,obeytabs,escapeinside=::,mathescape=true,fontsize=\normalsize]{text}
+term = term-sequence 
+     | term-atom
 
-Most commonly tokens are described using regular expressions. Below is description of token kinds supported by PyPltRedex.
-\begin{itemize}
-\item
-	TODO maybe more visual regex display.
-\end{itemize}
+term-sequence = lparen term* rparen
 
-\subsection{Parsing}
+atom = (\#true|\#false|\#t|\#f)					  :$\langle boolean \rangle$:
+	   | \"([^\"\\]|(\\[\s\S]))*\"				   :$\langle string  \rangle$:
+	   | (\+|\-)?[0-9]*\.[0-9]+					    :$\langle float \rangle$:
+	   | (\+|\-)?[0-9]+							        :$\langle integer \rangle$:
+	   | ([^ \(\)\[\]\{\}\"\'`;\#\n])*
+	     ([^ \(\)\[\]\{\}\"\'`;\#0123456789\n])+ 
+	     ([^ \(\)\[\]\{\}\"\'`;\#\n])*       :$\langle identifier \rangle$:
 
-Parsing takes individual lexemes and creates structured data out of them. In this case, terms are produced. Terms have the following grammar:
-
-\begin{lstlisting}
-term = term-sequence atom
-term-sequence = (term ...) 
-atom = integer 
-	 | string
-	 | (-|+)?[0-9]+\.[0-9]+
-	 | #t
-	 | #f
-	 | identifier
-\end{lstlisting}
-
+lparen = [\[\{\(]             :$\langle opening \text{ } parentheses \rangle$:
+rparen = [\]\}\)]             :$\langle closing \text{ } parentheses \rangle$:
+\end{minted} 
+\caption{Grammar for terms. All atoms match given regular expressions.}
+\label{tok-lex-grammar}
+\end{figure}
 
 \subsection{Implementation}
 Class diagram for both \texttt{Tokenizer} and \texttt{Parser} can be seen in Figure \ref{class-diagram-lexer-parser}.
@@ -44,9 +44,10 @@ Class diagram for both \texttt{Tokenizer} and \texttt{Parser} can be seen in Fig
 \label{class-diagram-lexer-parser}
 \end{figure}
 
-Actual lexer implementation doesn't use regular expressions that were described above but implements their functionality using manually implemented state machine. The following functions are used to classify symbols:
+Actual lexer implementation doesn't use regular expressions that were described above but implements their functionality using manually implemented state machine. Functions that classify characters can be seen in Figure \ref{char-predicates}.
 
-\begin{lstlisting}
+\begin{figure}[h]
+\begin{minted}[tabsize=2,obeytabs,escapeinside=::,mathescape=true,fontsize=\normalsize]{python}
 def is_whitespace(c):
     return c == ' ' or c == '\t' or c == '\n' or c == '\r'
 
@@ -70,8 +71,10 @@ def is_leftparen(c):
 
 def is_rightparen(c):
 	return c in [')', ']', '}']
-
-\end{lstlisting}
+\end{minted}
+\caption{Predicates for character identification.}
+\label{char-predicates}
+\end{figure}
 
 
 \begin{itemize}
@@ -86,6 +89,8 @@ def is_rightparen(c):
 
 \item
 \texttt{peek()} returns a character at index \texttt{end} of the \texttt{string}.
+
+\item
 \texttt{extract\_if\_contains(substring)} extracts substring \texttt{s} beginning at \texttt{start} and ending at \texttt{start+len(substring)} and compares it against provided \texttt{substring}. If both strings are equal, \texttt{start} and \texttt{end} indices are set to \texttt{start+len(substring)} and True is returned. Otherwise, False is returned.
 
 \item
@@ -230,7 +235,5 @@ Processing block:
 Seems like RPython's \texttt{RegexParser} functionality has a bug. After attempting to investigate, I decided (TODO passive voice) to implement these regular expressions manually instead of relying on the library. This decision was made also because construction of those regular expressions was rather slow.
 
 \subsection{Future Improvements}
-TODO compare performance on big terms. 
-float lexing is not faithful .3 and 1. are vaild floats
-scientific notation 1e03 is not supported and parsed as identifer.
 
+Since lexical analysis and parsing were implemented very early on, some of the regular expressions were hacked together to make everything work in short amount of time. In certain cases tokenization is not performed correctly with respect to Racket's tokenization logic. For example, Racket allows for specification of floating point numbers such as \texttt{.045} or \texttt{1.} (that is there must be either a digit before or after a decimal), which current implementation doesn't support (and are identified as Identifier instead). Scientific notation isn't supported, either.
