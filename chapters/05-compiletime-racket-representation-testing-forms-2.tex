@@ -1,6 +1,6 @@
 \section{Additional Testing Forms}
 
-PyPltRedex provides a number of additional forms that provide testing functionality. The goal is to be able to run individual components of PyPltRedex such as pattern matcher and term generator and compare results against expected ones. These additional forms are \texttt{redex-match-assert-equal}, \texttt{term-let-assert-equal} and \texttt{apply-reduction-relation-assert-equal}. They are defined in the following manner (and this notation will be used throughout the report):
+PyPltRedex provides several additional forms with testing functionality. The goal is to run individual components of PyPltRedex, such as pattern matcher and term generator, and compare the results against expected ones. These additional forms are \texttt{redex-match-assert-equal}, \texttt{term-let-assert-equal} and \texttt{apply-reduction-relation-assert-equal}. They are defined in the following manner (and this notation will be used throughout the report):
 
 \begin{lstlisting}
 type MatchAssignment = MatchAssignment($s$: string, $t$: Term)
@@ -15,16 +15,20 @@ type TopLevelForm = RedexMatchAssertEqual($l$: string, $p$: Pattern, $t$: Term, 
 These forms provide the following functionalities:
 
 \begin{itemize}
-\item \texttt{redex-match-assert-equal}: Given a term, it is matched against a pattern that may contain non-terminal symbols from \texttt{language}. Resulting list of matches is compared against expected list of matches. Order of expected matches in the list is important. Exception is raised under the following conditions:
+\item 
+\texttt{redex-match-assert-equal}: Given a term, it is matched against a pattern that may contain non-terminal symbols from \texttt{language}. It compares the resulting list of matches against the expected list. The order in which the expected matches appear in the list is important. An Exception is raised under the following conditions:
 	\begin{enumerate}
 	\item Lengths of both lists do not match.
 	\item Given two matches from both lists at position $i$, $m_i^{expected} \neq m_i^{actual}$, with equality operation defined in TODO.
 	\end{enumerate}
 	This form is based on \texttt{redex-match} form provided by PLT Redex.
 
-\item \texttt{term-let-assert-equal}: Given a list of pattern-variable assignments, replaces all pattern-variables in term-template with terms bound to pattern-variables and then asserts that resulting term is equal to the expected one.  While this form is based off \texttt{term-let} form provided by PltRedex, the way assignments are specified is different. In PltRedex, assignment is `(pattern term)` (i.e. term is matched against the pattern and terms bound by the match are then used to replace appropriate pattern-variables), whereas PyPltRedex bypasses matching step. `integer` in assignment represents ellipis depth of the pattern-variable and assumes that related term is well-formed with respect to ellipsis depth. That is, `(n 1 (term (1 2 3)))` is valid but `(n 1 (term ((1) (2) (3))))` is not.
 
-\item \texttt{apply-reduction-relation-assert-equal} This form takes a term-template, applies reduction-relation (assuming reduction-relation is defined and thus `reduction-relation-name` is valid), and ensures that a list of terms after reduction equals is equal to predefined list of terms. Exception is raised under the following conditions:
+\item 
+\texttt{term-let-assert-equal}: Given a list of pattern-variable assignments, it replaces all pattern-variables in term-template with terms bound to pattern-variables and then asserts that the resulting term is equal to the expected one.  While this form is based on the \texttt{term-let} form provided by PltRedex, the way assignments are specified is different. In PltRedex, assignment is `(pattern term)` (i.e. term is matched against the pattern and terms bound by the match are then used to replace pattern-variables), whereas PyPltRedex bypasses matching step. `integer` in assignment represents ellipsis depth of the pattern-variable and assumes that related term is well-formed regarding ellipsis depth. That is, `(n 1 (term (1 2 3)))` is valid but `(n 1 (term ((1) (2) (3))))` is not.
+
+\item 
+\texttt{apply-reduction-relation-assert-equal} This form takes a term-template, applies reduction-relation (assuming reduction-relation is defined and thus `reduction-relation-name` is valid), and ensures that a list of terms after reduction is equal to a predefined list of terms. An Exception is raised under the following conditions:
 
 	\begin{enumerate}
 	\item Lengths of both lists do not match.

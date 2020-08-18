@@ -9,11 +9,11 @@ All runtime terms are represented as shown in the class diagram in Figure <TODO>
 \label{class-diagram-runtime-term}
 \end{figure}
 
-As one may notice, these classes are all very similar and essentially just act as a wrapper for some primitive type. \texttt{Term} is the base class. Due to how RPython's type inference works creating a single class to represent all child classes such as \texttt{String} or \texttt{Float} results in the following compilation error.  Since the \texttt{LeafNode} instance is created with \texttt{helloworld!} string, any other instantiation of LeafNode expects it's second argument to be of type \texttt{string}. 
+These classes are all very similar and essentially just act as a wrapper for some primitive type. \texttt{Term} is the base class. Due to how RPython's type inference works creating a single class to represent all child classes such as \texttt{String} or \texttt{Float} results in the following compilation error.  Since the \texttt{LeafNode} instance is created with \texttt{helloworld!} string, any other instantiation of LeafNode expects it's second argument to be of type \texttt{string}. 
 
-One may notice that, for example, \texttt{String} and \texttt{Variable} could be merged into one class and additional \texttt{tag} field could be introduced to differentiate between strings and variables. However, since \texttt{isinstance} function is supported by RPython, such change would make term comparison logic more complex.
+One may notice that, for example, \texttt{String} and \texttt{Variable} could be merged into one class and an additional \texttt{tag} field could be introduced to differentiate between strings and variables. However, since \texttt{isinstance} function is supported by RPython, such change would make term comparison logic more complex.
 
-\begin{lstlisting}
+\begin{minted}[tabsize=2,obeytabs,fontsize=\normalsize]{python}
 class LeafNode:
     def __init__(self, kind, value):
         self.kind = kind 
@@ -26,16 +26,15 @@ def entrypoint():
 # UnionError:
 #  SomeString(const='hello world!', no_nul=True)
 #  SomeFloat(const=12.5)
-\end{lstlisting}
+\end{minted}
 
 All the classes implement following methods.
 \begin{itemize}
-\item \texttt{shallow\_copy} returns exact copy of the term. This kind of copying is not recursive.
+\item \texttt{shallow\_copy} returns an exact copy of the term. This kind of copying is not recursive.
 \item
 \texttt{deep\_copy} copies the term recursively. In practice, it duplicates \texttt{shallow\_copy} for every term type except \texttt{Sequence} - each element is copied recursively instead.
-
 \item
-\texttt{equals} compares two terms based on the type of the term and them on value.
+\texttt{equals} compares two terms based on the type of the term and then on the value.
 \item
 \texttt{tostring} returns a string representing the term. These are made to look like actual Racket expressions.
 and procedures

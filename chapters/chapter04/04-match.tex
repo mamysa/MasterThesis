@@ -13,47 +13,32 @@ To implement matches, two classes are defined - \texttt{Match} and \texttt{Bindi
 
 \begin{itemize}
 \item 
-\texttt{increase\_depth} pushes term \texttt{Sequence} onto the stack provided a term on top of the stack is also a \texttt{Sequence}, otherwise raises an error.
+\texttt{increase\_depth} pushes the term \texttt{Sequence} onto the stack provided a term on top of the stack is also a \texttt{Sequence}, otherwise it raises an Exception.
 
 \item
 \texttt{decrease\_depth} has the following behaviour:
 	\begin{enumerate}
 		\item
-        if stack is empty, raise exception
+        if the stack is empty, raise an Exception.
 		\item
-		if stack size is 1 and topmost element is not term \texttt{Sequence} raise exception.
+		if the stack size is 1 and the topmost element is not \texttt{Sequence}, raise an Exception.
 		\item
-		if stack size is 1 and topmost element is term \texttt{Sequence} do nothing.
+		if the stack size is 1 and the topmost element is \texttt{Sequence}, do nothing.
 		\item
-        if stack size > 1, pop topmost element and append it to element below. ( works because increasedepth must be called beforehand)
+        if the stack size is greater than one, pop the topmost \texttt{Sequence} and append it to \texttt{Sequence} below. (this works because \texttt{increasedepth} must be called beforehand)
 	\end{enumerate}
 
 \item
 \texttt{add(term)} has the following behaviour:
 	\begin{enumerate}
 		\item
-         if stack is empty, add value
+         if the stack is empty, add \texttt{term}. 
 		\item
-         if stack is not empty and not a compoundarray, raise exception
+         if the stack is not empty and the topmost term is not \texttt{Sequence}, raise an Exception
 		\item
-        if stack is not empty and is compoundarray, add value to the array.
-		\item
-        if stack size > 1, pop topmost element and append it to element below. ( works because increasedepth must be called beforehand)
-	\end{enumerate}
-
-\item
-\texttt{add(term)} has the following behaviour:
-	\begin{enumerate}
-		\item
-         if stack is empty, add value
-		\item
-         if stack is not empty and not a compoundarray, raise exception
-		\item
-        if stack is not empty and is compoundarray, add value to the array.
+        if the stack is not empty and the topmost term is \texttt{Sequence}, add \texttt{term} to the \texttt{Sequence}.
 	\end{enumerate}
 \end{itemize}
-
-
 
 \texttt{Match} class associates pattern-variable with \texttt{Binding} instance.
 
@@ -68,8 +53,8 @@ To implement matches, two classes are defined - \texttt{Match} and \texttt{Bindi
 \texttt{addtobinding} calls \texttt{add} method of relevant \texttt{Binding} instance with \texttt{term}.
 
 \item
-\texttt{comparekeys(key1, key2)} compares topmost terms on stacks of bindings assigned to key1 and key2.
+\texttt{comparekeys(key1, key2)}. Given two keys, appropriate \texttt{Binding} instances are retrieved.
 
 \item
-	\texttt{deepcopy} creates a new Match instance with all \texttt{Binding} and \texttt{Term} instances contained within copied using \texttt{deepcopy}.
+\texttt{deepcopy} creates a new Match instance with all \texttt{Binding} and \texttt{Term} instances contained within copied using \texttt{deepcopy}.
 \end{itemize}
