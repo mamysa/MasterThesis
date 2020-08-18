@@ -2,15 +2,13 @@
 
 
 \subsection{Lexical Analysis and Parsing}
-
-Initially, input to PyPltRedex is read from the file and stored as a string. To be able to apply reduction-relation, the string needs to be analyzed. 
+nitially, input to PyPltRedex is read from the file and stored as a string. To apply reduction-relation, the string needs to be analyzed.
 
 Lexical analysis breaks up the string into individual tokens and decides which kind of token it is. Most commonly tokens are described using regular expressions. 
 
-Parsing takes individual lexemes and creates structured data out of them. In this case, \texttt{Term} instances are produced. 
+Parsing takes individual lexemes and creates structured data out of them. In this case, it produces \texttt{Term} instances. 
 
 The grammar can be seen in Figure \ref{tok-lex-grammar}.
-
 
 \begin{figure}[h]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=::,mathescape=true,fontsize=\normalsize]{text}
@@ -44,7 +42,7 @@ Class diagram for both \texttt{Tokenizer} and \texttt{Parser} can be seen in Fig
 \label{class-diagram-lexer-parser}
 \end{figure}
 
-Actual lexer implementation doesn't use regular expressions that were described above but implements their functionality using manually implemented state machine. Functions that classify characters can be seen in Figure \ref{char-predicates}.
+The lexer implementation doesn't use regular expressions that were described above but implements their functionality using a manually implemented state machine. Functions that classify characters can be seen in Figure \ref{char-predicates}.
 
 \begin{figure}[h]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=::,mathescape=true,fontsize=\normalsize]{python}
@@ -97,7 +95,7 @@ def is_rightparen(c):
 \texttt{extract()} extracts the string between \texttt{start} and \texttt{end}, sets \texttt{start=end} and returns the extracted string.
 
 \item
-	\texttt{next()} returns the next token in the string. This method implements actual tokenization logic. All regular expressions are implemented directly instead of using RPython's regular expression library (for reasons why see below). State machine representing this method can be seen in Figure \ref{lexical-analysis-tokenize}.
+	\texttt{next()} returns the next token in the string. This method implements the tokenization logic. All regular expressions are implemented directly instead of using RPython's regular expression library (for reasons why see below). State machine representing this method can be seen in Figure \ref{lexical-analysis-tokenize}.
 
 \begin{figure}[th!]
 	\centering
@@ -106,25 +104,23 @@ def is_rightparen(c):
 \label{lexical-analysis-tokenize}
 \end{figure}
 
-Edges of the graph represent calls to \texttt{peek()} and ensuring the character satisfies a predicate an edge is labeled with. Taking a transition does not consume any characters. Predicates are described above.
-
-The state machine has different node types with different character consumption strategies.
+Edges of the graph represent calls to \texttt{peek()} and ensure the character satisfies a predicate an edge is labeled with (see Figure \texttt{char-predicates}). Unlike more traditional state machines such as finite automatons in which moving from one state to another is associated with input consumption, the one above consumes input only after switching to some state. There are different state kinds which consume input in different ways.
 \begin{itemize}
-\item states that return tokens annotated with their types, highlighted in green. After moving to this state no input is consumed.
-\item states that raise Exceptions highlighted in red. After moving to this state no input is consumed.
-\item \texttt{If} states are essentially \texttt{if} statements. They consume no characters.
-\item Circled blue states actually consume characters. They also may have self-loops indicating consumption of one or more characters satisfying given predicate.
+\item States that return tokens annotated with their types are highlighted in green. After moving to this state no input is consumed.
+\item States that raise Exceptions are highlighted in red. After moving to this state no input is consumed.
+\item \texttt{If} states correspond to \texttt{if} statements. They consume no characters.
+\item Circled blue states actually consume characters that satisfy a predicate the incoming edge is labeled with. They can also have self-loops indicating consumption of one or more characters satisfying a given predicate.
 \item Circled yellow states are conceptually identical to blue states but are handled differently as explained below.
 \end{itemize}
 
-The state machine proceeds in the following manner
+The state machine proceeds in the following manner:
 
 \begin{enumerate}
-\item First ensure end of the string has not been reached, otherwise return (Eof)
-\item Then, if current character whitespace, go to the state $s1$ that consumed all whitespace characters. Go back to the beginning and perform "end of the string" check.
-\item After moving to state $if3$ and if current character is semicolon indicating beginning of comment, go to state $s2$ that consumes anything that is not a newline or end-of-the-string. Comment is then discarded and state machine transitions either to $if1$ or $eof$ returning (Eof).
-\item Next two If statements detect closing and opening parantheses/braces/brackets and return (Lbrace) or (Rprace) accordingly.
-\item If current character starts with pound sign indicating possible boolean, goto state $s3$. These yellow states do not consume input character by character but utilize \texttt{extract\_if\_contains} peek and consume multiple characters at once. This method is called in following manner:
+\item First it ensures the end of the string has not been reached, otherwise \texttt{EOF} token is returned. 
+\item Then, if the current character is whitespace, greedily consume all whitespace characters and move to initial state.
+\item If the current character is semicolon thus thus indicating the beginning of a comment, greedily consume all characters until newline or end of the string, thus returning \texttt{EOF} token. 
+\item The next two If statements the detect opening and closing parantheses/braces/brackets and return \texttt{LParen} or \texttt{RParen} tokens accordingly.
+\item If the current character starts with pound sign indicating a possible boolean, the transition to the yellow state would be taken. However, these yellow states do not consume input on character by character basis like blue states do but utilize \texttt{extract\_if\_contains} method to peek and consume multiple characters at once. This method is called in the following manner:
 \begin{itemize}
 \item
 if \texttt{extract\_if\_contains("\#t")} return (Boolean "\#t)
@@ -136,29 +132,18 @@ if \texttt{extract\_if\_contains("\#true")} return (Boolean "\#t)
 if \texttt{extract\_if\_contains("\#false")} return (Boolean "\#f)
 \end{itemize}
 
-\item If current character is double quote, consume any character until closing double quote is found. Escape sequences are supported expecting a single character after backward slash. If end-of-string is encountered prematurely, Exception is raised. Otherwise, (String, \texttt{self.extract()}) is returned.
+\item If the current character is a double quote, consume any character until the closing double quote is found. Escape sequences are supported expecting a single character after a backward slash. If end-of-string is encountered prematurely, in Exception is raised. Otherwise, \texttt{String, self.extract()} token is returned.
 
-\item Finally, at this point a token can only be an integer, float, or identifier. This state machine is more complex.
-
-\begin{itemize}
-\item After arriving into state $1$, next character can either be (1) plus or minus thus moving to state 2;  (2) digit thus moving to state 3; (3) any other symbol that is not a delimeter this moving to state 6; and (4) delimiter thus moving to Exception state.
-\item After arriving to state $2$ and consuming \texttt{+} or \texttt{-}, next character can either be (1) digit -> 3; (2) delimeter -> returning (Identifier, \texttt{extract()}) as \texttt{-} or \texttt{+} are valid identifiers in Racket; (3) Any other symbol that is not delimeter -> 6.
-\item After arriving to state 3 and consuming a digit, next character can either be (1) a digit -> 3 (implemented as \texttt{while} loop); (2) delimeter thus returning (Integer, extract()); (3) fullstop symbol -> 4 indicating potential floating point number; (4) character that is neither a delimeter/number/nor fullstop -> 6.
-\item After arriving to state 4 and consuming fullstop, next character can either be (1) delimeter -> raise Exception because fractional part of the float is missing; (2) digit -> 5; (3)neither a digit or delimeter -> 6.
-\item After arriving to state 5 and consuming a digit, next character can either be (1) digit -> 5 (again, implemented as \texttt{while} loop); (2) delimeter -> return (Float, extract()) (3) neither a digit nor delimeter -> 6.
-\item After arriving to state 6 and consuming some character, next character can either be (1) delimeter - return (Ident, extract()); (2) not delimeter -> 6.
-
-\end{itemize}
-This completes state machine description
+\item Finally, the only token kinds remaining are \texttt{Integer}, \texttt{Float} and \texttt{Identifier}. First, need to ensure that the current character is not a special reserved one, raising an Exception. Otherwise, state machine moves to the last \texttt{If} statement. Explanation of state machine for these three token kinds would be too verbose to explain, but essentially it attempts to match an \texttt{Integer} or \texttt{Float} first but once a character that may not be in these two token kinds is seen, resulting token immediately becomes \texttt{Identifier}. All input from that point on is consumed greedly until some delimiter character.
 \end{enumerate}
 
 \end{itemize}
 
-This completes description of the tokenizer. The parser is implemented as a very simple recursive descent parser. Below follows the description of its methods and their functionalities.
+This completes the description of the tokenizer. The parser is implemented as a very simple recursive descent parser. Below follows the description of its methods and their functionalities.
 
 \begin{itemize}
 \item
-\texttt{iseof()} returns true if end of the string has been reached.
+\texttt{iseof()} returns true if the end of the string has been reached.
 
 \item
 \texttt{peek()} returns kind of the next token. 
@@ -167,14 +152,14 @@ This completes description of the tokenizer. The parser is implemented as a very
 \texttt{peekv()} returns kind of the next token along with it's value.
 
 \item 
-\texttt{expect(expectedkind, tok=None)} throws Exception when \texttt{currenttoken} is not the one expected. In particular,
+\texttt{expect(expectedkind, tok=None)} throws Exception when \texttt{currenttoken} is not the one expected. In particular:
 	\begin{itemize}
 		\item
-		If \texttt{expectedkind != nexttoken.kind} raise Exception.
+		If \texttt{expectedkind != nexttoken.kind}, raise an Exception.
 		\item
-		If \texttt{tok != None}, additionally check if \texttt{tok=nexttoken.value}. Raise Exception if it is not.
+		If \texttt{tok != None}, check if \texttt{tok=nexttoken.value} and raise an Exception if it is not.
 		\item
-		Otherwise, call \texttt{tokenizer.next()} and assign it to \texttt{nexttoken} and return previous token. 
+		Otherwise, call \texttt{tokenizer.next()} and assign it to \texttt{nexttoken} and return the previous token. 
 	\end{itemize}
 
 \item 
@@ -187,39 +172,36 @@ This completes description of the tokenizer. The parser is implemented as a very
 		The first token is expected to be \texttt{LParen}.
 
 		\item
-		While \texttt{peek()} is not \texttt{RParen}, if \texttt{peek()} is \texttt{LParen}, call \texttt{term-sequence} and append its result to \texttt{seq}, otherwise call \texttt{parse\_atom} and append its result to seq.
+		While \texttt{peek()} is not \texttt{RParen}, if \texttt{peek()} is \texttt{LParen}, call \texttt{term-sequence} and append its result to \texttt{seq}, otherwise call \texttt{parse\_atom} and append its result to \texttt{seq}.
 	
 		\item
-		\texttt{expect(RParen)} 
-
-		\item
-		Return \texttt{Sequence(seq)}
+		\texttt{expect(RParen)} and return \texttt{Sequence(seq)}
 	\end{itemize}
 
 \item
 \texttt{parse\_atom} implements parsing of \texttt{atom} from grammar.
 	\begin{itemize}
 	\item
-		If \texttt{peek()} is Integer, return \texttt{Integer(expect(Integer))}
+		If \texttt{peek()} is an \texttt{Integer} token, return \texttt{Integer(expect(Integer))}
 	\item
-		If \texttt{peek()} is Float, return \texttt{Float(expect(Decimal))}
-	\item
-
-		If \texttt{peek()} is String, return \texttt{String(expect(String))}
-	\item
-		If \texttt{peek()} is Boolean, return \texttt{Boolean(expect(Boolean))}
+		If \texttt{peek()} is a \texttt{Float} token, return \texttt{Float(expect(Decimal))}
 	\item
 
-		If \texttt{peek()} is Ident, then \texttt{peekv} to retrieve the value of the token. If value of token is \texttt{hole} return \texttt{Hole()}, otherwise Variable(self.expect(Ident)).
+		If \texttt{peek()} is a \texttt{String} token, return \texttt{String(expect(String))}
+	\item
+		If \texttt{peek()} is a \texttt{Boolean} token, return \texttt{Boolean(expect(Boolean))}
+	\item
+
+		If \texttt{peek()} is an \texttt{Ident} token, then call \texttt{peekv} to retrieve the \texttt{value} of the token. If \texttt{value} of token is \texttt{hole} return \texttt{Hole()}, otherwise \texttt{Variable(value)} is returned
 	\end{itemize}
 	
 
 \end{itemize}
 
 \subsection{Implementation: Difficulties}
-Initial lexical analysis implementation relied on regular expression library provided by RPython for identifying integers, floating point numbers and identifiers using regular expressions described in section TODO. While library works fine while running the lexer using \texttt{python2.7}, attempting to compile lexer code using \texttt{rpython} toolchain results in the following compilation error:
+The implementation of the initial lexical analysis relied on a regular expression library provided by RPython used to identify integers, floating point numbers and identifiers using regular expressions described in section TODO. While the library works fine while running the lexer using \texttt{python2.7}, attempting to compile the lexer code using \texttt{rpython} toolchain results in the following compilation error:
 
-\begin{lstlisting}
+\begin{minted}[tabsize=2,obeytabs,fontsize=\normalsize]{python}
 [translation:ERROR] AttributeError: 'FrozenDesc' object has no attribute 'pycall'
 Processing block:
  block@1149[_choice5_0...] is a <class 'rpython.flowspace.flowcontext.SpamBlock'> 
@@ -230,9 +212,9 @@ Processing block:
        v3 = newlist() 
        v4 = iter(v2) 
        v5 = hint(v3, v2, ({'maxlength': True})) 
-\end{lstlisting}
+\end{minted}
 
-Seems like RPython's \texttt{RegexParser} functionality has a bug. After attempting to investigate, I decided (TODO passive voice) to implement these regular expressions manually instead of relying on the library. This decision was made also because construction of those regular expressions was rather slow.
+There appears to be a bug within RPython's \texttt{RegexParser} functionality. After investigating the issue, it was decided to implement these regular expressions manually instead of relying on the library. This decision was also made because the construction of those regular expressions was rather slow.
 
 \subsection{Future Improvements}
 
