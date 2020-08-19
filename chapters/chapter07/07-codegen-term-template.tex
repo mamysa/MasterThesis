@@ -72,9 +72,9 @@ def |$f_t$|(match, |$arg_1, ..., arg_n$|):
 	{% endfor %}
 	sequence = Sequence()
 	{% for |$t_i$| in |$t_1, ..., t_n$|: %}
-		{% if isinstance(|$t_i$|, |\TermRepeat|) %}
+		{% if isinstance(|$t_i$|, Repeat) %}
 		# snip 
-		{% elif isinstance(|$t_i$|, |\PythonCall|) %}
+		{% elif isinstance(|$t_i$|, PythonCall) %}
 		# snip
 		{% else %}
 		# snip
@@ -89,7 +89,7 @@ Further code is generated based on the type of $t_i$. There are few cases to con
 Element is \TermRepeat.  Retrieve ForEach(param) annotation and let $fe_1, ..., fe_n$ be resulting set of pattern-variables. Note that these pattern-variables may be read from the match or simply passed as function parameter. First, need to ensure that terms that are assigned to these pattern-variables are \texttt{Sequence} instances with equal lengths. Exception is raised if the test fails. Otherwise, iterate over terms assigned to $fe_1, ..., fe_n$, retrieve term at position $i$ and call $f_{t_i}$.
 
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
-{% if isinstance(|$t_i$|, |\TermRepeat|): %}
+{% if isinstance(|$t_i$|, Repeat): %}
 lengths = set([])
 	{% |$fe_1, ..., fe_n$| = |$t_i$|.getannotation("ForEach")
 	{% for |$fe_i$| in |$fe_1, ..., fe_n$|: %}
@@ -111,7 +111,7 @@ Element is \PythonCall. Call $f_{t_i}$  to obtain the term $t^{\prime}$. Notice 
 	\end{enumerate}
 
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
-{% elif isinstance(|$t_i$|, |\PythonCall|) %}
+{% elif isinstance(|$t_i$|, PythonCall) %}
 	{% |$a_1, ..., a_n$| = |$t_i$|.getannotation("InArg") %}
 	$t^{\prime}$ = |$f_{t_i}$|(match, |$a_1, ..., a_n$|)
 	{% if |$m$| == "Normal") %}
