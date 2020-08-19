@@ -2,50 +2,36 @@
 
 \subsection{Algorithm}
 
-Immediately after parsing Redex specification, it is unknown whether certain elements of pattern are built-in patterns or non-terminal symbols or just literals. These elements will be represented with \UnresolvedSymbol instances. Given $DefineLanguage df$, let $Nts(df)$ be the set of all non-terminal symbols of the language. By analyzing $s$ in \UnresolvedSymbol using $Nts(df)$ and buildin pattern names (TODO) it is possible to termine if given \UnresolvedSymbol is either \Nt, \BuiltInPattern, or \LiteralPattern.
+Immediately after parsing PLTRedex specification, it is unknown whether certain elements of pattern are built-in patterns or non-terminal symbols or just literals. These elements are represented with \UnresolvedSymbol instances and will have to be resolved either one of the following: \BuiltInPatternNoArg, \NonTerminalNoArg, or \LiteralPatternNoArg.
 
-The symbol is analyzed in the following way: locate first underscore character. If there are no underscore characters, simply return the symbol, otherwise return all characters before the underscore. If underscore is the first character of the symbol, raise an `Exception` because Redex doesn't consider such symbols valid. Resulting symbol will be refered to as \textit{prefix}.
+This transformation is applicable to all patterns as well as patterns in \texttt{define-language} form. For \texttt{define-language} form, all sub-patterns that resolve to \LiteralPatternNoArg need to be stored in set $V$, initially empty, which the set of all variables used by the given language.
 
-This transformation is applicable to all patterns as well as \texttt{define-language} form. In case of \texttt{define-language}, need to maintain variables used in patterns in order to make \texttt{variables-not-otherwise-mentioned} pattern work. Let $V = \{\}$ be the set of all variables defined in the language. 
-
-Resolution algorithm proceeds in the following manner. The pattern is traversed recurisely. When coming across \UnresolvedSymbol node, extract prefix from the symbol $s$.  
-
+Given \LetDefineLanguage{$l$}, let $Nt_{l}$ be the set of all non-terminal symbols of the language. Given string $sym$, the prefix of $sym$ needs to be extracted. Let $prefix_{sym}$ be a string of characters up to the first occurence of underscore character in $sym$. There are several cases to consider.
 
 \begin{itemize}
-\item
-Prefix is \texttt{number}, replace \UnresolvedSymbol with  \BuiltInPattern with $t=Number$ and $s$ defined above.
-
-\item
-Prefix is \texttt{integer}, replace \UnresolvedSymbol with  \BuiltInPattern with $t=Integer$ and $s$ defined above.
-
-\item
-Prefix is \texttt{real}, replace \UnresolvedSymbol with  \BuiltInPattern with $t=Real$ and $s$ defined above.
-
-\item
-Prefix is \texttt{natural}, replace \UnresolvedSymbol with  \BuiltInPattern with $t=Natural$ and $s$ defined above.
-
-\item
-Prefix is \texttt{string}, replace \UnresolvedSymbol with  \BuiltInPattern with $t=String$ and $s$ defined above.
-
-\item
-Prefix is \texttt{boolean}, replace \UnresolvedSymbol with  \BuiltInPattern with $t=Boolean$ and $s$ defined above.
-
-\item
-Prefix is \texttt{variable-not-otherwise-mentioned}, replace \UnresolvedSymbol with  \BuiltInPattern with $t=Variable$ and $s$ defined above.
-
-\item
-* Prefix is \texttt{hole}, replace \UnresolvedSymbol with  \BuiltInPattern with $t=Variable$ and $s$ defined above. PltRedex does not allow underscores for \texttt{hole} patterns and thus raise Exception if prefix $\neq s$.
-
-\item
-Prefix $p$ is found in the list of non-terminal symbols defined by the language, replace unresolved symbol with \Nt with $nt=p$ and $s$ defined above.
-
-\item
-Finally, check that symbol contains no underscores. Redex only allows underscores after non-terminal symbols and built-in patterns. Abort compilation if that is the case. Otherwise, replace unresolved symbol with \LiteralPattern with $l=Variable$, $v=s$ and $V = V \cup \{s\}$.
-
+\item $prefix_{sym}$ does not exist; that is there are no underscore characters in $sym$. Let $prefix_{sym}=sym$.
+\item $prefix_{sym}$ is empty; that is the first character of $sym$ is underscore. Raise an Exception because Redex doesn't consider such symbols valid.
+\item Otherwise, $prefix_{sym}$ is the prefix.
 \end{itemize}
 
-If transformation was performed on \texttt{define-language}, annotate $DefineLanguage$ with $V$.
+Resolution algorithm proceeds in the following manner. The pattern is traversed recursively. When coming across \UnresolvedSymbol node, extract $prefix_{sym}$. One of the following cases may happen.
 
+\begin{itemize}
+\item Prefix is \texttt{number}, return \BuiltInPattern[Number][$sym$][false].
+\item Prefix is \texttt{integer}, return \BuiltInPattern[Integer][$sym$][false].
+\item Prefix is \texttt{real}, return \BuiltInPattern[Real][$sym$][false].
+\item Prefix is \texttt{natural}, return \BuiltInPattern[Natural][$sym$][false].
+\item Prefix is \texttt{string}, return \BuiltInPattern[String][$sym$][false].
+\item Prefix is \texttt{boolean}, return \BuiltInPattern[Boolean][$sym$][false].
+\item Prefix is \texttt{variable-not-otherwise-mentioned}, \\ return \BuiltInPattern[Variable][$sym$][false]
+\item Prefix is \texttt{hole}. Since PltRedex doesn't allow underscores for \texttt{hole} patterns check if $prefix(sym) \neq sym$ and raise an Exception accordingly. \\ Return \BuiltInPattern[Hole][$sym$][false].
+\item $prefix_{sym} \in Nt_l$, return \NonTerminal[$prefix_{sym}$][$sym$][false].
+\item Finally, check that symbol contains no underscores. Redex only allows underscores after non-terminal symbols and built-in patterns. Abort compilation if that is the case. Otherwise, $V=V\cup\{sym\}$ and return \LiteralPattern[Variable][$sym$][false]
+\end{itemize}
+
+Finally, if this transformation was performed on \LetDefineLanguage{$l$}, 
+
+If transformation was performed on \texttt{define-language}, \MakeAnnotation{$l$}{"ReservedVariables"}{$V$}.
 
 \subsection{Example}
 

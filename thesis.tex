@@ -12,6 +12,7 @@
 \usepackage{xcolor}
 \usepackage{colortbl}
 \usepackage{syntax}
+\usepackage{bm}
 \definecolor{identbefore}{HTML}{fce6e8}
 \definecolor{identafter}{HTML}{dbffde} 
 \usemintedstyle{emacs}
@@ -37,7 +38,10 @@ morecomment=[l]{//s},
 basicstyle=\ttfamily,numberstyle=\tiny,escapeinside={//*}{\^^M},
 mathescape=true}
 
-\setmintedinline{escapeinside=||,mathescape=true}
+\setmintedinline{escapeinside=||,mathescape=true, fontsize=\normalsize, 
+autogobble=true,
+resetmargins=true,
+}
 
 \newcommandx{\UnresolvedSymbol}[1][1=$sym$]{
 	\mintinline{text}{UnresolvedSymbol(|#1|: str)}
@@ -54,29 +58,33 @@ mathescape=true}
 	}
 }
 
-\newcommandx{\BuiltInPattern}[3][1=$tag$, 2=$pv$, 3=true]{
-	\ifthenelse{\boolean{#3}} {
-		\mintinline{text}{
-			BuiltInPattern(|#1|: BuiltInPatternKind, |#2|: str)
-		}
-	} {
-		\mintinline{text}{
-			BuiltInPattern(|#1|, |#2|)
-		}
-	}
-}
+% FIXME spaces are important here.
 
-\newcommandx{\NonTerminal}[3][1=$nt$, 2=$pv$, 3=true]{
-	\ifthenelse{\boolean{#3}} {
-		\mintinline{text}{
-			NonTerminal(|#1|: str, |#2|: str)
-		}
-	} {
-		\mintinline{text}{
-			NonTerminal(|#1|, |#2|)
-		}
-	}
-}
+
+\newcommandx{\BuiltInPatternNoArg}{%
+	{\mintinline{text}{BuiltInPattern}}}
+
+\newcommandx{\NonTerminalNoArg}{%
+	{\mintinline{text}{NonTerminal}}}
+
+\newcommandx{\LiteralPatternNoArg}{%
+	{\mintinline{text}{Literal}}}
+
+\newcommandx{\DefineLanguageNoArg}{%
+	{\mintinline{text}{DefineLanguage}} }
+
+\newcommandx{\MakeAnnotation}[3]{%
+{\mintinline{text}{|#1|.addannotation(#2, |#3|)}}}
+
+\newcommandx{\BuiltInPattern}[3][1=$tag$, 2=$pv$, 3=true]{%
+\ifthenelse{\boolean{#3}} 
+	{\mintinline{text}{BuiltInPattern(|#1|: BuiltInPatternKind, |#2|: str)}}
+	{\mintinline{text}{BuiltInPattern(|#1|, |#2|)}}}
+
+\newcommandx{\NonTerminal}[3][1=$nt$, 2=$pv$, 3=true]{%
+	\ifthenelse{\boolean{#3}} 
+	{\mintinline{text}{NonTerminal(|#1|: str, |#2|: str)}} 
+	{\mintinline{text}{NonTerminal(|#1|, |#2|)}}}
 
 \newcommandx{\PatternInHole}[4][1=$p_1$, 2=$p_2$, 3=$c_1$, 4=$c_n$]{
 	\mintinline{text}{
@@ -84,17 +92,10 @@ mathescape=true}
 	}
 }
 
-\newcommandx{\LiteralPattern}[3][1=$kind$, 2=$v$, 3=true]{
-	\ifthenelse{\boolean{#3}} {
-		\mintinline{text}{
-			Literal(|#1|: literalkind, |#2|: any)
-		}
-	} {
-		\mintinline{text}{
-			Literal(|#1|, |#2|)
-		}
-	}
-}
+\newcommandx{\LiteralPattern}[3][1=$kind$, 2=$v$, 3=true]{%
+	\ifthenelse{\boolean{#3}}
+	{\mintinline{text}{Literal(|#1|: literalkind, |#2|: any)}} 
+	{\mintinline{text}{Literal(|#1|, |#2|)}}}
 
 \newcommandx{\CheckConstraintT}[3][1=$sym_1$, 2=$sym_2$, 3=true]{
 	\ifthenelse{\boolean{#3}} {
@@ -109,7 +110,15 @@ mathescape=true}
 }
 
 
+\newcommandx{\NtDefinitionN}[4][1=$nt$, 2=$p_1$, 3=$p_n$, 4=true]{%
+	\ifthenelse{\boolean{#4}}
+	{\mintinline{text}{NtDefinition(|#1|: NonTerminal, [|#2|, |$...$|, |#3|]: Pattern)}}
+	{\mintinline{text}{(NtDefinition|#1|, [|#2|, |$...$|, |#3|])}}}
+	
+\newcommandx{\DFSColor}[2]{%
+	{\mintinline{text}{color(|#1|) =|\bfseries{#2}|}}}
 
+\newcommandx{\LetDefineLanguage}[1]{\mintinline{text}{DefineLanguage |#1|}}
 
 
 
@@ -188,7 +197,6 @@ This is a very abstract abstract.
 \listoftables %optional
 
 \mainmatter
-
 \input{chapters/01-introduction.tex}
 \input{chapters/02-features-of-pltredex.tex}
 \input{chapters/03-pypy-and-rpython.tex}

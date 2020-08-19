@@ -1,7 +1,7 @@
 \section{Non-Terminal Cycle Checking}
 
 \subsection{Motivation}
-PltRedex disallows language definitions such as ones in Figure below. 
+PltRedex doesn't allow language definitions such as the one in Figure \ref{dl-ntcyclegraph}. 
 
 \begin{figure}[H]
 \begin{minipage}{0.45\linewidth}
@@ -25,15 +25,15 @@ PltRedex disallows language definitions such as ones in Figure below.
 The problem with the language above (aside from it being completely useless) is a cycle of non-terminals $n \rightarrow p \rightarrow e$. When testing if some term is a non-terminal, a term is matched against every pattern in non-terminal definition. For example, given term \texttt{String("hello world")} it is matched against non-terminal \texttt{e}. Since  the term doesn't match pattern \texttt{(e e)}, non-terminal \texttt{n} is then matched. Since the term doesn't match any patterns here either, non-terminal \texttt{p} is then matched. Similarly, the term doesn't match any patterns here either, \texttt{e} is then matched, but that's where the matching has started and thus \textit{infinite recursion} becomes an issue. Languages need to be analyzed for presence of non-terminal cycles.
 
 \subsection{Algorithm}
-To detect such cycles, \texttt{define-language} needs to be interpreted as directed graph and some cycle-detecting algorithm must be used. Graph is constructed in the following manner.
+To detect such cycles, \DefineLanguageNoArg needs to be interpreted as directed graph and some cycle-detecting algorithm must be used. The graph is constructed in the following manner.
 
 TODO fix notation here
 
 \begin{enumerate}
 \item
-For each \NtDefinition, create a vertex with label $s=nt$.
+For each \NtDefinitionN[n], create a vertex  labeled $n$.
 \item
-For $p_1, ..., p_n$, if $p_i$ is $\Nt$ then create edge $s->nt$.
+For $p_1, ..., p_n$, if $p_i$ is \NtDefinitionN[m], create the edge $n\rightarrow m$.
 \end{enumerate}
 
 
@@ -45,22 +45,29 @@ For cycle detection, depth-first-search is employed. Vertices in the graph can b
 \textbf{White} meaning the vertex hasn't been visited before. All vertices are initially assigned this color.
 
 \item
-\textbf{Grey} meaning successors of the vertex $v$ are still being visited. When $v$ is visited for the first time, $color(v)$ becomes \textbf{Grey}.
+\textbf{Gray} meaning successors of the vertex $v$ are still being visited. When $v$ is visited for the first time, $color(v)$ becomes \textbf{Gray}.
 \item
 \textbf{Black} meaning all successors of the vertex $v$ have been explored. 
 \end{itemize}
 
 
 
-Vertex coloring allows for detection of cycles; more specifically, if during depth-first-traversal vertex $v$ is encountered with $color(v)=Grey$, this means that there's a \textbf{back-edge} in dfs-tree. (expand). That is, back-edge (u,v) connects vertex $v$ to its predecessor in depth-first-search tree $u$. Once such cycle is found, the error is reported and compilation aborts.
+The detection of cycles is done through vertex coloring. For example, if during depth-first-traversal vertex $v$ is encountered with \DFSColor{$v$}{Gray}, this means that there's a \textbf{back-edge} in the tree created by depth-first traversal. That is, back-edge $u \rightarrow v$ connects vertex $u$ to its predecessor in depth-first-search tree $v$. Once such cycle is found, the error is reported and the compilation aborts.
 
-To report a path of non-terminals that make up the cycle, a path of non-terminals has to be maintained. The path can be represented as a stack. The vertex is added to the stack when it changes color to $Grey$ and removed from the stack when it changes color to $Black$. Pseudocode for depth-first-traversal and cycle reporting can be seen below.
+To report a path of non-terminals that make up the cycle, a path of non-terminals has to be maintained. The path can be represented as a stack. Given starting vertex $v$, depth-first-search proceeds as follows:
 
-Since resulting non-terminal graphs may be disjoint, we need to keep track of visited vertices during traversal. Let $V$ be a set of vertices whose $color(v)=Black$. Thus, every time vertex $v$ changes its color to $Black$, $V = V \cup \{v\} $. Let $U$ be a set of vertices whose $color(u)=White$; that is, it initially contains all the non-terminals. The algorithm proceeds as follows:
+\begin{enumerate}
+\item If \DFSColor{$v$}{Gray}, report cycle and abort compilation.
+\item If \DFSColor{$v$}{White}, set color to \textbf{Gray} and add $v$ to the path. 
+\item Visit each successor vertex $v^{\prime}$ recursively.
+\item Set color of $v$ to \textbf{Black} and remove it from the path.
+\end{enumerate}
+
+Since the resulting non-terminal graphs may be disjoint, we need to keep track of visited vertices during traversal. Let $V$ be a set of vertices whose \DFSColor{$v$}{Black}. Thus, every time vertex $v$ changes its color to \textbf{Black}, $V = V \cup \{v\} $. Let $U$ be a set of vertices whose \DFSColor{$v$}{White}; that is, it initially contains all the non-terminals. The algorithm proceeds as follows:
 
 \begin{enumerate}
 \item
-Pick random vertex $u$ from set $U$. Create empty set $V$. Starting from $u$ perform depth-first-search as described above. Compute set difference - $U = U-V$.
+Pick a random vertex $u$ from set $U$. Create empty set $V$. Starting from $u$ perform depth-first-search as described above. Compute set difference - $U = U-V$.
 \item
 Continue until $U$ is empty.
 \end{enumerate}
@@ -70,9 +77,9 @@ Code for this can be seen in Appendix TODO.
 
 \subsection{Example}
 
-Figure \ref{ntcycle-dfs-example} demonstrates cycle searching using graph shown in Figure \ref{dl-ntcyclegraph} starting from non-terminal $s$. Initially $U=\{s,p,n,e\}$. Its color becomes \texttt{Grey} as seen in (a). Since it has no successor vertices, its color becomes \texttt{Black}, as seen in (b). 
+Figure \ref{ntcycle-dfs-example} demonstrates cycle searching using the graph shown in Figure \ref{dl-ntcyclegraph} starting from the non-terminal $s$. Initially $U=\{s,p,n,e\}$. Its color becomes \texttt{Grey} as seen in (a). Since it has no successor vertices, its color becomes \texttt{Black}, as seen in (b). 
 
-Since $V = \{ s \}$, $U=\{p,n,e\}$. Pick vertex $p$ for expansion and color it \texttt{Grey}. Then, visit the only successor of $s$, vertex $e$ and color it \texttt{Grey}. Visit the only successor of $e$, vertex $n$ and color it \texttt{Grey}. Finally, visit the only successor of $n$, vertex $p$. But since it is already colored \texttt{Grey}, the cycle  $p \rightarrow p \rightarrow n$ has been found and compilation error should be raised.
+Since $V = \{ s \}$, $U=\{p,n,e\}$. Pick vertex $p$ for expansion and color it \texttt{Grey}. Then, visit the only successor of $s$, vertex $e$ and color it \texttt{Grey}. Visit the only successor of $e$, vertex $n$ and color it \texttt{Grey}. Finally, visit the only successor of $n$, vertex $p$. But since it is already colored \texttt{Grey}, the cycle  $p \rightarrow p \rightarrow n$ has been found and a compilation error should be raised.
 
 \begin{figure}[H]
 \begin{subfigure}{0.32\linewidth}

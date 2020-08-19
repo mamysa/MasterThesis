@@ -2,14 +2,13 @@
 
 \subsection{Motivation}
 
-Recall that for any pattern in $DefineLanguage$ constraint-checking is not performed. This means that the suffix is not relevant - one can write pattern \texttt{(+ e e)} as \texttt{(+ e\_1 e\_1)} or \texttt{(e\_1 e\_2)}. However, since `Match` objects cannot store more than one assignment for pattern variable, patterns like \texttt{(+ e e)} have to rewritten. PyPltRedex solves this problem by first stripping the suffix and then generating a fresh one for each pattern variable.
+Recall that for patterns in \DefineLanguageNoArg constraint-checking is not performed. This means, for instance, that in this context patterns \texttt{(+ e e)} as \texttt{(+ e\_1 e\_1)} are equivalent. Due to design of \texttt{Match} class described in Section TODO, PyPltRedex needs to modify all such pattern-variables to be unique. Given pattern variable $pv$, $prefix_{pv}$ (defined in Section TODO) is extracted and concatenated with some previously unused integer - $freshint()$. 
 
 \subsection{Algorithm}
-Givem $DefineLanguage$, each pattern in $NtDefinition$ is visited recursively.
-
+Given \LetDefineLanguage{$l$}, each pattern in $NtDefinition$ is visited recursively.
 \begin{itemize}
-\item Given \BuiltInPattern, let $p=prefix(s)$, and then return new \BuiltInPattern with $s= fresh(p)$.
-\item Given \Nt, return new $\Nt$ with $s=fresh(nt)$
+\item Given \BuiltInPattern, \\ return \BuiltInPattern[$tag$][$prefix_{pv}+freshint()$][false].
+\item Given \NonTerminal, \\ return \NonTerminal[$nt$][$prefix_{pv}+freshint()$][false].
 \end{itemize}
 
 \subsection{Example}
