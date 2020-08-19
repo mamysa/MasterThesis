@@ -46,17 +46,11 @@ resetmargins=true,
 \newcommandx{\UnresolvedSymbol}[1][1=$sym$]{
 	\mintinline{text}{UnresolvedSymbol(|#1|: str)}
 }
-\newcommandx{\PatternSequence}[2][1=$p_1$, 2=$p_n$]{
-	\mintinline{text}{
-		PatternSequence([|#1|,|$...$|,|#2|] : Pattern?)
-	}
-}
+\newcommandx{\PatternSequence}[2][1=$p_1$, 2=$p_n$]{%
+	\mintinline{text}{PatternSequence([|#1|,|$...$|,|#2|] : Pattern?)}}
 
-\newcommandx{\PatternRepeat}[1][1=$p_r$]{
-	\mintinline{text}{
-		Repeat(|#1|: Pattern)
-	}
-}
+\newcommandx{\PatternRepeat}[1][1=$p_r$]{%
+	\mintinline{text}{Repeat(|#1|: Pattern)}}
 
 % FIXME spaces are important here.
 
@@ -86,28 +80,20 @@ resetmargins=true,
 	{\mintinline{text}{NonTerminal(|#1|: str, |#2|: str)}} 
 	{\mintinline{text}{NonTerminal(|#1|, |#2|)}}}
 
-\newcommandx{\PatternInHole}[4][1=$p_1$, 2=$p_2$, 3=$c_1$, 4=$c_n$]{
-	\mintinline{text}{
-		InHole(|#1|: Pattern, |#2|: Pattern, [|#3|,|$...$|,|#4|]: CheckConstraint?)
-	}
-}
+\newcommandx{\PatternInHole}[5][1=$p_1$, 2=$p_2$, 3=$c_1$, 4=$c_n$, 5=true]{%
+	\ifthenelse{\boolean{#5}} 
+	{\mintinline{text}{InHole(|#1|: Pattern, |#2|: Pattern, [|#3|,|$...$|,|#4|]: CheckConstraint?)}}
+	{\mintinline{text}{InHole(|#1|, |#2|, [|#3|,|$...$|,|#4|])}}}
 
 \newcommandx{\LiteralPattern}[3][1=$kind$, 2=$v$, 3=true]{%
 	\ifthenelse{\boolean{#3}}
 	{\mintinline{text}{Literal(|#1|: literalkind, |#2|: any)}} 
 	{\mintinline{text}{Literal(|#1|, |#2|)}}}
 
-\newcommandx{\CheckConstraintT}[3][1=$sym_1$, 2=$sym_2$, 3=true]{
-	\ifthenelse{\boolean{#3}} {
-		\mintinline{text}{
-			CheckConstraint(|#1|: str, |#2|: str)
-		}
-	} {
-		\mintinline{text}{
-			CheckConstraint(|#1|, |#2|)
-		}
-	}
-}
+\newcommandx{\PatternCheckConstraint}[3][1=$sym_1$, 2=$sym_2$, 3=true]{%
+	\ifthenelse{\boolean{#3}} 
+	{\mintinline{text}{CheckConstraint(|#1|: str, |#2|: str)}}
+	{\mintinline{text}{CheckConstraint(|#1|, |#2|)}}}
 
 
 \newcommandx{\NtDefinitionN}[4][1=$nt$, 2=$p_1$, 3=$p_n$, 4=true]{%
@@ -156,7 +142,7 @@ resetmargins=true,
 
 \newcommand{\ReadFromStdinAndApplyReductionRelation}{\lstinline[mathescape]!ReadFromStdinAndApplyReductionRelation($red$: string, $mf$: string)! }
 
-\newcommand{\Visit}[1]{$\texttt{visit}($#1$)$ }
+\newcommand{\Visit}[1]{\texttt{visit}(#1)}
 
 \title{My Dissertation - A very long title\\ which runs over two
   lines} %compulsory

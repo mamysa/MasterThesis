@@ -1,69 +1,65 @@
 \section{Constraint Check Insertion}
-As mentioned before, Redex supports a few different forms of constraint checking; however, for the initial PyRedex implementation only "equality of terms" constraint check will be supported. For example, in pattern `(number\_1 number\_1)` both bound terms must be the same, that is term `(1 1)` matches the pattern but `(1 2)` does not. 
+\subsection{Motivation}
+As mentioned before, Redex supports a few different forms of constraint checking; however, for the initial PyRedex implementation only "equality of terms" constraint check will be supported. For example, in pattern \texttt{(number\_1 number\_1)} both terms bound to \texttt{number\_1} must be the same meaning the term \texttt{(1 1)} does match the pattern but \texttt{(1 2)} does not. 
 
-However, the `Match` object does not store multiple bindings for the same symbol and thus assignable symbols seen in the pattern have to be renamed. In the example above, the pattern could become `(number\_1 number\_1\#1)`. Now both bound terms can be stored in the `Match` object.
+However, since current design of \texttt{Match} class explained in Section TODO does not allow assigning multiple terms to the same pattern-variable, and thus certain pattern variables have to be renamed. Given $n$ occurences of a pattern-variable, $n-1$ occurences are to be renamed. After completion of pattern matching these $n-1$ pattern-variables must be removed from all returned \texttt{Match} instances.
 
-Now, actual equality checks have to be inserted. Two obvious strategies could be employed here:
+Finally, actual equality checks have to be inserted. There are two obvious strategies that could be employed:
 
 \begin{itemize}
-\item
-Perform constraint checking after the pattern has been matched entirely. For example, `(n\_1 n\_1\#1 n\_2 (Check n\_1 == n\_1\#1))`. The disadvantage of this strategy is that if pattern is large and something goes wrong in the beginning the rest of the pattern is still matched and lots of useless work is done. 
+\item Compare required pattern-variables \textit{after} matching a term against a pattern. The disadvantage of this strategy is that the pattern has to be matched entirely despite the fact that failure may happen very early in the matching process, thus resulting in useless work.
 
-\item
-Perform constraint checking the earliest time possible. This implies that by that time both terms have to be matched. Pattern `(n\_1 n\_1\#1 (Check n\_1 == n\_1\#1) n\_2)` is the example of such strategy. The disadvantage of this strategy is that assignable symbols under ellipsis will be checked multiple times. `(((number\_1 ...) (number\_1\#1 ...) (check number\_1 == number\_1\#1)) ...)`
+\item Compare required pattern-variables the \textit{earliest} time possible, as pattern-variables become available. This is the strategy that PyPltRedex uses.
 \end{itemize}
-The algorithm to be detailed below employs the second strategy.
 
-Finally, since `Match` object now contains extra symbols such as `number\_1\#1` these will have to be removed after successfully matching the pattern.
-
-\subsection{Algorithm}
-To be able to insert constraint-checks all symbols to end up in `Match` object have to be known. Since certain symbols will be renamed, need to maintain a mapping between old symbol and new symbol. Additionally, maintain a set to store symbols that will have to be removed. The pattern is traversed recursively. 
+\subsection{Pattern-Variable Renaming}
+Pattern variable $pv$ is renamed in the following manner: $pv + \# + freshint()$, $freshint()$ if $freshint() > 0$ otherwise $pv$. $freshint$ operation was defined previously in Section TODO. For example, assuming $freshint()=0$, renaming \texttt{m} results in \texttt{m}. Successive application of renaming operation results in \texttt{$m\#1$}
 
 
+
+\subsection{Pattern Transformation}
+Since the algorithm is based in renaming (or modification) of pattern-variables, let $v^{\prime}$ be a new pattern-variable after modifying $v$. There's a need to maintain pairs $(pv, pv^{\prime})$ to be able to decide where to insert equality checks. Let $M$ be a set containing such pairs. Furthermore, to be able to remove renamed pattern-variables after matching, need to maintain set $R$ containing such pattern-variables.
+
+Given some pattern $p$, \Visit{$p$}. The following kinds of $p$ are of interest.
 \begin{itemize}
+\item $p=$\BuiltInPattern. Let $pv^{\prime}$ be a renamed variable and let $M=\{(pv, pv^{\prime})\}$. If $pv \neq pv^{\prime}$, $R=R \cup \{pv^{\prime}\}$. Return \BuiltInPattern[$tag$][$pv^{\prime}$][false] and $M$.
+\item $p=$\NonTerminal. Let $pv^{\prime}$ be a renamed variable and let $M=\{(pv, pv^{\prime})\}$. If $pv \neq pv^{\prime}$, $R=R \cup \{pv^{\prime}\}$. Return \NonTerminal[$nt$][$pv^{\prime}$][false] and $M$.
+\item $p=$\LiteralPattern contains to no assignable symbols and thus $p$ and $\emptyset$ are returned.
+\item $p=$\PatternRepeat. Let $p_r^{\prime}, M =$\Visit{$p_r$}. Return \PatternRepeat[$p_r^{\prime}$], $M$.
 \item
-\BuiltInPattern and \Nt. Generate a fresh symbol given template string `symbol\_\#`. If generated symbol is `symbol\_\#0` then original symbol is seen for the first time and thus remains unchanged. Otherwise, modify `BuildInPattern` and `Nt` by changing its symbol to a new one. Add new symbol to the set of the symbols to be removed. After processing the pattern, return a mapping `{tag : symbol}` if pattern is `BuildInPattern` or `{nt: symbol}` if pattern is `Nt`.
-
-\item
-\LiteralPattern contains to no assignable symbols and thus empty list is returned.
-
-\item
-\Repeat. Recursively visit $p$ and return its mapping. 
-
-\item
-\PatternSequence. If sequence contains no child patterns, return empty mapping. Otherwise, let `syms` be a mapping returned after visiting the first pattern. For each remaining pattern in the sequence:
+$p=$\PatternSequence. If sequence contains no child patterns, return $p$, $\emptyset$. Now, define \texttt{merge} operation that, given two sets $M_i, M_j$ returns two sets $M_k$ and $M_r$; this operation will be discussed below. 
+Let $p^{\prime}$ be the pattern sequence that replaces $p$.
+Let $p_1^{\prime}, M_1$=\Visit{$p_1$}. Insert $p_1^{\prime}$ into $p^{\prime}$. For $p_i \in p_2, ..., p_n$, let $p_i^{\prime}, M_i$=\Visit{$p_i$}.
 	\begin{enumerate}
+	\item 
+	Insert $p_i^{\prime}$ into $p^{\prime}$.
 	\item
-	Let `syms2` be a mapping returned after visiting the pattern.
-	\item
-	Let `syms` be a result of merging `syms` and `syms2` mappings; merging will be discussed below.
-	\item
-	Let `syms2merge` be a set containing pairs of symbols that have to be checked for equality obtained fter merging `syms` and `syms2` mappings. For each pair of symbols in `syms2merge` add `ConstraintCheck` node to the sequence, exactly after the current pattern. 
+	Let $M_1$, $M_r$ = \texttt{merge}($M_1$, $M_i$). For each pair of pattern-variables $(pv_a, pv_b) \in M_r$, insert \PatternCheckConstraint[$pv_a$][$pv_b$][false] into $p^{\prime}$.
 	\end{enumerate}
+Finally, return $p^{\prime}, M_1$.
 
 \item
-\InHolePattern. Let `syms1`, `syms2` be mappings returned after visiting `pattern1` and `pattern2`, respectively. Let `syms` be a result of merging `syms` and `syms2` mappings, and let `syms2merge` be a set containing pairs of symbols. For each pair of symbols `(s1, s2)` in the set, create `cc\_i` = `ConstraintCheck(s1, s2)` node. Replace InHole pattern with `InHole(pattern1, pattern2, {cc\_0 ... cc\_i ... })`.
+$p=$\PatternInHole.\\ Let $p_1^{\prime}, M_1$= \Visit($p_1$) and $p_2^{\prime}, M_2$= \Visit($p_2$). Let $M, M_r$=\texttt{merge}($M_1$, $M_2$). For each pair of pattern-variables $(pv_a, pv_b) \in M_r$, let $c_i$=\PatternCheckConstraint[$pv_a$][$pv_b$][false]. Return \PatternInHole[$p_1^{\prime}$][$p_2^{\prime}$][$c_1$][$c_n$][false], $M$.
 \end{itemize}
 
-\subsection{Variable Merging}
+Finally, make annotation \MakeAnnotation{$p$}{"PatternVariable2Remove"}{$R$}.
 
-Consider pattern `(number\_1 number\_1\#1 number\_1\#2)` and observe that after inserting constraint checks in the following way: `(number\_1 number\_1\#1 (number\_1 == number\_1\#1 ?) number\_1\#2 (number\_1 == number\_1\#2 ?) (number1\#1 == number\_1\#2 ?))` one of the comparisons it the end is superfluous since it's known that `(number\_1 == number\_1\#1)`. Thus, while merging mappings, only one assignable symbol has to be in resulting mapping.
+\subsection{\texttt{merge} Operation}
+Before proceeding with pattern traversal, need to define \texttt{merge} operation. Given two sets $M_1$ and $M_2$ it produces two sets $M$ and $M_r$. Those sets are constructed in the following manner:
 
-Given two mappings $m1 = {k_i: sym1, k_j: sym2, ...}$ and $m2 = {q_i: sym, q_j: sym}$, compute ${k_0 ... k_i ... k_n}$ intersection ${q_0 ... q_i ... q_n}$. If some $p_i$ is in intersection, retrieve $m1[p_i]$ and $m2[p_i]$ and create pair out of retrieved elements. These symbols will require constraint checking. 
-
-The resulting mapping is constructed in the following way:
-\begin{itemize}
-\item
-If $p_i$ is in intersection, add ${p_i: m2[p_i]}$ to the mapping.
-\item
-For any $k_i$ that is not in intersection add ${k_i: m1[k_i]}$ to the mapping.
-\item
-For any $q_i$ that is not in intersection add ${q_i: m2[q_i]}$ to the mapping.
-\end{itemize}
+\begin{enumerate}
+\item Let $M=\emptyset$ and $M_r=\emptyset$.
+\item For each $(pv, pv^{\prime}) \in M_1$, find pair $(pv, pv^{\prime\prime}) \in M_2$. 
+\begin{enumerate}
+\item If such pair exists, then $M_r=M_r \cup \{(pv^{\prime},  pv^{\prime\prime})\}$ and $M=M \cup \{(pv,  pv^{\prime\prime})\}$.
+\item Otherwise, $M=M \cup \{(pv,  pv^{\prime})\}$
+\item For any other $(pv, pv^{\prime\prime}) \in M_2$ s.t.  $(pv, pv^{\prime}) \notin M_1$, $M=M \cup \{(pv,  pv^{\prime\prime})\}$
+\end{enumerate}
+\end{enumerate}
 
 \subsection{Example}
 
-\begin{figure}[H]
+\begin{figure}[ht]
 	\centering
 	\makebox[\textwidth][c] { \includegraphics[scale=0.15]{transformation-pattern-constraintcheck.png} }
 \caption{Applying transformation to pattern \texttt{((n\_1 ...) ... (in-hole ((n\_1 ...) hole (n\_1 ...)) (n\_1 ...)) ...)}}
