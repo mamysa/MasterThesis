@@ -2,29 +2,29 @@
 
 \subsection{Motivation}
 
-Pattern variables with the same symbol should be under consistent number of ellipses. For example, in pattern \texttt{(((n\_1 ...) n\_1) ...)} pattern variable \texttt{n\_1} is not under consistent number of ellipses (or \textit{ellipsis depth}). One occurence of \texttt{n\_1} has ellipsis depth of two while another has ellipsis depth of one. Such invalid patterns should be reported during compilation process.
+Pattern-variables with the same symbol should be under a consistent number of ellipses. For example, in pattern \texttt{(((n\_1 ...) n\_1) ...)} the pattern variable \texttt{n\_1} is not under consistent number of ellipses - one has \textit{ellipsis depth} of one, whereas the other is two. Such invalid patterns should be reported during the compilation process.
 
-Additionally, ellipsis depth for each pattern variable is required to be able to generate terms. 
+In addition, since after pattern matching pattern-variables are plugged into term-termplates, ellipsis depth of each pattern-variable is needed to ensure that given term-template is well-formed.
 
-\subsection{Algorithm}
-Two bits of information is needed to find out ellipsis depth of pattern variable :
+\subsection{Pattern Traversal}
+
+During pattern traversal, need to maintain the following:
 
 \begin{enumerate}
 \item
-\textbf{number of ellipses} on the path from root to some node which is changed with each ellipsis encountered during pattern traversal. Let $n$ be number of ellipses.
-\item 
-Association between pattern-variable and its ellipsis depth. Let E = \{\} be the set s.t. each element is tuple $(s \text{ is string }, n \in \mathbb{N})$.
+Let $n$ be \textbf{number of ellipses} on the path from the root of the pattern to some child sub-pattern. $n$ is modified accordingly when visiting patterns of king \RepeatNoArg.
+
+\item Association between pattern-variable $pv$ and its ellipsis depth $d$. Let $E=\emptyset$ containing pairs $(pv, d)$. 
 \end{enumerate}
 
-Pattern is traversed recurisively. The following patterns are of interest.
-
+Give some pattern $p$, \Visit{$p$}. The following kinds of $p$ are of interest.
 \begin{itemize}
-\item 
-\Repeat Let $n=n+1$, recursively visit $p$, and then let $n=n-1$.
-
-\item
-\BuiltInPattern Check if $s$ is in the set $E$. If there is not, $E = E \cup \{ (s, n) \}$. Otherwise, let $(s, n\prime) \in E$. If $n \neq n\prime$, then $s$ has inconsistent ellipsis depth and error should be raised.
+\item $p=$\PatternRepeat. Let $n=n+1$, \Visit{$p_r$}, and then let $n=n-1$.
+\item $p$=\BuiltInPattern Check if there exists pair $(pv, d) \in E$. If it does not, $E = E \cup \{ (pv, d) \}$. Otherwise, if $n \neq d$, then $pv$ has inconsistent ellipsis depth and an Exception is raised.
+\item $p$=\NonTerminal is handled in the same way as \BuiltInPatternNoArg.
 \end{itemize}
+
+Finally, need to annotate pattern $p$ with $E$ - \MakeAnnotation{$p$}{"EllipsisDepths"}{$E$}.
 
 \subsection{Example}
 

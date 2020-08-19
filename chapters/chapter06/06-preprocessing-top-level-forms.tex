@@ -4,8 +4,6 @@ Having defined and explained transformation/analyses passes for both patterns an
 
 Identify three strategies for processing patterns.
 
-NtRewriter -> IdRewriter -> NtCycleChecker -> HoleReachabilitySolver -> AssignableSymbolExtractor for define-language. These accept \lstinline{define-language} form as input and apply described transformations for each pattern in non-terminal definitions.
-
 \includegraphics[scale=0.32]{pipeline-pattern-strat-1.png}
 
 \includegraphics[scale=0.32]{pipeline-pattern-strat-2.png}
@@ -14,39 +12,37 @@ NtRewriter -> IdRewriter -> NtCycleChecker -> HoleReachabilitySolver -> Assignab
 
 \includegraphics[scale=0.32]{pipeline-term-strat.png}
 
-
-Notice that non-terminal resolution occurs with respect to some \lstinline{define-language} form. Similarly, during "Metafunction Application Rewriting" pass requires set $Mf$ containing all meta-functions defined until this point. We need to maintain a symbol table for:
+Notice that non-terminal resolution occurs with respect non-terminal definitions on some \DefineLanguageNoArg form. Similarly, during "Metafunction Application Rewriting" pass requires set $Mf$ containing all meta-functions defined until this point. 
 
 \begin{enumerate}
-\item All $dl =$ \DefineLanguage forms. Maintain a mapping $L$ that maps $name$ to $dl$
-\item All $mf =$ \DefineMetafunction forms. Maintain a mapping $M$ that maps $name$ to $mf$
-\item All \lstinline{define-reduction-relation} forms (let it be $r$ and let $n$ be the name of reduction-relation). Maintain a set $R$ that contains $(r, n)$ pairs.
-TODO Maintain symbol tables
+\item All $dl=$\TlDefineLanguage \space forms. Maintain a set $L$ that stores ($n, dl$) pairs.
+\item All $mf=$\TlDefineMetafunction \space forms. Maintain a set $M$ that stores $(n, mf)$ pairs.
+\item All $red=$\TlDefineReductionRelation \space forms. Maintain a set $R$ that contains $(n, red)$ pairs.
 \end{enumerate}
 
-\subsection{Algorithm}
+\subsection{Top-Level Form Analysis}
 
 \begin{itemize}
 \item
-$d =$ \DefineLanguage 
+Given $df=$\TlDefineLanguage 
 	\begin{enumerate}
-		\item apply strategy (1) to $d$ 
-		\item $L = L \cup \{ (name, d) \}$
+		\item apply strategy (1) to $df$ 
+		\item $L = L \cup \{ (n, df) \}$
 	\end{enumerate}
 
-\item $m=$ \DefineMetafunction: 
+\item $mf=$ \TlDefineMetafunction: 
 	\begin{enumerate}
-	\item Ensure that there exists tuple $(n, d) \in L$ such that $name=n$, otherwise raise Exception.
+	\item Ensure that there exists tuple $(l, df) \in L$, otherwise raise Exception.
 	\item apply strategy (2) to $domain$ and $codomain$ patterns.
 	\item For each $c_i=$ \MetafunctionCase, apply strategy (3) to $p$ and apply term-processing strategy. 
-	\item $M = M \cup \{ (name, m) \}$. 
+	\item $M = M \cup \{ (n, mf) \}$. 
 	\end{enumerate}
 
-\item $r=$ \DefineReductionRelation: 
+\item $red=$ \TlDefineReductionRelation: 
 \begin{enumerate}
-\item ensure that there exists tuple $(n, d) \in L$ such that $n=languagename$, otherwise raise Exception.
+\item ensure that there exists tuple $(l, df) \in L$ such that $n=languagename$, otherwise raise Exception.
 \item Apply strategy (3) to $domain$ pattern. 
-\item For each $r_i=$ \ReductionCase in $r$, apply strategy (3) to $p$ and apply the only term-processing strategy. $R = R \cup \{ (name, d) \}$.
+\item For each $r_i=$ \ReductionCase in $r$, apply strategy (3) to $p$ and apply the only term-processing strategy. $R = R \cup \{ (n, red) \}$.
 \end{enumerate}
 
 \item $tl=$ \ReadFromStdinAndApplyReductionRelation
