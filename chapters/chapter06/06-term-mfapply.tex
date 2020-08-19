@@ -2,20 +2,20 @@
 
 Since metafunction applications have the following shape - `(metafunction-name term-template ...)` these can be detected quite trivially given a list of defined metafunctions. 
 
-\subsection{Algorithm}
-Term-template is visited recursively. Let $Mf$ be the set of metafunction names. When visiting $t_{in}=\text{\TermSequence}$, check if $t_1$ is \TermLiteral where $l=\text{Variable}$ and $v \in Mf$. Return \ApplyMetafunction with $n=v$ and $t=t_{in}$.
+\subsection{Rewriting Algorithm.}
+Let $Mf$ be the set of metafunction names. Let $t$ be some term-template, \Visit{$t$}. 
+\begin{itemize}
+\item $t=$\TermSequence. Check if $t_1$ is \TermLiteral with $kind=$Variable and $v \in Mf$ and return \\ \ApplyMetafunction[$v$][$t$][false] handling annotations as described below; otherwise return $t$. 
 
-$t_{in}$ contains InArg and MatchRead annotations. These are handled in the following way:
-
+$t$ may contain \texttt{InArg} and \texttt{MatchRead} annotations and they are modified in the following way:
 \begin{itemize}
 \item
-InArg annotations are left intact. Signatures of both `TermSequence` and `ApplyMetafunctions` must match.
+\texttt{InArg} annotations are left intact. Signatures of both \texttt{TermSequence} and \texttt{ApplyMetafunctions} must match.
 \item
-MatchRead annotations can be safely removed. None of such variable assignments are used to generate $t_{in}$.
+\texttt{MatchRead} annotations can be safely removed. None of such variable assignments are used to generate $t$.
 \end{itemize}
-
+\end{itemize}
 \subsection{Example}
-
 The example shown in Figure \ref{transformation-term-mfapply} displays transformation described above given a set of meta-function names only containing single \texttt{set-contains?}. Since the first element of \texttt{TermSequence} is \texttt{Variable} term-template with suitable name, additional \texttt{MetafunctionApplication} term is added.
 
 \begin{figure}[H]
