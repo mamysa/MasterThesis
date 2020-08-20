@@ -127,7 +127,7 @@ breaklines=true,
 	{\mintinline{text}{(NtDefinition|#1|, [|#2|, |$...$|, |#3|])}}}
 
 
-\newcommandx{\PythonCall}[4][1=$nt$, 2=$p_1$, 3=$p_n$, 4=true]{%
+\newcommandx{\PythonCall}[4][1=$nt$, 2=$t_1$, 3=$t_n$, 4=true]{%
 	\ifthenelse{\boolean{#4}}
 	{\mintinline{text}{PythonCall(|#1|: PyCallMode, [|#2|, |$...$|, |#3|]: TermTemplate?)}}
 	{\mintinline{text}{PythonCall(|#1|, [|#2|, |$...$|, |#3|])}}}
