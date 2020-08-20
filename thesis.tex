@@ -149,16 +149,20 @@ breaklines=true,
 \newcommandx{\TlDefineLanguage}[3][1=$n$, 2=$nt_1$, 3=$nt_m$]{%
 \mintinline{text}{DefineLanguage(|#1|: string, [|#2|, |$...$|,|#3|]: NtDefinition)}}
 
-\newcommandx{\TlDefineMetafunction}[6][1=$n$, 2=$l$, 3=$d$, 4=$c$, 5=$mc_1$, 6=$mc_n$]{%
-{\mintinline{text}{DefineMetafunction(|#1|: str, |#2|: str, |#3|: Pattern, |#4|: Pattern, [|#5|, |$...$|, |#5|]: MfCase)}}}
+\newcommandx{\TlDefineMetafunction}[7][1=$n$, 2=$l$, 3=$domain$, 4=$codomain$, 5=$mc_1$, 6=$mc_n$, 7=true]{%
+	\ifthenelse{\boolean{#7}}
+{\mintinline{text}{DefineMetafunction(|#1|: str, |#2|: str, |#3|: Pattern, |#4|: Pattern, [|#5|, |$...$|, |#6|]: MetafunctionCase)}}
+{\mintinline{text}{DefineMetafunction(|#1|, |#2|, |#3|, |#4|, [|#5|, |$...$|, |#6|])}}}
 
 \newcommandx{\MetafunctionCase}[3][1=$p$, 2=$t$, 3=true]{%
 	\ifthenelse{\boolean{#3}}
 	{\mintinline{text}{MetafunctionCase(|#1|: Pattern, |#2|: TermTemplate)}}
 	{\mintinline{text}{MetafunctionCase(|#1|, |#2|)}}}
 
-\newcommandx{\TlDefineReductionRelation}[5][1=$n$, 2=$l$, 3=$d$, 4=$rc_1$, 5=$rc_n$]{%
-{\mintinline{text}{DefineReductionRelation(|#1|: str,  |#2|: str, |#3|: Pattern?, [|#4|, ..., |#5|]: ReductionCase)}}}
+\newcommandx{\TlDefineReductionRelation}[6][1=$n$, 2=$l$, 3=$domain$, 4=$rc_1$, 5=$rc_n$, 6=true]{%
+\ifthenelse{\boolean{#6}}
+{\mintinline{text}{DefineReductionRelation(|#1|: str, |#2|: str, |#3|: Pattern?, [|#4|, ..., |#5|]: ReductionCase)}}
+{\mintinline{text}{DefineReductionRelation(|#1|, |#2|, |#3|, [|#4|, ..., |#5|])}}}
 
 \newcommandx{\ReductionCase}[4][1=$p$, 2=$t$, 3=$n$, 4=true]{%
 	\ifthenelse{\boolean{#4}}
@@ -170,26 +174,26 @@ breaklines=true,
 
 \newcommandx{\Match}[5][1=$s_1$, 2=$t_1$, 3=$s_n$, 4=$t_n$, 5=true]{%
 	\ifthenelse{\boolean{#5}}
-	{\mintinline{text}{Match([(|#1|, |#2|), $...$, (|#3|, |#4|)]: Tuple(string, Term)?)}}
-	{\mintinline{text}{Match([(|#1|, |#2|), $...$, (|#3|, |#4|)])}}}
+	{\mintinline{text}{Match([(|#1|, |#2|), |$...$|, (|#3|, |#4|)]: Tuple(string, Term)?)}}
+	{\mintinline{text}{Match([(|#1|, |#2|), |$...$|, (|#3|, |#4|)])}}}
 
 \newcommandx{\RedexMatchAssertEqual}[6][1=$l$, 2=$p$, 3=$t$, 4=$m_1$, 5=$m_n$, 6=true]{%
 	\ifthenelse{\boolean{#6}}
 	{\mintinline{text}{RedexMatchAssertEqual(|#1|: str, |#2|: Pattern, |#3|: TermTemplate, [|#4|, ..., |#5|]: Match?)}}
-	{\mintinline{text}{RedexMatchAssertEqual(|#1|, |#2|, |#3|, [|#4|, $...$, |#5|])}}}
+	{\mintinline{text}{RedexMatchAssertEqual(|#1|, |#2|, |#3|, [|#4|, |$...$|, |#5|])}}}
 
-\newcommandx{\TermLetAssertEqual}[9][1=$v_1$, 2=$n_1$, 3=$t_1$, 4=$n_m$, 5=$n_m$, 6=$t_m$, 7=$t$, 8=$e$, 9=true]{%
+\newcommandx{\TermLetAssertEqual}[9][1=$v_1$, 2=$n_1$, 3=$t_1$, 4=$v_m$, 5=$n_m$, 6=$t_m$, 7=$t$, 8=$e$, 9=true]{%
 	\ifthenelse{\boolean{#9}}
-	{\mintinline{text}{TermLetAssertEqual([(|#1|, |#2|, |#3|), $...$, (|#4|, |#5|, |#6|)]: Tuple(string, natural, TermTemplate)?, |#7|: TermTemplate, |#8|: TermTemplate)}}
-	{\mintinline{text}{TermLetAssertEqual([(|#1|, |#2|, |#3|), $...$, (|#4|, |#5|, |#6|)], |#7|, |#8|)}}}
+	{\mintinline{text}{TermLetAssertEqual([(|#1|, |#2|, |#3|), |$...$|, (|#4|, |#5|, |#6|)]: Tuple(string, natural, TermTemplate)?, |#7|: TermTemplate, |#8|: TermTemplate)}}
+	{\mintinline{text}{TermLetAssertEqual([(|#1|, |#2|, |#3|), |$...$|, (|#4|, |#5|, |#6|)], |#7|, |#8|)}}}
 
 
 \newcommandx{\ApplyReductionRelationAssertEqual}[5][1=$r$, 2=$t$, 3=$e_1$, 4=$e_n$, 5=true]{%
 	\ifthenelse{\boolean{#5}}
-	{\mintinline{text}{ApplyReductionRelationAssertEqual(|#1|: str, |#2|: TermTemplate, [|#3|, $...$, |#4|]: TermTemplate?)}}
-	{\mintinline{text}{ApplyReductionRelationAssertEqual(|#1|, |#2|, [|#3|, $...$, |#4|])}}}
+	{\mintinline{text}{ApplyReductionRelationAssertEqual(|#1|: str, |#2|: TermTemplate, [|#3|, |$...$|, |#4|]: TermTemplate?)}}
+	{\mintinline{text}{ApplyReductionRelationAssertEqual(|#1|, |#2|, [|#3|, |$...$|, |#4|])}}}
 
-\newcommandx{\ReadFromStdinAndApplyReductionRelation}[2][1=$red$, 2=$mf$]{%
+\newcommandx{\ReadFromStdinAndApplyReductionRelation}[2][1=$r$, 2=$f$]{%
 	\mintinline{text}{ReadFromStdinAndApplyReductionRelation(|#1|: str, |#2|: str)}}
 
 

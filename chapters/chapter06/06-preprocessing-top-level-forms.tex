@@ -15,67 +15,74 @@ Identify three strategies for processing patterns.
 Notice that non-terminal resolution occurs with respect non-terminal definitions on some \DefineLanguageNoArg form. Similarly, during "Metafunction Application Rewriting" pass requires set $Mf$ containing all meta-functions defined until this point. 
 
 \begin{enumerate}
-\item All $dl=$\TlDefineLanguage \space forms. Maintain a set $L$ that stores ($n, dl$) pairs.
-\item All $mf=$\TlDefineMetafunction \space forms. Maintain a set $M$ that stores $(n, mf)$ pairs.
-\item All $red=$\TlDefineReductionRelation \space forms. Maintain a set $R$ that contains $(n, red)$ pairs.
+\item All $tl=$\TlDefineLanguage \space forms. Maintain a set $L$ that stores ($n, tl$) pairs.
+\item All $tl=$\TlDefineMetafunction \space forms. Maintain a set $M$ that stores $(n, tl)$ pairs.
+\item All $tl=$\TlDefineReductionRelation \space forms. Maintain a set $R$ that contains $(n, tl)$ pairs.
 \end{enumerate}
 
 \subsection{Top-Level Form Analysis}
 
 \begin{itemize}
 \item
-Given $df=$\TlDefineLanguage 
+Given $tl=$\TlDefineLanguage 
 	\begin{enumerate}
-		\item apply strategy (1) to $df$ 
-		\item $L = L \cup \{ (n, df) \}$
+		\item apply strategy (1) to $tl$ resulting in $tl^{\prime}$.
+		\item $L = L \cup \{ (n, tl^{\prime}) \}$
+		\item Return $tl^{\prime}$.
 	\end{enumerate}
 
-\item $mf=$ \TlDefineMetafunction: 
+\item $tl=$ \TlDefineMetafunction: 
 	\begin{enumerate}
-	\item Ensure that there exists tuple $(l, df) \in L$, otherwise raise Exception.
-	\item apply strategy (2) to $domain$ and $codomain$ patterns.
-	\item For each $c_i=$ \MetafunctionCase, apply strategy (3) to $p$ and apply term-processing strategy. 
-	\item $M = M \cup \{ (n, mf) \}$. 
+	\item Ensure that there exists tuple $(l, tl) \in L$, otherwise raise Exception.
+	\item apply strategy (2) to $domain$ and $codomain$ patterns resulting in $domain^\prime$ and $codomain^\prime$.
+	\item For each $mc_i=$ \MetafunctionCase, apply strategy (3) to $p$ thus resulting in $p^{\prime}$ and apply term-processing strategy to $t$ resulting in $t^{\prime}$. Let $mc_i^{\prime}$ = \MetafunctionCase[$p^{\prime}$][$t^{\prime}$].
+	\item Let $tl^\prime$  = \TlDefineMetafunction[$n$][$l$][$domain^\prime$][$codomain^\prime$][$mc_1^\prime$][$mc_n^\prime$][false].
+	\item $M = M \cup \{ (n, tl^\prime)\}$ and return $tl^\prime$. 
 	\end{enumerate}
 
 \item $red=$ \TlDefineReductionRelation: 
 \begin{enumerate}
-\item ensure that there exists tuple $(l, df) \in L$ such that $n=languagename$, otherwise raise Exception.
-\item Apply strategy (3) to $domain$ pattern. 
-\item For each $r_i=$ \ReductionCase in $r$, apply strategy (3) to $p$ and apply the only term-processing strategy. $R = R \cup \{ (n, red) \}$.
+\item ensure that there exists tuple $(l, df) \in L$ otherwise raise Exception.
+\item Apply strategy (3) to $domain$ pattern resulting in $domain^\prime$, if it exists.
+\item For each $rc_i=$ \ReductionCase \space in $r$, apply strategy (3) to $p$ resuling in $p^{\prime}$ and apply the only term-processing strategy to $t$ resulting in $t^\prime$. Let $rc_i^\prime=$\ReductionCase[$p^{\prime}$][$t^{\prime}$][$n$][false].
+\item Let $tl^\prime=$\TlDefineReductionRelation[$n$][$l$][$domain^\prime$][$rc_1^\prime$][$rc_n^\prime$]
+\item $R = R \cup \{ (n, tl^\prime) \}$ and return $tl^\prime$. 
+
 \end{enumerate}
 
 \item $tl=$ \ReadFromStdinAndApplyReductionRelation
 \begin{enumerate} 
-\item If $mf$ is present, ensure there exists tuple $(n, m) \in M$ s.t. $mf=n$, otherwise raise Exception.
-\item Ensure there exists tuple $(n, d) \in R$ such that $n=red$, otherwise raise Exception.
+\item If $mf$ is present, ensure there exists tuple $(f, mf) \in M$, otherwise raise Exception.
+\item Ensure there exists tuple $(r, red) \in R$, otherwise raise Exception.
+\item Return $tl$.
 \end{enumerate}
 
 
 \item 
 $r=$ \RedexMatchAssertEqual. 
 	\begin{enumerate}
-	\item Ensure that there exists tuple $(n, d) \in L$ such that $l=n$, otherwise raise Exception.
-	\item Process $p$ according to strategy (3). 
-	\item Process $t$ according to the only specified strategy.
-	\item For each $m=$ \Match, process each $t_i$ according to the only specified strategy.
+	\item Ensure that there exists tuple $(l, d) \in L$, otherwise raise Exception.
+	\item Process $p$ according to strategy (3) resulting in $p^\prime$. 
+	\item Process $t$ according to the only specified strategy, resulting in $t^\prime$.
+	\item For each $m_i=$ \Match, process each $t_i$ according to the only specified strategy resulting in $t_i^\prime$. Let $m_i^\prime=$\Match[$s_1$][$t_1^\prime$][$s_n$][$t_n^\prime$][false].
+	\item Let $tl^\prime$=\RedexMatchAssertEqual[$l$][$p^\prime$][$t^\prime$][$m_1^\prime$][$m_n^\prime$][false] and return $tl^\prime$.
 	\end{enumerate}
 
 \item $tl=$ \TermLetAssertEqual
 	\begin{enumerate}
-	\item  Process each $t_i$ according to the only specified strategy.
-	\item Process $t$ and $e$ according to the only specified strategy.
+	\item  Process each $t_i$ according to the only specified strategy resulting in $t_i^\prime$.
+	\item Process $t$ and $e$ according to the only specified strategy, resulting in $t^\prime$ and $e^\prime$, respectively.
+	\item Let $tl^\prime=$\TermLetAssertEqual[$v_1$][$n_1$][$t_1^\prime$][$v_m$][$n_m$][$t_m^\prime$][$t^\prime$][$e^\prime$][false] and return $tl^\prime$.
 	\end{enumerate}
 
 \item $tl=$ \ApplyReductionRelationAssertEqual
 	\begin{enumerate}
-	\item Ensure that there exists tuple $(n, d) \in R$ such that $r=n$, otherwise raise Exception.
-	\item Process $t$ according to the only specified strategy.
-	\item Process each term $t_i$ according to the only specified strategy.
+	\item Ensure that there exists tuple $(r, red) \in R$, otherwise raise Exception.
+	\item Process $t$ according to the only specified strategy resulting in $t^\prime$
+	\item Process each term $e_i$ according to the only specified strategy, resulting in $e_i^\prime$.
+	\item Let $tl^\prime=$\ApplyReductionRelationAssertEqual[$r$][$t^\prime$][$e_1^\prime$][$e_n^\prime$][false] and return $tl^\prime$.
 	\end{enumerate}
 \end{itemize}
 
 \subsection{Remarks}
-It should be noted that the PyPltRedex handles metafunction resolution is slightly different from PLT Redex. PLT Racket seems to keep track of metafunctions that have been defined up until a certain point, and it also keeps track of metafunctions that have not been defined yet. Roughly speaking, instead of passing a single set $Mf$ into "Metafunction Application Pass", PLT Redex passes a second set $\overline{Mf}$ containing names of metafunctions that haven't been defined yet. This way, when attempting to detect metafunction applications, "Metafunction Application Pass" also checks set $\overline{Mf}$ and raises \lstinline{cannot use metafunction before its definition} error. Since PyPltRedex doesn't handle this, all possible metafunction applications do not get rewritten and thus more often than not $codomain$ check fails.
-
-TODO mention inaccurate treatment of domain checks?
+It should be noted that the way in which PyPltRedex handles metafunction resolution is slightly different from PLTRedex. PLTRedex seems to keep track of metafunctions that have been defined up until a certain point, and it also keeps track of metafunctions that have not been defined yet. Roughly speaking, instead of passing a single set $Mf$ into "Metafunction Application Pass", PLTRedex passes a second set $\overline{Mf}$ containing names of metafunctions that haven't been defined yet. This way, when attempting to detect metafunction applications, "Metafunction Application Pass" also checks set $\overline{Mf}$ and raises \lstinline{cannot use metafunction before its definition} error. Since PyPltRedex doesn't handle this at this time, all possible metafunction applications do not get rewritten and thus more often than not $codomain$ check fails.
