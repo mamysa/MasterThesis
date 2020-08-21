@@ -2,6 +2,7 @@
 \usepackage{lipsum}
 \setlength{\parindent}{0em}
 \setlength{\parskip}{0.5em}
+\usepackage{placeins}
 
 \usepackage{minted}
 \usepackage{xargs}
@@ -57,7 +58,7 @@ breaklines=true,
 	\mintinline{text}{PatternSequence([|#1|,|$...$|,|#2|] : Pattern?)}}
 
 \newcommandx{\TermSequence}[2][1=$t_1$, 2=$t_n$]{%
-	\mintinline{text}{PatternSequence([|#1|,|$...$|,|#2|] : TermTemplate?)}}
+	\mintinline{text}{TernSequence([|#1|,|$...$|,|#2|] : TermTemplate?)}}
 
 \newcommandx{\PatternRepeat}[1][1=$p_r$]{%
 	\mintinline{text}{Repeat(|#1|: Pattern)}}
@@ -70,6 +71,22 @@ breaklines=true,
 
 \newcommandx{\BuiltInPatternNoArg}{%
 	{\mintinline{text}{BuiltInPattern}}}
+\newcommandx{\PatternSequenceNoArg}{%
+	{\mintinline{text}{PatternSequence}}}
+\newcommandx{\PatternInHoleNoArg}{%
+	{\mintinline{text}{InHole}}}
+\newcommandx{\PythonCallNoArg}{%
+	{\mintinline{text}{PythonCall}}}
+
+\newcommandx{\MetafunctionApplicationNoArgs}{%
+	{\mintinline{text}{MetafunctionApplication}}}
+
+
+\newcommandx{\ConstraintCheckNoArg}{%
+	{\mintinline{text}{ConstraintCheck}}}
+
+\newcommandx{\TermSequenceNoArg}{%
+	{\mintinline{text}{TermSequence}}}
 
 \newcommandx{\NonTerminalNoArg}{%
 	{\mintinline{text}{NonTerminal}}}
@@ -199,11 +216,14 @@ breaklines=true,
 
 
 
-\newcommand{\Repeat}{$Repeat(p_r)$ }
+\newcommand{\Repeat}{$Repeat(p_r)$}
 \newcommand{\Nt}{$Nt(nt, s)$ }
 \newcommand{\InHolePattern} {$InHole(p_1, p_2)$ }
 %\newcommand{\UnresolvedSymbol}{$UnresolvedSymbol(s)$ }
 \newcommand{\CheckConstraint}{$CheckConstraint(s_1, s_2)$ }
+
+\newcommand{\CodeRepeat}{$Repeat(p_r)$}
+\newcommand{\CodeCheckConstraint}{$CheckConstraint(sym_1, sym_2)$}
 
 \newcommand{\DefineReductionRelation}{bfgfgf}
 
