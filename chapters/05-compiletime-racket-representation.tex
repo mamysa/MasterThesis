@@ -2,55 +2,9 @@
 
 This chapter describes how PyPltRedex represents constructs of PLT Redex described in Chapter 02 and establishes notation to be used throughout the report. Forms that are not part of PLT Redex are also introduced.
 
-\section{Define Language}
-
-This form defines languages.
-
-\begin{lstlisting}
-define-language ::= (define-language language-name non-terminal-definition ... +)
-non-terminal-definition ::= (non-terminal-name ::= pattern ... +)
-\end{lstlisting}
-
-Compile-time representation of `define-language` follows the grammar defined above closely. 
-
-\begin{itemize}
-\item
-`DefineLanguage(name, ntdef)` represents `define-language` form. 
-\item
-`NtDefinition(sym, patterns)` represents `non-terminal-definition` inside `define-language`
-\end{itemize}
-
-\section{Metafunctions}
-Supported subset of `define-metafunction` grammar is as follows:
-
-\begin{lstlisting}
-(define-metafunction language-name
-  metafunction-contract
-  metafunction-case ...)
-
-metafunction-contract =	id : pattern-sequence ... -> pattern 
-metafunction-case =  [(name pattern ...) term] 
-\end{lstlisting}
-
-A metafunction is a function on terms. The define-metafunction form builds a metafunction according to a pattern and right-hand-side expressions. The first argument demonstrates the language that is used to resolve non-terminals found in pattern expressions. Each of the rhs-expressions are implicitly wrapped in term. (TODO rewrite this.. if term is a specific term it needs to be put in texttt or else it's confusing)
-
-TODO example metafunction definition.
-
-\section{Reduction Relation}
-
-\begin{lstlisting}
-reduction-relation ::= (reduction-relation language domain reduction-case ...)
-reduction-case     ::= (-> pattern term reduction-case-name)
-domain ::= #:domain pattern
-\end{lstlisting}
-
-This form had to be modified. Example of this modification can be seen in Figure ??? below. Since PyPltRedex does not interpret Racket in any capacity, introducing `(define id expr)` form (which evaluates `expr` and assigns it to `id`) would have resulted in additional unnecessary complexity; more specifically, keeping track of forms that are not allowed to be used with `define` form such as `define-language`. Thus, `define` and `reduction-relation` were collapsed into a single form `define-reduction-relation`. In addition, use of `define` form to define reduction-relations seems to be inconsistent with respect to `define-language` and `define-metafunction` forms.
-
-
-`domain` optional parameter provides contract for reduction relation. When `reduction-relation` is applied to a term, it has to satisfy the contract; that is the term must match provided pattern otherwise it is an error. Similarly, after applying reduction relation to the term, resulting term(s) also have to sastisfy said contract; that is each term has to match the pattern provided by `domain`.
-
 \input{chapters/chapter05/05-pattern.tex}
-\input{chapters/05-compiletime-racket-representation-term.tex}
-\input{chapters/05-compiletime-racket-representation-testing-forms-2.tex}
+\input{chapters/chapter05/05-repr-termtemplate.tex}
+\input{chapters/chapter05/05-tlform.tex}
 \input{chapters/chapter05/05-repl.tex}
+\input{chapters/chapter05/05-repr-testing-forms.tex}
 
