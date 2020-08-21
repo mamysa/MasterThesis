@@ -211,7 +211,7 @@ breaklines=true,
 
 \newcommandx{\Match}[5][1=$s_1$, 2=$t_1$, 3=$s_n$, 4=$t_n$, 5=true]{%
 	\ifthenelse{\boolean{#5}}
-	{\mintinline{text}{Match([(|#1|, |#2|), |$...$|, (|#3|, |#4|)]: Tuple(string, Term)?)}}
+	{\mintinline{text}{Match([(|#1|, |#2|), |$...$|, (|#3|, |#4|)]: Tuple(string, TermTemplate)?)}}
 	{\mintinline{text}{Match([(|#1|, |#2|), |$...$|, (|#3|, |#4|)])}}}
 
 \newcommandx{\RedexMatchAssertEqual}[6][1=$l$, 2=$p$, 3=$t$, 4=$m_1$, 5=$m_n$, 6=true]{%
@@ -231,7 +231,7 @@ breaklines=true,
 	{\mintinline{text}{ApplyReductionRelationAssertEqual(|#1|, |#2|, [|#3|, |$...$|, |#4|])}}}
 
 \newcommandx{\ReadFromStdinAndApplyReductionRelation}[2][1=$r$, 2=$f$]{%
-	\mintinline{text}{ReadFromStdinAndApplyReductionRelation(|#1|: str, |#2|: str)}}
+	\mintinline{text}{ReadFromStdinAndApplyReductionRelation(|#1|: str?, |#2|: str)}}
 
 
 

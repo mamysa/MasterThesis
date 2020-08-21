@@ -1,46 +1,60 @@
-\section{Define Language}
+\section{Top-Level Forms}
 
-This form defines languages.
+PyPltRedex supports two forms lifted directly from PLTRedex: \texttt{define-language}, \\ \texttt{define-metafunction}; one form that had to be slightly modified: \texttt{apply-reduction-relation}; and the one that emulates behaviour of \texttt{apply-reduction-relation} form but the manipulated term is read from standard input: \texttt{read\_from\_stdin\_and\_eval}. Grammars for all these forms can be found in Figure \ref{grammar-tlmain}.
 
-\begin{lstlisting}
+\begin{figure}
+\begin{minted}[tabsize=2,obeytabs,escapeinside=//,mathescape=true,fontsize=\normalsize]{text}
 define-language ::= (define-language language-name non-terminal-definition ... +)
 non-terminal-definition ::= (non-terminal-name ::= pattern ... +)
-\end{lstlisting}
 
-Compile-time representation of `define-language` follows the grammar defined above closely. 
-
-\begin{itemize}
-\item
-`DefineLanguage(name, ntdef)` represents `define-language` form. 
-\item
-`NtDefinition(sym, patterns)` represents `non-terminal-definition` inside `define-language`
-\end{itemize}
-
-\section{Metafunctions}
-Supported subset of `define-metafunction` grammar is as follows:
-
-\begin{lstlisting}
-(define-metafunction language-name
+define-metafunction ::= (define-metafunction language-name
   metafunction-contract
-  metafunction-case ...)
-
+  metafunction-case ...
 metafunction-contract =	id : pattern-sequence ... -> pattern 
 metafunction-case =  [(name pattern ...) term] 
-\end{lstlisting}
 
-A metafunction is a function on terms. The define-metafunction form builds a metafunction according to a pattern and right-hand-side expressions. The first argument demonstrates the language that is used to resolve non-terminals found in pattern expressions. Each of the rhs-expressions are implicitly wrapped in term. (TODO rewrite this.. if term is a specific term it needs to be put in texttt or else it's confusing)
-
-TODO example metafunction definition.
-
-\section{Reduction Relation}
-
-\begin{lstlisting}
 reduction-relation ::= (reduction-relation language domain reduction-case ...)
 reduction-case     ::= (-> pattern term reduction-case-name)
 domain ::= #:domain pattern
-\end{lstlisting}
 
-This form had to be modified. Example of this modification can be seen in Figure ??? below. Since PyPltRedex does not interpret Racket in any capacity, introducing `(define id expr)` form (which evaluates `expr` and assigns it to `id`) would have resulted in additional unnecessary complexity; more specifically, keeping track of forms that are not allowed to be used with `define` form such as `define-language`. Thus, `define` and `reduction-relation` were collapsed into a single form `define-reduction-relation`. In addition, use of `define` form to define reduction-relations seems to be inconsistent with respect to `define-language` and `define-metafunction` forms.
+read-from-stdin-and-apply-reduction-relation ::= (read-from-stdin-and-apply-reduction-relation :#mf string)
+\end{minted}
+\caption{Grammar for primary top-level forms.}
+\label{grammar-tlmain}
+\end{figure}
 
+\begin{itemize}
+\item
+\TlDefineLanguage. $n$ is the of the language and $nt_1,...,nt_m$ are \NtDefinitionN \space instances containing one or more \texttt{Pattern} instances.
 
-`domain` optional parameter provides contract for reduction relation. When `reduction-relation` is applied to a term, it has to satisfy the contract; that is the term must match provided pattern otherwise it is an error. Similarly, after applying reduction relation to the term, resulting term(s) also have to sastisfy said contract; that is each term has to match the pattern provided by `domain`.
+\item
+\TlDefineMetafunction. $n$ is the \texttt{id} specified by \texttt{metafunction-contract}. Let $p_1, ..., p_n$ be the pattern sequence specified by the \texttt{metafunction-contract}, between \texttt{id} and \texttt{->}. $domain$ pattern then is constructed in the following way: \mintinline{text}{PatternSequence(|$n$|, [|$p_1$|, |$...$|, |$p_n$|])}. $codomain$ pattern is the one following \texttt{->}. If input term doesn't match pattern $domain$, an Exception is raised. Similarly, if resulting term doesn't match $codomain$ pattern, an Exception is also raised. If metafunction produces no terms, an Exception raised. $mc_1,...,mc_n$ is the sequence of \MetafunctionCase containing a pattern $p$ to be matched and a term-template to plug matches into. $l$ is the name of the language with respect to which all non-terminal symbols in patterns $p$ are resolved.
+
+\item \TlDefineReductionRelation. $n$ is the name of the reduction-relation, optional $domain$ pattern ensures that the input term and resulting terms match the pattern otherwise Exception is raised, and each $rc_i$=\ReductionCase contains a pattern $p$ and term-template $t$; $n$ is the name of the reduction case.
+
+This form had to be modified due to the fact that PyPltRedex doesn't interpret Racket in any way and thus \texttt{define} form is not supported. Thus, \texttt{define} and \texttt{reduction-relation} forms had to be collapsed into a single \texttt{define-reduction-relation} form.
+
+\item \ReadFromStdinAndApplyReductionRelation \space is self-explanatory -  it reads a string from standard input or file, parses it into a term using logic outlined in Section TODO, and applies reduction-relation with name $r$. Optionally, one can provide metafunction with name $f$ to apply to the parsed term before application of $r$. This allows to separate specification of "code" from everything else that is required to evaluate the "code" (such as model of the heap/stack, etc).
+\end{itemize}
+
+PyPltRedex provides several additional forms with testing functionality. The goal is to run individual components of PyPltRedex, such as pattern matcher and term generator, and compare the results against expected ones. These additional forms are \texttt{redex-match-assert-equal}, \texttt{term-let-assert-equal} and \\ \texttt{apply-reduction-relation-assert-equal}. 
+
+\begin{itemize}
+\item \RedexMatchAssertEqual. Given a term instantiated from term-template $t$, it is matched against a pattern $p$ containing non-terminal symbols from language $l$. Resulting list of matches is then compared against the list of expected matches $m_1,...,m_n$, potentially empty, where $m_i$=\Match. Term instantiated from term-template $t_i$ is assigned to pattern-variable $s_i$. An Exception is raised under the following conditions:
+	\begin{enumerate}
+	\item Lengths of both lists do not match.
+	\item Given two matches from both lists at position $i$, $m_i^{expected} \neq m_i^{actual}$, with equality operation defined in TODO.
+	\end{enumerate}
+	This form is based on the \texttt{redex-match} form provided by PLT Redex.
+
+\item \TermLetAssertEqual. Given a list of pattern-variable assignments $(v_i, n_i, t_i)$, a new \texttt{Match} instance is created, term instantiated from term-template $t_i$ is assigned to pattern-variable $v_i$. Resulting \texttt{Match} is then plugged into term-template $t$, and resulting term is compared against a term produced by term-template $e$.
+
+\item \ApplyReductionRelationAssertEqual. This form takes a term produced by term-template $t$, applies reduction relation with name $r$, and then compares resulting terms against a list of terms instantiated from term-templates $e_1,...,e_n$.
+	\begin{enumerate}
+	\item Lengths of both lists do not match.
+	\item Given two terms from both lists at position $i$, $t_i^{expected} \neq t_i^{actual}$, with equality operation defined in TODO.
+	\end{enumerate}
+\end{itemize}
+
+TODO UML DIAGRAM
+

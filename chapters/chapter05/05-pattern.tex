@@ -1,10 +1,11 @@
 \section{Pattern Language}
 
-This section describes subset of PltRedex's pattern specification language supported by \texttt{PyPltRedex}. Grammar for the pattern language can be seen below, in EBNF notation. 
+This section describes subset of PltRedex's pattern specification language supported by \texttt{PyPltRedex}. Grammar for the pattern language can be seen in Figure \ref{pattern-grammar}, in EBNF notation. 
 
-\begin{lstlisting}
+\begin{figure}[h]
+\begin{minted}[tabsize=2,obeytabs,escapeinside=//,mathescape=true,fontsize=\normalsize]{text}
 pattern = number 
-        | integer 
+		| integer 
 		| real 
 		| natural 
 		| string 
@@ -12,11 +13,14 @@ pattern = number
 		| variable-not-otherwise-mentioned 
 		| hole 
 		| symbol
-        | (in-hole pattern pattern)
-        | (pattern-sequence *) 
+		| (in-hole pattern pattern)
+		| (pattern-sequence *) 
 pattern-sequence : pattern 
                  | pattern ...  # literal ellipsis
-\end{lstlisting}
+\end{minted}
+\caption{Grammar of the pattern language.}
+\label{pattern-grammar}
+\end{figure}
 
 \begin{itemize}
 \item
@@ -29,7 +33,7 @@ pattern-sequence : pattern
 \textit{real} matches any real number.
 
 \item
-\textit{natural} matches any natural number; that is any non-negative integer.
+\textit{natural} matches any natural number; that is, any non-negative integer.
 
 \item
 \textit{string} matches any string.
@@ -37,57 +41,54 @@ pattern-sequence : pattern
 \item
 \textit{boolean} matches any boolean - \texttt{\#t} or \texttt{\#f}.
 \item
-\textit{variable-not-otherwise-mentioned} matches any symbol that is not used as a literal in language definition. For example, if language definition contains pattern \texttt{(+ number number)} \textit{variable-not-otherwise-mentioned} will not match symbol \texttt{+}.
+\textit{variable-not-otherwise-mentioned} matches any symbol that is not used as a literal in the language definition. For example, if language definition contains the pattern \texttt{(+ number number)} \textit{variable-not-otherwise-mentioned} will not match symbol \texttt{+}.
 
 \item
 \textit{hole} matches \texttt{hole} term exactly.
 
 \item
-\textit{symbol} matches any symbol except if its value coincides with non-terminal symbol in language definition.
+\textit{symbol} matches any symbol except if its value coincides with non-terminal symbol in the language definition or contains an underscore.
 \end{itemize}
 
-All pattern above except \textit{hole} can be suffixed with underscore and identifier (for example, \textit{number\_1}) to create binding to matched term.
+All patterns above, except \textit{hole} can be suffixed with underscore and identifier (for example, \textit{number\_1}) to create binding to matched term.
 
 \begin{itemize}
 \item
-\textit{(in-hole pattern pattern)} traverses the term trying to match the second pattern; upon successful match the term matching the second pattern is replaced with term `hole` and then the first pattern is matched. First pattern must match exactly one hole.
+\textit{(in-hole pattern pattern)} traverses the term trying to match the second pattern; upon successful match the term matching the second pattern is replaced with the term \texttt{hole} and then the first pattern is matched. The first pattern must match exactly one hole.
 
 \item
 \textit{pattern-sequence} pattern matches a term list, where each pattern-sequence element matches an element of the list. Each individual pattern within the sequence can be suffixed with \texttt{...} (literal ellipsis) and that will match zero or more terms matching the pattern.
 \end{itemize}
 
-If patterns in the pattern-sequence are suffixed with the same identifier (e.g. \texttt{(number\_1 number\_1)})), then the match is contrained to terms that are equal. That means term \texttt{(1 1)} matches the pattern but \texttt{(1 2)} does not. For patterns in \textit{define-language} constraint checking is not performed. PltRedex provides other constraint checks but they will not be considered.
+If patterns in the pattern-sequence are suffixed with the same identifier (e.g. \texttt{(number\_1 number\_1)})), then the match is contrained to terms that are equal. That means term \texttt{(1 1)} matches the pattern but \texttt{(1 2)} does not. For patterns in \texttt{define-language} form constraint checking is not performed. PltRedex provides other constraint checks but they will not be considered.
 
-\section{Compile-time Representation of Patterns}
+\section{Compile-Time Representation of Patterns}
 
-Throughout the report the following notation will be used to represent actual Python classes used to implement the pattern language. Actual Python source code can be seen on page (TODO-appendix reference). 
-
-\includegraphics[scale=0.175]{class-diagram-pattern.png}
-
+The Python source code can be found on page (TODO-appendix reference). Throughout the report the following notation will be used to represent the Python classes used in the implementation of the pattern language. It follows the following format: \mintinline{text}{Typename(|$a$|: A, [|$b_1,...,b_n$|]: B, [|$c_1,...,c_m$|]: C?)}. $a$ is a field of type \texttt{A}. \mintinline{text}{[|$b_1,...,b_n$|]} is a sequence containing $n$ fields of type \texttt{B}. \mintinline{text}{[|$c_1,...,c_m$|]} is a sequence containing \textit{zero} or $m$ fields of type \texttt{C} (that is, \texttt{C?} is optional type).
 
 \begin{itemize}
 \item
-\PatternSequence represents `pattern-sequence` clause of the pattern language and may contain zero or more child patterns $p_i$.
+\PatternSequence \space represents the \texttt{pattern-sequence} clause of the pattern language and may contain zero or more child patterns $p_i$. 
 
 \item 
-\Repeat represents pattern $p$ under ellipsis.
-
-\item 
-\Nt represents non-terminal. $nt$ is a non-terminal symbol, while $s$ is the symbol used for binding terms. For example, given pattern \texttt{e\_1} $s$ is \texttt{e\_1} and $nt$ is \texttt{e}.
-\item
-\BuiltInPattern represents various built-in patterns such as \texttt{number} or \texttt{string}. $t$ is the tag and must be picked from set $T$. $s$ is the symbol used for binding terms.
+\PatternRepeat \space represents pattern $p_r$ under ellipsis.
 
 \item
-\InHolePattern represents \texttt{in-hole} pattern, $p_1$ and $p_2$ must be patterns.
+\PatternCheckConstraint is used for equality checking of terms. Terms assigned to $sym_1$ and $sym_2$ are checked for equality.
 
 \item 
-\LiteralPattern represents a literal values in patterns. Since literal values can be of many types, a tag $l$ must be provided from set $T$. $v$ is actual literal value.
-
-\item 
-\UnresolvedSymbol used to represent symbols that are initially unknown to be non-terminal or literal, $s$ is the symbol.
+\NonTerminal \space represents non-terminal. $nt$ is a non-terminal symbol, while $pv$ is a pattern-variable to which some term will be assigned during matching. 
 
 \item
-\CheckConstraint is used for equality checking of terms. Terms bound to $s_1$ and $s_2$ are checked for equality.
+\BuiltInPattern \space represents various built-in patterns such as \texttt{number} or \texttt{string}. $tag$ is chosen from \texttt{BuiltInPatternKind} enumeration.
+
+\item
+\PatternInHole \space represents \texttt{in-hole} pattern where $p_1$ and $p_2$ are patterns, and $c_1, ..., c_n$ are optional \ConstraintCheckNoArg instances.
+
+\item 
+\LiteralPattern \space represents a literal values in patterns. It's $kind$ is chosen from \texttt{PatternLiteralKind} enumeration and $v$ is the value of the literal. Type of the literal must match the $kind$.
+
+\item 
+\UnresolvedSymbol is used to represent symbols that are initially unknown to be non-terminal, built-in pattern, or literal; $sym$ is the symbol.
 
 \end{itemize}
-
