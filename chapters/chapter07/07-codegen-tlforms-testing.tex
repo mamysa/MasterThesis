@@ -1,4 +1,4 @@
-\section{Redex-Match-Assert-Equal}
+\section{\RedexMatchAssertEqualNoArgs \space Form}
 Given \RedexMatchAssertEqual code generation proceeds in the following manner.
 
 \begin{enumerate}
@@ -11,6 +11,7 @@ Given \RedexMatchAssertEqual code generation proceeds in the following manner.
 \item Let \texttt{actualmatches} = $f_p(f_t())$ and then call \texttt{assert\_compare\_match\_lists(expectedmatches, actualmatches)}.
 \end{enumerate}
 
+\begin{figure}[h]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
 {% def codegenRedexMatchAssertEqual(|$rm$|): %}
 	{% |$f_{rm}$| = symgen("redexmatchassertequal") %}
@@ -19,7 +20,7 @@ Given \RedexMatchAssertEqual code generation proceeds in the following manner.
 def |$f_{rm}$|():
 	{% for |$m_i$| in |$rm$|[|$m_1, ..., m_n$|]: %}
 	|$mi_i$| = Match()
-		{% for $(s_i, t_i)$ in |$m_i$|[$(s_1, t_1), ..., (s_m, t_m)$]:
+		{% for |$(s_i, t_i)$| in |$m_i$|[$(s_1, t_1), ..., (s_m, t_m)$]:
 			{% |$f_{t_i}$| = CodegenTermTemplate(|$t_i$|) %}
 	term = |$f_{t_i}$|(Match())
 	|$mi_i$|.addkey(|$s_i$|)
@@ -33,8 +34,11 @@ def |$f_{rm}$|():
 {% return |$f_{rm}$| %}
 {% enddef %}
 \end{minted} 
+\caption{Code generation for \RedexMatchAssertEqualNoArgs \space form.}
+\label{codegen-redexmatch}
+\end{figure}
 
-\section{Term-Let-Assert-Equal}
+\section{\TermLetAssertEqualNoArgs \space Form}
 
 Given $tl=$ \TermLetAssertEqual code generation proceeds in the following manner.
 \begin{enumerate}
@@ -47,6 +51,7 @@ Given $tl=$ \TermLetAssertEqual code generation proceeds in the following manner
 \item Call \texttt{asserttermsequal}$(f_t(m), f_e(Match()))$.
 \end{enumerate}
 
+\begin{figure}[h]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
 {% def codegenTermLetAssertEqual(|$tl$|): %}
 	{% |$f_{tl}$| = symgen("termletassertequal") %}
@@ -66,22 +71,28 @@ def |$f_{tl}$|():
 {% return |$f_{tl}$|  %}
 {% enddef %}
 \end{minted} 
+\caption{Code generation for \TermLetAssertEqualNoArgs \space form.}
+\label{codegen-termlet}
+\end{figure}
 
 
-\section{Apply-Reduction-Relation-Assert-Equal}
+\section{\ApplyReductionRelationAssertEqualNoArgs \space Form}
 
 Given \ApplyReductionRelationAssertEqual
 \begin{enumerate}
 \item First, need to generate a list of expected terms \texttt{expected}, potentially empty.
 	\begin{enumerate}
-	\item Generate function $f_{e_i}$ for term template $e_i$.
-	\item Concatenate $f_{e_i}(Match())$ to \texttt{expected}.
+	\item Generate function $f_{e_i}$ for each term-template $e_i$.
+	\item Concatenate results of $f_{e_i}(Match())$ to \texttt{expected}.
 	\end{enumerate}
 \item Generate function $f_t$ for term-template $t$.
-\item Let $f_{red}$ be a function generated after visiting \texttt{define-reduction-relation} with name $r$. Let \texttt{actual} =$f_{red}(f_t())$ be the list of terms after applying reduction relation.
+\item Let $f_{red}$ be a Python function for \RedexMatchAssertEqualNoArgs \space with name $r$. Let \texttt{actual} =$f_{red}(f_t())$ be the list of terms after the applying reduction relation.
 \item Call \texttt{asserttermlistsequal(expected, actual)}
 \end{enumerate}
 
+
+
+\begin{figure}[ht]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
 {% def codegenApplyReductionRelationAssertEqual(|$ar$|): %}
 	{% |$f_{ar}$| = symgen("applyreductionrelationassertequal") %}
@@ -95,3 +106,8 @@ def |$f_{ar}$|():
 {% return |$f_{ar}$| %}
 {% enddef %}
 \end{minted} 
+\caption{Code generation for \ApplyReductionRelationAssertEqualNoArgs \space form.}
+\label{codegen-applyred}
+\end{figure}
+
+

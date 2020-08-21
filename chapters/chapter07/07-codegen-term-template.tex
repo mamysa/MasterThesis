@@ -115,8 +115,8 @@ for j in range(list(lengths)[0]): # convert set to list
 \item
 Element is \PythonCall. Call $f_{t_i}$ to obtain the term $t^{\prime}$. Notice that arguments for $f_{t_i}$ are generated using "InArg" annotations of $f_{t_i}$. 
 	\begin{enumerate}
-	\item Insertion mode is normal. Append $t^{\prime}$ to the sequence.
-	\item Insertion mode is splice. Ensure that $t^{\prime}$ is \texttt{Sequence} and then append terms $t^{\prime}$ to \texttt{sequence}.
+	\item Insertion $mode$ is \texttt{Normal}. Append $t^{\prime}$ to the sequence.
+	\item Insertion $mode$ is \texttt{Splice}. Ensure that $t^{\prime}$ is \texttt{Sequence} and then append each term in $t^{\prime}$ to the \texttt{term} \texttt{Sequence}.
 	\end{enumerate}
 
 \begin{figure}
@@ -176,7 +176,7 @@ def |$f_t$|(match, |$arg_1, ..., arg_n$|):
 
 
 \subsection{\PythonCallNoArg}
-Given $t$ =\PythonCall generate functions $f_1$, ..., $f_n$ for $t_1$, ..., $t_n$. Call procedures $f_{t_1}$, ..., $f_{t_n}$ with appropriate arguments and let $t_1^{\prime}$, ..., $t_1^{\prime}$ be resulting terms. Call $function$ arguments $t_i^{\prime}$. Note that $t$ has neither \texttt{InArg} nor \texttt{MatchRead} annotations, by construction.
+Given $t$ =\PythonCall generate functions $f_1$, ..., $f_n$ for $t_1$, ..., $t_n$. Call procedures $f_{t_1}$, ..., $f_{t_n}$ with appropriate arguments and let $t_1^{\prime}$, ..., $t_1^{\prime}$ be resulting terms. Call $pyfunc$ with arguments $t_i^{\prime}$. Note that $t$ has neither \texttt{InArg} nor \texttt{MatchRead} annotations, by construction.
 
 \begin{figure}
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
@@ -187,7 +187,7 @@ def |$f_t$|(match):
 	{% for |$f_{t_i}$| in |$f_{t_1}, ..., f_{t_n}$|: %}
 	|$t_i^{\prime}$| = |$f_{t_i}$|(match)
 	{% endfor %}
-	return |$pyfunction$|(|$t_1^{\prime},...,t_n^{\prime}$|) 
+	return |$pyfunc$|(|$t_1^{\prime},...,t_n^{\prime}$|) 
 {% enddef %}
 \end{minted}
 \caption{Code generation for \PythonCallNoArg \space term-templates.}

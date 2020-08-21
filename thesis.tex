@@ -77,9 +77,10 @@ breaklines=true,
 	{\mintinline{text}{InHole}}}
 \newcommandx{\PythonCallNoArg}{%
 	{\mintinline{text}{PythonCall}}}
-
 \newcommandx{\MetafunctionApplicationNoArgs}{%
 	{\mintinline{text}{MetafunctionApplication}}}
+\newcommandx{\NtDefinitionNoArgs}{%
+	{\mintinline{text}{NtDefinition}}}
 
 
 \newcommandx{\ConstraintCheckNoArg}{%
@@ -95,7 +96,27 @@ breaklines=true,
 	{\mintinline{text}{Literal}}}
 
 \newcommandx{\DefineLanguageNoArg}{%
-	{\mintinline{text}{DefineLanguage}} }
+	{\mintinline{text}{DefineLanguage}}}
+
+\newcommandx{\DefineMetafunctionNoArgs}{%
+	\mintinline{text}{DefineMetafunction}}
+
+\newcommandx{\DefineReductionRelationNoArgs}{%
+	\mintinline{text}{DefineReductionRelationNoArgs}}
+
+\newcommandx{\RedexMatchAssertEqualNoArgs}{%
+	\mintinline{text}{RedexMatchAssertEqual}}
+
+\newcommandx{\TermLetAssertEqualNoArgs}{%
+	\mintinline{text}{TermLetAssertEqual}}
+
+\newcommandx{\ApplyReductionRelationAssertEqualNoArgs}{%
+	\mintinline{text}{ApplyReductionRelation}}
+
+\newcommandx{\ReadFromStdinAndApplyReductionRelationNoArgs}{%
+	\mintinline{text}{ReadFromStdinAndApplyReductionRelation}}
+
+
 
 \newcommandx{\MakeAnnotation}[3]{%
 {\mintinline{text}{|#1|.addannotation(#2, |#3|)}}}
@@ -143,11 +164,10 @@ breaklines=true,
 	{\mintinline{text}{NtDefinition(|#1|: NonTerminal, [|#2|, |$...$|, |#3|]: Pattern)}}
 	{\mintinline{text}{(NtDefinition|#1|, [|#2|, |$...$|, |#3|])}}}
 
-
-\newcommandx{\PythonCall}[4][1=$nt$, 2=$t_1$, 3=$t_n$, 4=true]{%
-	\ifthenelse{\boolean{#4}}
-	{\mintinline{text}{PythonCall(|#1|: PyCallMode, [|#2|, |$...$|, |#3|]: TermTemplate?)}}
-	{\mintinline{text}{PythonCall(|#1|, [|#2|, |$...$|, |#3|])}}}
+\newcommandx{\PythonCall}[5][1=$pyfunc$, 2=$mode$, 3=$t_1$, 4=$t_n$, 5=true]{%
+	\ifthenelse{\boolean{#5}}
+	{\mintinline{text}{PythonCall(|#1|: str, |#2|: PyCallMode, [|#3|, |$...$|, |#4|]: TermTemplate?)}}
+	{\mintinline{text}{PythonCall(|#1|: str, |#2|, [|#3|, |$...$|, |#4|])}}}
 
 \newcommandx{\ApplyMetafunction}[3][1=$mf$, 2=$t_m$, 3=true]{%
 	\ifthenelse{\boolean{#3}}

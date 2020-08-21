@@ -1,6 +1,6 @@
-\section{read-from-stdin-and-apply-reduction-relation}
+\section{\ReadFromStdinAndApplyReductionRelationNoArgs \space Form.}
 
-Let $tl$ =\ReadFromStdinAndApplyReductionRelation. If $mf$ is present, let $f_{mf}$ be previously generated metafunction for metafunction with name $mf$. Let $f_{red}$ be previously generated reduction relation with name $red$. 
+Let $tl$ =\ReadFromStdinAndApplyReductionRelation. If $mf$ is present, let $f_{mf}$ be previously generated Python function for metafunction with name $mf$. Let $f_{red}$ be previously generated Python function for \RedexMatchAssertEqualNoArgs \space with name $red$. 
 
 \begin{enumerate}
 \item Call \texttt{read\_from\_stdin\_and\_parse} function to obtain initial term $t$.
@@ -9,7 +9,8 @@ Let $tl$ =\ReadFromStdinAndApplyReductionRelation. If $mf$ is present, let $f_{m
 \item Let $ts$ = $ts^{\prime}$ and repeat previous step until $ts$ is empty.
 \end{enumerate}
 
-\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
+\begin{figure}
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
 {% def codegenReadFromStdinAndApplyReductionRelation(t): %}
 	{% |$f_{tl}$| =  symgen("readfromstdinandeval") %}
 	{% |$f_{mf}$| =  get_metafunction(|$mf$|) %}
@@ -27,5 +28,7 @@ def |$f_{tl}$|():
             |$ts^{\prime}$|= |$ts^{\prime}$| + terms 
         |$ts$| = |$ts^{\prime}$|
 {% enddef %}
-
 \end{minted}
+\caption{Code-generation for \ReadFromStdinAndApplyReductionRelationNoArgs form.}
+\label{codegen-repl}
+\end{figure}
