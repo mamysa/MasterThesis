@@ -30,9 +30,5 @@ These forms provide the following functionalities:
 \item 
 \texttt{apply-reduction-relation-assert-equal} This form takes a term-template, applies reduction-relation (assuming reduction-relation is defined and thus `reduction-relation-name` is valid), and ensures that a list of terms after reduction is equal to a predefined list of terms. An Exception is raised under the following conditions:
 
-	\begin{enumerate}
-	\item Lengths of both lists do not match.
-	\item Given two terms from both lists at position $i$, $t_i^{expected} \neq t_i^{actual}$, with equality operation defined in TODO.
-	\end{enumerate}
-\end{itemize}
+	\\end{itemize}
 This form is based on \texttt{apply-reduction-relation} from provided by PLT Redex.

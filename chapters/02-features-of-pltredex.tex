@@ -1,3 +1,70 @@
 \chapter{Features of PltRedex}
 
-TODO
+\section{Imp}
+
+To introduce PLTRedex, Imp language will be used, originally introduced by Glynn Winskel.
+
+\begin{lstlisting}
+a = X | n | a1 + a2 | a1 * a2
+b = true | false | a1 <= a2 | not b | b1 and b2 | b1 or b2
+c = skip | x = a | c1; c2 | if b c1 else c2 | while b c
+
+
+a in Aexp arithmetic expressions
+b in Bexp boolean expressions
+c in Com  commands 
+X in Loc  locations
+n in Z
+\end{lstlisting}
+
+Set of states $\Sigma$ consists of of functions $\sigma$: \texttt{Loc -> Z}. Thus, $\sigma(X)$ is contents of location $X$ in state $\sigma$. 
+
+Given arithmetic expression $a$ and state $\sigma$, define evaluation relation $<a,\sigma> \rightarrow n$: arithmetic expression $a$ in state $\sigma$ evaluates to integer $n$.
+
+Similarly, define evaluation relation for boolean expressions $b$. $<b, \sigma> \rightarrow {true, flase}$: boolean expression $b$ in state $\sigma$ evaluates to either \texttt{true} or \texttt{false}.
+
+Finally, define evaluation relation for command $c$. Given $c$ and state $\sigma$, $<c, \sigma> -> \sigma\prime$. 
+
+Small-step operational semantics are specified below using inference rules.
+
+TODO-this is quite lengthy. Also provide derivation tree for some example - say \texttt{x = 12; if x <= 20 x = x + 1 else x = x - 1 } showing resulting state after evaluation.
+
+
+\section{Evaluation Contexts}
+
+Inference rules above are verbose and can be tricky to evaluate. PLTRedex uses \texttt{evaluation contexts}, originally introduced in \texttt{https://www2.ccs.neu.edu/racket/pubs/tcs92-fh.pdf}. 
+
+An evaluation context $E[.]$ is an expression containing a single occurence of special symbol $.$ called "hole".$E[e]$ is the expression that results from replacing $.$ with some expression $e$. Evaluation contexts are usually specified using EBNF grammar. 
+
+Using evaluation contexts, the following inference is introduced
+
+$(r, \sigma) \rightarrow (t\prime, \sigma) THEN (E[r], \sigma\prime) \rightarrow (E[t\prime], \sigma\prime)$. Where redex $r$ reduces to some expression $r$ in a single step.
+
+This allows for specification one one global reduction rule seen above and reduction rule for each redex $r$. These are shown in Figure TODO.
+
+\begin{lstlisting}
+
+(x, sigma) -> (n, sigma) where n = sigma(x)
+(n1 + n2, sigma) -> (n, sigma) where n = n1 + n2, n1, n2, n in Z.
+(b1 and b2, sigma) -> (b, sigma) where b = b1 and b2.
+(skip;c, sigma) -> (c, sigma)
+
+E = []
+  | (x = E)
+  | E;c
+  | (E + e)
+  | (n + E)
+  | (E * e)
+  | (n + E)
+  | if E c else c
+ 
+TODO complete this.
+\end{lstlisting}
+
+
+\subsection{Imp: PLTRedex Implementation}
+
+Basically include \texttt{https://github.com/mamysa/PyPltRedex/blob/master/examples/imp/imp-racketcompat.rkt} here but explain all the forms.
+
+Also mention non-determinism.
+
