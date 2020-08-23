@@ -66,6 +66,15 @@ If patterns in the pattern-sequence are suffixed with the same identifier (e.g. 
 
 The Python source code can be found on page (TODO-appendix reference). Throughout the report the following notation will be used to represent the Python classes used in the implementation of the pattern language. It follows the following format: \mintinline{text}{Typename(|$a$|: A, [|$b_1,...,b_n$|]: B, [|$c_1,...,c_m$|]: C?)}. $a$ is a field of type \texttt{A}. \mintinline{text}{[|$b_1,...,b_n$|]} is a sequence containing $n$ fields of type \texttt{B}. \mintinline{text}{[|$c_1,...,c_m$|]} is a sequence containing \textit{zero} or $m$ fields of type \texttt{C} (that is, \texttt{C?} is optional type).
 
+\begin{figure}[H]
+	\centering
+	\makebox[\textwidth][c] { \includegraphics[scale=0.23]{class-diagram-pattern.png} }
+	\caption{Representation of patterns.}
+\label{class-diagram-pattern}
+\end{figure}
+
+Figure \ref{class-diagram-pattern} shows class diagram for all patterns.
+
 \begin{itemize}
 \item
 \PatternSequence \space represents the \texttt{pattern-sequence} clause of the pattern language and may contain zero or more child patterns $p_i$. 
