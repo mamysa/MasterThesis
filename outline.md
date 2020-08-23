@@ -61,8 +61,9 @@ Alternate outline - add extra chapter
 	-Codegen
 
 # Testing/Evaluation
-	- Testing forms (assert-equals etc)
-	- Unittesting.
+	- Testing 
+		- Unit Testing
+		- Integration Testing.
 	- Correctness?
 
 # Conclusion

@@ -2,45 +2,33 @@
 
 \section{Future Work}
 \subsection{Ellipsis Determinism}
-In Chapter < Pattern codegen > an algorithm for deterministic matching of patterns under ellipsis was described but careful reader might notice the report doesn't describe how such patterns are made deterministic. In fact, PyPltRedex provides a transformation pass called \texttt{EllipsisMatchModeRewriter} that analyzes patterns under ellipses and decides if given ellipsis can be matched deterministically but current algorithm is flawed and doesn't work correctly for all patterns. 
+Ellipsis (\RepeatNoArg) matching algorithm that was described in Section TODO produces non-deterministic results. PyPltRedex provides a transformation pass called \texttt{EllipsisMatchModeRewriter} that analyzes patterns under ellipses and decides if a given ellipsis can be matched deterministically. However, the current algorithm is flawed and doesn't work correctly for all patterns.
+
+\subsection{\texttt{in-hole} Hole Count}
+Recall that pattern $p_1$ in \PatternInHole may only contain a single hole. In fact, PyPltRedex provides two analysis passes to solve this problem: \texttt{HoleReachabilitySolver} and \texttt{InHoleChecker}. \texttt{HoleReachabilitySolver}, given some \DefineLanguageNoArg, computes minimum/maximum number of holes for all non-terminals of the language. \texttt{InHoleChecker} locates \PatternInHoleNoArg patterns, and computes minumum and maximum number of holes for $p_1$ and raises Exception accordingly. While the implementation seems to work fine for most cases, for certain kind of languages it produces very strange results and hence description of algorithms used was omitted.
 
 \subsection{\texttt{localehole} function}
-While matching \texttt{in-hole} pattern, a path to \texttt{hole} is maintained. It should be possible store a path of pointers to the \texttt{hole} in \texttt{Match} instance instead of traversing term every time looking for a \texttt{hole}, like \texttt{localehole} does.
+While matching \texttt{in-hole} pattern, a path to \texttt{hole} is maintained. It should be possible to store a path of pointers to the \texttt{hole} in \texttt{Match} instance instead of traversing term every time looking for a \texttt{hole}, like \texttt{localehole} does.
 
 Such implementation stemmed from confusion of how PLTRedex handles \texttt{hole} - while reduction-relations may only match a single hole, terms still may contain additional multiple \texttt{hole}. PyPltRedex disallows this at runtime (i.e. \texttt{hole} variable is reserved), making it possible to optimize this further.
 
 \subsection{Term Kind Annotation.}
-One of more important performance-related features that was left out due to time-constraints is so called "term kind annotation". That is, a term would additionally contain two sets: (1) A set $success$ of non-terminals and built-in patterns the term matches and (2) a set $fail$ of non-terminals and built-in patterns it definitely does not match. This annotation would occur while executing \texttt{isA} functions. If term matches some pattern in \texttt{isA}, a symbol representing the pattern would be added to $success$ set. Otherwise, it would be added to $fail$ set. This way, when executing the same \texttt{isA} function against the same term, only set lookup would be sufficient, thus bypassing matching all patterns in \texttt{isA} function.
+One of the more important performance-related features that were left out due to time constraints is the so-called "term kind annotation". That is, a term would additionally contain two sets: (1) A set $success$ of non-terminals and built-in patterns the term matches and (2) a set $fail$ of non-terminals and built-in patterns it does not match. This annotation would occur while executing \texttt{isA} functions. If the term matches some pattern in \texttt{isA}, a symbol representing the pattern would be added to the $success$ set. Otherwise, it would be added to the $fail$ set. This way, when executing the same \texttt{isA} function against the same term, a set lookup would be sufficient, thus bypassing matching all patterns in the \texttt{isA} function.
 
-When applying reduction-relations, these annotations would have be discarded (1) before replacing some term with \texttt{hole} and (2) while replacing \texttt{hole} with some term for every term on path from root.
+When applying reduction-relations, these annotations would have to be discarded (1) before replacing some term with \texttt{hole} and (2) while replacing \texttt{hole} with some term for every term on the path from the root.
 
 
 \subsection{\texttt{define-metafunction} and \texttt{define-reduction-relation} pattern merging.}
 
-Algorithms for application of reduction-relation and metafunctions match each pattern separately. However, it may be the case that patterns in reduction-cases are similar and bind terms to same identifiers in the same position within the pattern.
+Algorithms for application of reduction-relation and metafunctions match each pattern separately. However, it may be the case that patterns in reduction-cases are similar and bind terms to same pattern-variables in same positions within the pattern. In such cases, it would be possible to merge such patterns together producing a single \texttt{Match} instance up to the point where patterns are no longer similar; and then creating deep copies of the \texttt{Match} instances for separate branches of the pattern.
 
-\begin{lstlisting}
-(M_1  (in-hole P x (+ n_1 n_2)))
-(M_1  (in-hole P n (- n_1 n_2)))
-\end{lstlisting}
+This merging of patterns would allow for handling of \PatternInHoleNoArg patterns in much better way. Instead of traversing the term and finding a single redex at a time, multiple redexes would be located instead and appropriate pattern-variable assignments would be made in appropriate \texttt{Match} instances. 
 
-Two patterns above are an example - both patterns contain pattern-variable $M\_1$ in the first position within the sequence. This means at this point there needs to be a single $Match$ object containing $M\_1$. Since $in-hole$ patterns are different, after matching $M\_1$ $Match$ object can be copied to contain terms matches by each $in-hole$. Diagram can be seen below - 
+\subsection{\texttt{where} and \texttt{side-condition} clauses}
+While describing code-generation for \texttt{define-metafunction} form, it was mentioned that PyPltRedex doesn't support \texttt{where} and \texttt{side-condition} clauses. Implementing an actual language without these clauses becomes more tricky and dropping an assumption that user-defined Python functions must return a \texttt{Term} doesn't result in clean solution.
 
-TODO
-
-
-Furthermore, the first pattern in both \texttt{in-hole} patterns is the same - $P$. Since both \texttt{in-hole} patterns are at the second position within respective pattern sequences, instead of using multiple term traversals to find child terms matching \texttt{(+ n\_1 n\_2)} and \texttt{(- n\_1 n\_2)}, one travesal would be sufficient. This could be done by introducing a new pattern, say, $InHoleMulti(pattern1, pattern2 ...)$ that accepts multiple patterns. Diagram for this can be seen below:
-
-TODO
+\subsection{Evaluation}
+While implementing PyPltRedex, most of the time was focused on how pattern matching and term-generation works and testing those functionalities seperately. The assumption was if both of those are well-tested and produce expected results, chaining them would also produce correct results. However, while focusing on correctness, the performance was left out. (TODO FINISH ME)
 
 
-However, since since matches may have been split before, this introduces additional complexity of \texttt{Match} object management.
-
-\subsection{where and side-condition clauses}
-While describing code-generation for \texttt{define-metafunction} form, it was mentioned that PyPltREdex doesn't support \texttt{where} and \texttt{side-condition} clauses. Implementing an actual language without these clauses becomes more tricky and dropping an assumption that user-defined Python functions must return a \texttt{Term} doesn't result in clean solution.
-
-\subsection{More evaluation}
-
-I was not able to explore performance of the system w.r.t. larger terms.
-
-
+\section{Conclusion}

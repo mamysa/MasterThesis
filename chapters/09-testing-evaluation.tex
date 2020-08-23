@@ -1,2 +1,10 @@
 \chapter{Testing and Evaluation}
-TODO
+
+\section{Testing}
+
+To test PyPltRedex, two forms testing is employed: 
+
+\begin{enumerate}
+\item Unit testing form most non-trivial transformation / analysis passes.
+\item Integration tests containing \texttt{redex-match-assert-equal}, \texttt{term-let-assert-equal}, \texttt{apply-reduction-relation-assert-equal} forms that test functionality of pattern matching, term-generation and application of reduction relations and metafunctions. Some tests cases were lifted from testing suite that comes with PLTRedex. All test cases use output of PLTRedex for comparison.
+\end{enumerate}

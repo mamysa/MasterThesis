@@ -82,7 +82,6 @@ breaklines=true,
 \newcommandx{\NtDefinitionNoArgs}{%
 	{\mintinline{text}{NtDefinition}}}
 
-
 \newcommandx{\ConstraintCheckNoArg}{%
 	{\mintinline{text}{ConstraintCheck}}}
 
@@ -304,39 +303,9 @@ This is a very abstract abstract.
 \input{chapters/05-compiletime-racket-representation.tex}
 \input{chapters/06-pattern-matching.tex}
 \input{chapters/07-codegen.tex}
-\input{chapters/08-toplevel-forms.tex}
 \input{chapters/09-testing-evaluation.tex}
 \input{chapters/10-conclusion.tex}
 
-
-\chapter{ListListing example}
-\lstset{language=algebra,linewidth=0.95\linewidth,breaklines=true,numbers=left,
-basicstyle=\ttfamily,numberstyle=\tiny,escapeinside={//*}{\^^M},
-mathescape=true}
-\begin{lstlisting}
-import IntSpec, ItemSpec;
-
-sort cart; //*\label{sort}
-
-constructors //*\label{begin-sig}
-create() $\longrightarrow$ cart;
-insert(cart, item) $\longrightarrow$ cart;
-observers
-amount(cart) $\longrightarrow$ int;
-transformers
-delete(cart, item) $\longrightarrow$ cart; //*\label{end-sig}
-
-axioms //*\label{begin-axioms}
-forall c: cart, i, j: item 
-
-amount(create()) $=$ 0; //*\label{begin-amount}
-amount(insert(c,i)) $=$ amount(c) $+$ price(i); //*\label{end-amount}
-delete(create(),i) $=$ create(); //*\label{begin-delete}
-delete(insert(c,i),j) $=$
-if (i =$\:$= j) c
-else insert(delete(c,j),i); //*\label{end-axioms}
-end
-\end{lstlisting}
 
 
 
