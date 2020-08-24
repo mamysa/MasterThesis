@@ -17,6 +17,15 @@ X in Loc  locations
 n in Z
 \end{lstlisting}
 
+\[\begin{prooftree}\infer0{ \vdash A }\hypo{ \vdash B } \infer1{ \vdash B, C }\infer2{ \vdash A\wedge B, C }\end{prooftree}\quad \rightsquigarrow \quad\begin{prooftree}\infer0{ \vdash A } \hypo{ \vdash B }\infer2{ \vdash A\wedge B }\infer1{ \vdash A\wedge B, C }\end{prooftree} 
+\]
+
+\[ 
+\begin{prooftree}
+\hypo{ \vdash B } \infer1{ \vdash B, C }
+\end{prooftree}
+\]
+
 Set of states $\Sigma$ consists of of functions $\sigma$: \texttt{Loc -> Z}. Thus, $\sigma(X)$ is contents of location $X$ in state $\sigma$. 
 
 Given arithmetic expression $a$ and state $\sigma$, define evaluation relation $<a,\sigma> \rightarrow n$: arithmetic expression $a$ in state $\sigma$ evaluates to integer $n$.

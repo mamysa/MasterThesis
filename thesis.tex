@@ -3,11 +3,14 @@
 \setlength{\parindent}{0em}
 \setlength{\parskip}{0.5em}
 \usepackage{placeins}
+\usepackage{ebproof}
+\usepackage{caption}
 
 \usepackage{minted}
 \usepackage{xargs}
 \usepackage{listings}
 \usepackage{float}
+\usepackage{newfloat}
 \usepackage{subcaption}
 \usepackage{changepage}
 \usepackage{xcolor}
@@ -44,6 +47,13 @@ autogobble=true,
 resetmargins=true,
 breaklines=true,
 }
+
+\newenvironment{code}{\captionsetup{type=listing}}{}
+
+
+\definecolor{mintedbg}{rgb}{0.95,0.95,0.95}
+\setminted[python]{frame=lines,framerule=1.25pt,framesep=10pt,bgcolor=mintedbg, breaklines=true,fontsize=\normalsize}
+\setminted[text]{frame=lines,framerule=1.25pt,framesep=10pt,bgcolor=mintedbg, breaklines=true,fontsize=\normalsize}
 
 \newcommandx{\UnresolvedSymbol}[1][1=$sym$]{
 	\mintinline{text}{UnresolvedSymbol(|#1|: str)}}
@@ -306,12 +316,11 @@ This is a very abstract abstract.
 \input{chapters/09-testing-evaluation.tex}
 \input{chapters/10-conclusion.tex}
 
-
+%\appendix 
+%\input{appendix/pypltredex-source.tex}
 
 
 \backmatter
-
-\chapter{Glossary} %optional
 
 %\bibliographystyle{alpha}
 %\bibliographystyle{dcu}
