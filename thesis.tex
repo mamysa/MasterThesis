@@ -19,6 +19,7 @@
 \usepackage{colortbl}
 \usepackage{syntax}
 \usepackage{bm}
+\usepackage{mdframed}
 \definecolor{identbefore}{HTML}{fce6e8}
 \definecolor{identafter}{HTML}{dbffde} 
 \usemintedstyle{emacs}
@@ -44,18 +45,26 @@ morecomment=[l]{//s},
 basicstyle=\ttfamily,numberstyle=\tiny,escapeinside={//*}{\^^M},
 mathescape=true}
 
-\setmintedinline{escapeinside=||,mathescape=true, fontsize=\normalsize, 
-autogobble=true,
-resetmargins=true,
-breaklines=true,
-}
 
 \newenvironment{code}{\captionsetup{type=listing}}{}
 
 
 \definecolor{mintedbg}{rgb}{0.95,0.95,0.95}
-\setminted[python]{frame=lines,framerule=1.25pt,framesep=10pt,bgcolor=mintedbg, breaklines=true,fontsize=\normalsize}
-\setminted[text]{frame=lines,framerule=1.25pt,framesep=10pt,bgcolor=mintedbg, breaklines=true,fontsize=\normalsize}
+\setminted[python]{breaklines=true,fontsize=\normalsize}
+\setminted[text]{breaklines=true,fontsize=\normalsize}
+\setminted[racket]{breaklines=true,fontsize=\normalsize}
+
+\BeforeBeginEnvironment{minted}{\begin{mdframed}[backgroundcolor=mintedbg,rightline=false,leftline=false,linewidth=1.5pt]}
+\AfterEndEnvironment{minted}{\end{mdframed}}
+
+\setmintedinline{
+	escapeinside=||,
+	mathescape=true,
+	fontsize=\normalsize, 
+	autogobble=true,
+	resetmargins=true,
+	breaklines=true,
+}
 
 \newcommandx{\UnresolvedSymbol}[1][1=$sym$]{
 	\mintinline{text}{UnresolvedSymbol(|#1|: str)}}

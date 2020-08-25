@@ -2,55 +2,60 @@
 
 \section{Imp}
 
-To introduce PLTRedex, Imp language will be used, originally introduced by Glynn Winskel.
+To introduce PLTRedex, Imp language will be used. It's grammar can be seen in Figure \ref{imp-grammar}.
 
-\begin{lstlisting}
-a = X | n | a1 + a2 | a1 * a2
-b = true | false | a1 <= a2 | not b | b1 and b2 | b1 or b2
-c = skip | x = a | c1; c2 | if b c1 else c2 | while b c
+\begin{figure}[h]
+\begin{align*}
+a &= X \text{ | } n \text{ | } a_1 + a_2 \text{ | } a_1 \times a_2 \\
+b &= \textbf{true} \text{ | } \textbf{false} \text{ | } a1 \leq a2 \text{ | } \neg b \text{ | } b1 \land b2 \text{ | } b1 \lor b2 \\
+c &= \textbf{skip} \text{ | } x = a \text{ | } c1; c2 \text{ | } \textbf{if } b \textbf{ then } c_1 \textbf{ else } c_2 \text{ | } \textbf{while } b \textbf{ do } c
+\end{align*}
+\caption{Grammar of Imp.}
+\label{imp-grammar}
+\end{figure}
+
+\begin{itemize}
+\item $a \in \text{ Aexp}$ is the set of all arithmetic expressions. $X$ ranges over locationx $Loc$; $n \in \mathbb{Z}$.
+\item $b \in \text{ Bexp}$ is the set of all boolean expressions.
+\item $c \in \text{ Com}$ is the set of all commands, including no-op, variable assignment, command sequencing, conditionals and while loops.
+\item Finally set $\Sigma$ consists of functions $\sigma: Loc -> \mathbb{Z}$, mapping locations to integers. Thus, $\sigma(X)$ retrieves appropriate $n$ from location $X$.
+\end{itemize}
 
 
-a in Aexp arithmetic expressions
-b in Bexp boolean expressions
-c in Com  commands 
-X in Loc  locations
-n in Z
-\end{lstlisting}
+\section{Structural Operational Semantics}
+To be able to prove properties of programs, languages need to be described formally. Operational semantics describe behavior of programming languages in terms execution of programs on abstact machines. Structural operation semantics that was first introduced in ~\cite{plotkin}, represents computation using deductive systems meaning execution of programs on abstract machines turns into system of logical inferences. To define a language, inference rules are used such as ones seen in Figures \ref{infer-arith}, \ref{infer-bool}, \ref{infer-comm}.
+
+For arithmetic expressions in Imp, define evaluation relation $\langle a, \sigma \rangle \rightarrow \langle a^\prime, \sigma  \rangle$; meaning evaluation of $a$ under state $\sigma$ in single step yields $a\prime$. Figure \ref{infer-arith} shows seven distinct inference rules, with rules $[\text{Aexp-}\oplus]$, etc created for each operator in $\{+, \times \}$, and all operators having usual semantics w.r.t. $\mathbb{Z}$. These rules are specified in a way that ensures that all arithmetic expressions will be evaluated from left to right.
 
 \begin{figure}[h]
 \input{chapters/chapter02/02-imp-smallstep-arith.tex}
 \caption{Evaluation of arithmetic expressions.}
+\label{infer-arith}
 \end{figure}
+
+Similarly, for boolean expressions single-step evaluation relation $\langle b, \sigma \rangle \rightarrow \langle b^\prime, \sigma  \rangle$ is defined and related inference rules can be seen in Figure \ref{infer-bool}. Rules [$\text{BExp-}\oslash]$, etc, created for each operators $\land$ and $\lor$, as above.
 
 \begin{figure}[h]
 \input{chapters/chapter02/02-imp-smallstep-bool.tex}
 \caption{Evaluation of boolean expressions.}
+\label{infer-bool}
 \end{figure}
+
+Finally, single-step evaluation relation for commands is defined: $\langle c, \sigma \rangle \rightarrow \langle b^\prime, \sigma^\prime \rangle$. Inference rules can been seen in Figure \ref{infer-comm}.
 
 \begin{figure}[h]
 \input{chapters/chapter02/02-imp-smallstep-com.tex}
-\caption{Evaluation of commands.}
+\caption{Inference rules for evaluation of commands.}
+\label{infer-comm}
 \end{figure}
 
+TODO define reflexive-transitive relation.
 
-
-~\cite{plotkin}
-
-
-Set of states $\Sigma$ consists of of functions $\sigma$: \texttt{Loc -> Z}. Thus, $\sigma(X)$ is contents of location $X$ in state $\sigma$. 
-
-Given arithmetic expression $a$ and state $\sigma$, define evaluation relation $<a,\sigma> \rightarrow n$: arithmetic expression $a$ in state $\sigma$ evaluates to integer $n$.
-
-Similarly, define evaluation relation for boolean expressions $b$. $<b, \sigma> \rightarrow {true, flase}$: boolean expression $b$ in state $\sigma$ evaluates to either \texttt{true} or \texttt{false}.
-
-Finally, define evaluation relation for command $c$. Given $c$ and state $\sigma$, $<c, \sigma> -> \sigma\prime$. 
-
-Small-step operational semantics are specified below using inference rules.
-
-TODO-this is quite lengthy. Also provide derivation tree for some example - say \texttt{x = 12; if x <= 20 x = x + 1 else x = x - 1 } showing resulting state after evaluation.
 
 
 \section{Evaluation Contexts}
+\label{02-evaluation-context}
+TODO finish this off.
 
 Inference rules above are verbose and can be tricky to evaluate. PLTRedex uses \texttt{evaluation contexts}, originally introduced in \texttt{https://www2.ccs.neu.edu/racket/pubs/tcs92-fh.pdf}. 
 
@@ -84,7 +89,113 @@ TODO complete this.
 
 \subsection{Imp: PLTRedex Implementation}
 
-Basically include \texttt{https://github.com/mamysa/PyPltRedex/blob/master/examples/imp/imp-racketcompat.rkt} here but explain all the forms.
+First, need to define the grammar of the language. PLTRedex provides \texttt{define-language} form to do that, as seen in Figure \ref{imp-define-language}. Grammar is specified in EBNF-like manner. \texttt{define-language} consists of several \textit{non-terminal definitions}. Each non-terminal definition contains a number of \textit{patterns} that are matched against a term. 
 
-Also mention non-determinism.
+\texttt{Aexp}, \texttt{Bexpr}, \texttt{Com} non-terminal definitions are equivalent to the grammar shown in Figure \ref{imp-grammar}. The only main difference is that \texttt{Com} does not model command sequencing as described in the grammar but utilizes so called \texttt{ellipsis} - patterns under ellipsis such as \texttt{Com ...} match zero or more terms that match \texttt{Com} pattern.
 
+\texttt{var}, \texttt{int}, \texttt{bool} patterns match built-in patterns provided by PLTRedex - \texttt{integer} that matches integers, \texttt{boolean} that matches booleans and \texttt{variable-not-otherwise-mentioned} that matches any variable not used in the language definition such as \texttt{+} or \texttt{<=}.
+
+\texttt{Loc} non-terminal represents locations and is modelled as a list containing zero or more variable-integer pairs.
+
+\texttt{Program} models $\langle c, \sigma \rangle$; that is, locations and potenially empty list of commands.
+
+Non-terminals \texttt{P} and \texttt{E} specify evaluation contexts $E$, as described in Section TODO. \texttt{hole} represents hole $\bullet$.
+
+\begin{figure}[h]
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{racket}
+(define-language Imp
+  (Aexp ::= var int (Aexp + Aexp) (Aexp * Aexp))
+  (Bexp ::= bool (Aexp <= Aexp) (Bexp and Bexp) (Bexp or Bexp) (not Bexp))
+  (Com  ::= skip
+           (var = Aexp)
+           (if Bexp Com Com ... else Com Com ...)
+           (while Bexp Com Com ...))
+  (var ::= variable-not-otherwise-mentioned)
+  (int ::= integer)
+  (bool ::= boolean) 
+
+  (Loc ::= ((var int) ...))
+  (Program ::= (Loc (Com ...)))
+
+  (P ::= (var = E) (if E Com ... else Com ...) hole)
+  (E ::= (E + Aexp) (int + E) (E * Aexp) (int * E) hole 
+         (E <= Aexp) (int <= E)  (not E)     
+         (E and Bexp) (bool and E)
+         (E or  Bexp) (bool or  E)))
+\end{minted}
+\caption{Defining Imp in PLTRedex.}
+\label{imp-define-language}
+\end{figure}
+
+Now, need to handle operations $\sigma(X)$ and $\sigma[X \mapsto n]$ that retrieve from and store integers in provided locations. To be able to do that, PLTRedex provides metafunctions - functions that act on terms and rearrange them in some way. Definition of two metafunctions can be seen in Figure \ref{imp-define-mf}. Metafunction essentially consists of pattern-term clauses - provided term is matched against the pattern, upon successful matching appropriate terms get assigned to pattern-variables such as \texttt{var\_1} or \texttt{int\_2}, and they get plugged into the term. If matching is unsuccessful, the next clause is matched. Error is raised if none of the clauses match provided term. All non-terminals in patterns are resolved with respect to the language - \texttt{Imp}.
+
+Finally, all terms provided as arguments and all terms that are produced by metafunctions must satisfy the contract. In case of the first metafunction, the contract is \texttt{var-lookup : Loc var -> int}. \texttt{var-lookup} is the name of the function. Following the colon, provided argument terms must match patterns \texttt{Loc} and \texttt{var}, otherwise it is an error. Similarly, all resulting terms produced by \texttt{var-lookup} metafunction must match pattern \texttt{int} which is preceeded by symbol \texttt{->}.
+
+Careful reader might notice that the pattern of the first clause in \texttt{var-lookup} has two occurrences of pattern-variable \texttt{var}. This means that both terms bound to both occurences after pattern-matching must be exactly the same.
+
+\begin{figure}[h]
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{racket}
+(define-metafunction Imp
+  var-lookup : Loc var -> int
+  [(var-lookup ((var_1 int_1) ... (var int) (var_2 int_2) ...) var) int]
+  [(var-lookup ((var_1 int_1) ...) var) 0])
+
+(define-metafunction Imp
+    var-assign : Loc var int -> Loc 
+  [(var-assign ((var_1 int_1) ... (var int_3) (var_2 int_2) ...) var int)
+   ((var_1 int_1) ... (var int) (var_2 int_2) ...)]
+  [(var-assign ((var_1 int_1) ...) var int)
+   ((var_1 int_1) ... (var int))])
+\end{minted}
+\caption{Metafunctions for retrieving and storing integers.}
+\label{imp-define-mf}
+\end{figure}
+
+Finally, need to specify evaluation relation. PLTRedex utilizes evaluation contexts as described in Section \ref{02-evaluation-context}. Reduction relation can be seen in Figure \ref{imp-define-red} and is defined using \texttt{reduction-relation} form.
+
+\begin{figure}[ht]
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{racket}
+(define imp-red 
+  (reduction-relation Imp
+  #:domain Program 
+    [--> (Loc ((while Bexp Com_1 ...) Com_2 ...))
+         (Loc ((if Bexp Com_1 ... (while Bexp Com_1 ...) 
+                else skip) Com_2 ...))
+         "while"]
+    [ --> (Loc ((in-hole P (var = int)) Com ...))
+          ((var-assign Loc var int) (Com ...))
+          "var-assign"]
+    [ --> (Loc (skip Com ...))
+          (Loc (Com ...))
+          "skip"]
+    [--> (Loc ((in-hole P var) Com ...))
+         (Loc ((in-hole P (var-lookup Loc var)) Com ...))
+         "var-lookup"]
+    [--> (Loc ((in-hole P (if #t Com_1 ... else Com_2 ...)) Com ...))
+         (Loc (Com_1 ... Com ...))
+         "if-true"]
+    [--> (Loc ((in-hole P (if #f Com_1 ... else Com_2 ...)) Com ...))
+         (Loc (Com_2 ... Com ...))
+         "if-false"]
+    [--> (Loc ((in-hole P (int_1 + int_2)) Com ...))
+         (Loc ((in-hole P ,(+ (term int_1) (term int_2))) Com ...))
+         "integer-add"]
+    [--> (Loc ((in-hole P (int_1 * int_2)) Com ...))
+         (Loc ((in-hole P ,(* (term int_1) (term int_2))) Com ...))
+         "integer-mul"]
+    [--> (Loc ((in-hole P (bool_1 and bool_2)) Com ...))
+         (Loc ((in-hole P ,(and (term bool_1) (term bool_2))) Com ...))
+         "boolean-and"]
+    [--> (Loc ((in-hole P (bool_1 or bool_2)) Com ...))
+         (Loc ((in-hole P ,(or (term bool_1) (term bool_2))) Com ...))
+         "boolean-or"]
+    [--> (Loc ((in-hole P (not bool_1)) Com ...))
+         (Loc ((in-hole P ,(not (term bool_1))) Com ...))
+         "boolean-not"]
+    [--> (Loc ((in-hole P (int_1 <= int_2)) Com ...))
+         (Loc ((in-hole P ,(<= (term int_1) (term int_2))) Com ...))
+         "less-equal"]))
+\end{minted}
+\caption{Metafunctions for retrieving and storing integers.}
+\label{imp-define-red}
+\end{figure}
