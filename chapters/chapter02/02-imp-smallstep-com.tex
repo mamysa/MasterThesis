@@ -1,0 +1,89 @@
+\[
+\begin{prooftree}
+\hypo{
+	\langle a, \sigma \rangle \rightarrow
+	\langle a^\prime, \sigma \rangle 
+} 
+\infer1{
+	\langle x = a, \sigma \rangle \rightarrow  
+	\langle x = a^\prime, \sigma \rangle
+}
+\end{prooftree} \; \; \; [\text{Assign-A}]
+\]
+
+
+\[
+\begin{prooftree}
+\infer0{
+	\langle x = n, \sigma \rangle \rightarrow  
+	\langle \textbf{skip},  \sigma[x \mapsto n] \rangle
+}
+\end{prooftree} \; \; \; [\text{Assign-N}]
+\]
+
+\[
+\begin{prooftree}
+\hypo{
+	\langle c_0, \sigma \rangle \rightarrow
+	\langle c_0^\prime, \sigma^\prime \rangle 
+} 
+\infer1{
+	\langle c_0; c_1,  \sigma \rangle \rightarrow  
+	\langle c_0^\prime; c_1, \sigma^\prime \rangle
+}
+\end{prooftree} \; \; \; [\text{Sequence-A}]
+\]
+
+\[
+\begin{prooftree}
+\infer0{
+	\langle \textbf{skip}; c_1,  \sigma \rangle \rightarrow  
+	\langle c_1, \sigma \rangle
+}
+\end{prooftree} \; \; \; [\text{Sequence-Skip}]
+\]
+
+\[
+\begin{prooftree}
+\hypo{
+	\langle b, \sigma \rangle \rightarrow
+	\langle b^\prime, \sigma \rangle 
+} 
+\infer1{
+	\langle \textbf{if } b \textbf{ then } c_0 \textbf{ else } c_1, \sigma   \rangle
+	\rightarrow
+	\langle \textbf{if } b^\prime \textbf{ then } c_0 \textbf{ else } c_1, \sigma  \rangle
+}
+\end{prooftree} \; \; \; [\text{Conditional}]
+\]
+
+\[
+\begin{prooftree}
+\infer0{
+\langle \textbf{if } \textbf{true} \textbf{ then } c_0 \textbf{ else } c_1, \sigma  \rangle
+\rightarrow
+\langle c_0, \sigma \rangle 
+}
+\end{prooftree} \; \; \; [\text{Conditional-True}]
+\]
+
+\[
+\begin{prooftree}
+\infer0{
+\langle \textbf{if } \textbf{false} \textbf{ then } c_0 \textbf{ else } c_1, \sigma  \rangle
+\rightarrow
+\langle c_1, \sigma \rangle 
+}
+\end{prooftree} \; \; \; [\text{Conditional-False}]
+\]
+
+\[
+\begin{prooftree}
+\infer0{
+\langle \textbf{while } b \textbf{ do } c, \sigma \rangle
+\rightarrow
+\langle \textbf{if } b \textbf{ then } (c; \textbf{while } b \textbf{ do } c)
+\textbf{ else } \textbf{skip}, \sigma \rangle
+}
+\end{prooftree} \; \; \; [\text{While}]
+\]

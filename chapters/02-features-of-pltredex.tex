@@ -17,14 +17,25 @@ X in Loc  locations
 n in Z
 \end{lstlisting}
 
-\[\begin{prooftree}\infer0{ \vdash A }\hypo{ \vdash B } \infer1{ \vdash B, C }\infer2{ \vdash A\wedge B, C }\end{prooftree}\quad \rightsquigarrow \quad\begin{prooftree}\infer0{ \vdash A } \hypo{ \vdash B }\infer2{ \vdash A\wedge B }\infer1{ \vdash A\wedge B, C }\end{prooftree} 
-\]
+\begin{figure}[h]
+\input{chapters/chapter02/02-imp-smallstep-arith.tex}
+\caption{Evaluation of arithmetic expressions.}
+\end{figure}
 
-\[ 
-\begin{prooftree}
-\hypo{ \vdash B } \infer1{ \vdash B, C }
-\end{prooftree}
-\]
+\begin{figure}[h]
+\input{chapters/chapter02/02-imp-smallstep-bool.tex}
+\caption{Evaluation of boolean expressions.}
+\end{figure}
+
+\begin{figure}[h]
+\input{chapters/chapter02/02-imp-smallstep-com.tex}
+\caption{Evaluation of commands.}
+\end{figure}
+
+
+
+~\cite{plotkin}
+
 
 Set of states $\Sigma$ consists of of functions $\sigma$: \texttt{Loc -> Z}. Thus, $\sigma(X)$ is contents of location $X$ in state $\sigma$. 
 

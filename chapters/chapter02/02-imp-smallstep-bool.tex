@@ -1,0 +1,93 @@
+\[
+\begin{prooftree}
+\hypo{
+	\langle a_1, \sigma \rangle \rightarrow
+	\langle a_1^\prime, \sigma \rangle 
+} 
+\infer1{
+	\langle a_1 \leq a_2, \sigma \rangle \rightarrow  
+	\langle a_1^\prime \leq a_2, \sigma \rangle
+}
+\end{prooftree} \; \; \; [\text{BExp-Lhs-}\leq]
+\]
+
+\[
+\begin{prooftree}
+\hypo{
+	\langle a_2, \sigma \rangle \rightarrow
+	\langle a_2^\prime, \sigma \rangle 
+} 
+\infer1{
+	\langle a_1 \leq a_2, \sigma \rangle \rightarrow  
+	\langle a_1 \leq a_2^\prime, \sigma \rangle
+}
+\end{prooftree} \; \; \; [\text{BExp-Rhs-}\leq]
+\]
+
+\[
+\begin{prooftree}
+\infer0{
+	\langle n_1 \oslash n_2, \sigma \rangle \rightarrow  
+	\langle t, \sigma \rangle
+}
+\end{prooftree} \; \; \; \; t \in \{ \textbf{true}, \textbf{false} \} \; \; \; [\text{BExp-}\leq]
+\]
+
+\[
+\begin{prooftree}
+\hypo{
+	\langle b_1, \sigma \rangle \rightarrow
+	\langle b_1^\prime, \sigma \rangle 
+} 
+\infer1{
+	\langle b_1 \oslash b_2, \sigma \rangle \rightarrow  
+	\langle b_1^\prime \oslash b_2, \sigma \rangle
+}
+\end{prooftree} \; \oslash = \{\land,\lor\} \; \; \; [\text{BExp-Lhs-}\oslash]
+\]
+
+\[
+\begin{prooftree}
+\hypo{
+	\langle b_2, \sigma \rangle \rightarrow
+	\langle b_2^\prime, \sigma \rangle 
+} 
+\infer1{
+	\langle b_1 \oslash b_2, \sigma \rangle \rightarrow  
+	\langle b_1 \oslash b_2^\prime, \sigma \rangle
+}
+\end{prooftree} \; \oslash = \{\land,\lor\} \; \; \; [\text{BExp-Rhs-}\oslash]
+\]
+
+\[
+\begin{prooftree}
+\infer0{
+	\langle t_1 \oslash t_2, \sigma \rangle \rightarrow  
+	\langle t_3,  \sigma \rangle
+}
+\end{prooftree} \; \; \; \; \oslash = \{\land,\lor\}, t_1, t_2, t_3 \in \{ \textbf{true}, \textbf{false} \}  \; \; \; [\text{BExp-}\oslash]
+\]
+
+\[
+\begin{prooftree}
+\hypo{
+	\langle b_1, \sigma \rangle \rightarrow  
+	\langle b_1^\prime,  \sigma \rangle
+}
+\infer1{
+	\langle \neg b_1, \sigma \rangle \rightarrow  
+	\langle \neg b_1^\prime,  \sigma \rangle
+}
+\end{prooftree} \; \; \; [\text{BExp-E}\neg]
+\]
+
+\[
+\begin{prooftree}
+\infer0{
+	\langle \neg t_1, \sigma \rangle \rightarrow  
+	\langle t_2,  \sigma \rangle
+}
+\end{prooftree} \; \; \; \; \oslash = \{\land,\lor\}, t_1, t_2 \in \{ \textbf{true}, \textbf{false} \}  \; \; \; [\text{BExp-}\neg]
+\]
+
+
