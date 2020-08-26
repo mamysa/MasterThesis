@@ -1,0 +1,116 @@
+\begin{align*}
+E = \bullet &\text{ | } E + a_2 \text{ | } n_1 + E \text{ | } E \times a_2 \text{ | } n_1 \times E \\
+  &\text{ | } E \land b_2 \text{ | } t_1 \land E  \text{ | } E \lor b_2 \text{ | } t_1 \lor E \text{ | } \neg E \text{ | } E \leq a_2 \text{ | } n_1 \leq E  \\
+  &\text{ | } x = E \text{ | } E;c \text{ | } \textbf{if } E \textbf{ then } c \textbf{ else } c
+\end{align*}
+
+\[
+\begin{prooftree}
+\infer0{
+	\langle x, \sigma \rangle 
+	\rightarrow  
+	\langle \sigma(x), \sigma \rangle 
+}
+\end{prooftree} \; \; \; [\text{Variable}]
+\]
+
+\[
+\begin{prooftree}
+\infer0{
+	\langle n_1 \oplus n_2, \sigma \rangle \rightarrow  
+	\langle n_3,  \sigma \rangle
+}
+\end{prooftree} \; \; \; \; \oplus = \{+,\times\}, n_1, n_2, n_3 \in \mathbb{Z} \; \; \; [\text{AExp-}\oplus]
+\]
+
+\[
+\begin{prooftree}
+\infer0{
+	\langle n_1 \leq n_2, \sigma \rangle \rightarrow  
+	\langle t, \sigma \rangle
+}
+\end{prooftree} \; \; \; \; t \in \{ \textbf{true}, \textbf{false} \} \; \; \; [\text{BExp-}\leq]
+\]
+
+\[
+\begin{prooftree}
+\infer0{
+	\langle t_1 \oslash t_2, \sigma \rangle \rightarrow  
+	\langle t_3,  \sigma \rangle
+}
+\end{prooftree} \; \; \; \; \oslash = \{\land,\lor\}, t_1, t_2, t_3 \in \{ \textbf{true}, \textbf{false} \}  \; \; \; [\text{BExp-}\oslash]
+\]
+
+\[
+\begin{prooftree}
+\infer0{
+	\langle \neg t_1, \sigma \rangle \rightarrow  
+	\langle t_2,  \sigma \rangle
+}
+\end{prooftree} \; \; \; \; t_1, t_2 \in \{ \textbf{true}, \textbf{false} \}  \; \; \; [\text{BExp-}\neg]
+\]
+
+\[
+\begin{prooftree}
+\infer0{
+	\langle x = n, \sigma \rangle \rightarrow  
+	\langle \textbf{skip},  \sigma[x \mapsto n] \rangle
+}
+\end{prooftree} \; \; \; [\text{Assign-N}]
+\]
+
+\[
+\begin{prooftree}
+\infer0{
+	\langle \textbf{skip}; c_1,  \sigma \rangle \rightarrow  
+	\langle c_1, \sigma \rangle
+}
+\end{prooftree} \; \; \; [\text{Sequence-Skip}]
+\]
+
+\[
+\begin{prooftree}
+\infer0{
+\langle \textbf{if } \textbf{true} \textbf{ then } c_0 \textbf{ else } c_1, \sigma  \rangle
+\rightarrow
+\langle c_0, \sigma \rangle 
+}
+\end{prooftree} \; \; \; [\text{Conditional-True}]
+\]
+
+\[
+\begin{prooftree}
+\infer0{
+\langle \textbf{if } \textbf{false} \textbf{ then } c_0 \textbf{ else } c_1, \sigma  \rangle
+\rightarrow
+\langle c_1, \sigma \rangle 
+}
+\end{prooftree} \; \; \; [\text{Conditional-False}]
+\]
+
+\[
+\begin{prooftree}
+\infer0{
+\langle \textbf{while } b \textbf{ do } c, \sigma \rangle
+\rightarrow
+\langle \textbf{if } b \textbf{ then } (c; \textbf{while } b \textbf{ do } c)
+\textbf{ else } \textbf{skip}, \sigma \rangle
+}
+\end{prooftree} \; \; \; [\text{While}]
+\]
+
+
+\[
+\begin{prooftree}
+\hypo{
+	\langle r, \sigma \rangle
+	\rightarrow
+	\langle r^\prime, \sigma^\prime \rangle
+}
+\infer1{
+	\langle E[r], \sigma \rangle
+	\rightarrow
+	\langle E[r^\prime], \sigma^\prime \rangle
+}
+\end{prooftree} \; \; \; [\text{Generalized small-step}]
+\]
