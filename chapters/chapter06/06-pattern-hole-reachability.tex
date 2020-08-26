@@ -1,6 +1,6 @@
 \section{Hole Reachability}
 
-Recall that pattern \InHolePattern requires $p_1$ to match exactly one \lstinline{hole} term. The main problem is counting a number of holes matched by non-terminal symbols of the language. Consider the language \lstinline{MatchesManyHoles} listed below.
+The pattern \InHolePattern requires $p_1$ to match exactly one \lstinline{hole} term. The main problem is counting a number of holes matched by non-terminal symbols of the language. Consider the language \lstinline{MatchesManyHoles} listed below.
 
 \begin{lstlisting}
 (define-language MatchesManyHoles
@@ -9,9 +9,9 @@ Recall that pattern \InHolePattern requires $p_1$ to match exactly one \lstinlin
 	(E ::= (+ E P) (+ n E) hole))
 \end{lstlisting}
 
-To compute value for non-terminal \lstinline{E} analysis of pattern \lstinline{(+ E P)} is required but the vallue of \lstinline{E} is not yet known. Moreover, computing a single value that represents number of holes in insufficient; pattern lstinline{(E ...)} may match zero or many holes. Thus, a \textbf{minimum} and \textbf{maximum} number of holes matched by some pattern must be computed. 
+To compute value for  the non-terminal \lstinline{E}, an analysis of pattern \lstinline{(+ E P)} is required but the value of \lstinline{E} is not yet known. Moreover, computing a single value that represents number of holes is insufficient; pattern lstinline{(E ...)} may match zero or many holes. Thus, a \textbf{minimum} and \textbf{maximum} number of holes matched by some pattern must be computed.
 
-\subsection{Graph Modelling}
+\subsection{Graph Modeling}
 
 Graph consists of two parts - \textbf{outer-nodes} and \textbf{inner-nodes}.
 
@@ -20,29 +20,29 @@ Outer-nodes are a stand-in for the pattern and come in four different varieties:
 \begin{itemize}
 \item \lstinline{Sequence} representing pattern-sequences.
 \item \lstinline{Repeat} representing ellipses.
-\item \lstinline{LeafHole} that represents pattern \lstinline{hole}.
-\item \lstinline{LeafNotHole} that represents any other pattern except \InHolePattern
+\item \lstinline{LeafHole} representing the pattern \lstinline{hole}.
+\item \lstinline{LeafNotHole} representing any other pattern except \InHolePattern
 \end{itemize}
 
-Inner-nodes are stored in \lstinline{Sequence} and \lstinline{Repeat} outer-nodes and act as non-terminal references. Each inner-node has a set of outer-node successors pointing to a set of expressions that the non-terminal matches. 
+Inner-nodes are stored in \lstinline{Sequence} and \lstinline{Repeat} outer-nodes and act as non-terminal references. Each inner-node has a set of outer-node successors pointing to a set of expressions that the non-terminal matches.
 
-Graph for language defined above can be seen in the following figure: 
+Graph for language defined above can be seen in the following figure:
 TODO
 
 \subsection{Graph Construction}
 
-Constructing the graph involves two stages: 
+Constructing the graph involves two stages:
 \begin{enumerate}
 \item
 Creation of outer nodes for each top-level pattern such as `(+ E P)` or `hole`.
 \item
-Creation of inner nodes and edges from inner to outer nodes. If outer node is a `Sequence` and it contains other sequences or ellipses, additional creation of outer-nodes will be required. 
+Creation of inner nodes and edges from inner to outer nodes. If the outer node is a `Sequence` and it contains other sequences or ellipses, additional creation of outer-nodes will be required.
 \end{enumerate}
 
 
 \subsection{Creation of Outer Nodes}
 
-Need to maintain a mapping `M` between patterns in non-terminal definition. For each non-terminal definition `N` let `E\_N = \{\}` be a set storing top-level non-terminal references. For example, in the language described above for non-terminal definition `P` the only such reference is `E`.
+A mapping of `M` has to be maintained between patterns in non-terminal definition. For each non-terminal definition `N` let `E\_N = \{\}` be a set storing top-level non-terminal references. For example, in the language described above for non-terminal definition `P` the only such reference is `E`.
 
 Each non-terminal definition `N` is visited and we may come across the following patterns.
 \begin{itemize}
@@ -52,7 +52,7 @@ Each non-terminal definition `N` is visited and we may come across the following
 \item
 \Nt. This means that `N` is also `nt` and thus all expressions in non-terminal definition of `nt` should also be reachable from any inner-node that reaches expressions in `N`. Thus, `E\_N = E\_N union {nt}`.
 \item
-\InHolePattern. Raise compilation error and quit. This, however, is not actual behaviour of the PltRedex. (TODO explain why we handle it differently?)
+\InHolePattern. Raise compilation error and quit. This, however, is not actual behavior of the PltRedex. (TODO explain why we handle it differently?)
 * `p = PatternSequence(pattern ...)`. If length of `p` is zero, then `n = LeafNotHole`, otherwise `n = Sequence`. Thus, `M = M union {(p, n)}`.
 \end{itemize}
 
@@ -70,7 +70,7 @@ For each non-terminal definition `N` and each pattern $p_i$, if $p_i$ is `PatSeq
 \PatternSequence. Create outer-node `Sequence` `s` for `p`; create inner node `i`; add edge `i->s`. Retrieve parent outer-node `O` and add node `i` to it. Append `s` to the stack `S`. For each child pattern $c_i$ of `p`, recursively visit each $c_i$. Pop topmost element off the stack `S`.
 
 \item
-* \Repeat. Create outer-node `Repeat` `r` for `p`, create inner node `i`, add edge `i->r`. Retrieve parent outer-node `O` and add node `i` to it. Append `r` to the stack `S`. Visit child pattern `c` of `p`. Pop topmost element off the stack `S`. 
+* \Repeat. Create outer-node `Repeat` `r` for `p`, create inner node `i`, add edge `i->r`. Retrieve parent outer-node `O` and add node `i` to it. Append `r` to the stack `S`. Visit child pattern `c` of `p`. Pop topmost element off the stack `S`.
 
 \item
 \InHolePattern Raise compilation error and quit.
@@ -87,24 +87,24 @@ For each non-terminal definition `N` and each pattern $p_i$, if $p_i$ is `PatSeq
 
 Minimum / maximum number of holes can be one of the following: `Zero`, `One`, `Many` (i.e. >= 2) and `Uninitialized` indicating said value should not be used for computation just yet.
 
-Furthermore, need to define three operators - `+`, `min`, `max`. Assume Zero = 0, One = 1, Many = 2 and Uninitialized = 3
+Furthermore, three operators need to be defined - `+`, `min`, `max`. Assume Zero = 0, One = 1, Many = 2 and Uninitialized = 3
 
 Addition operation.
 
 \begin{align}
-	a + b = 
+	a + b =
 	\begin{cases}
 		3 \text{ if } a = 3 \text{ and } b = 3 \\
 		a \text{ if } b = 3 \\
 		b \text{ if } a = 3 \\
-		min(a + b, 2) 
+		min(a + b, 2)
 	\end{cases}
 \end{align}
 
 Min operation:
 
 \begin{align}
-	min(a,b) = 
+	min(a,b) =
 	\begin{cases}
 		3 \text{ if } a = 3 \text{ and } b = 3 \\
 		a \text{ if } b = 3 \\
@@ -115,7 +115,7 @@ Min operation:
 
 Max operation:
 \begin{align}
-	max(a, b) = 
+	max(a, b) =
 	\begin{cases}
 		3 \text{ if } a = 3 \text{ and } b = 3 \\
 		a \text{ if } b = 3 \\
@@ -130,7 +130,7 @@ Min/max values are computed both for inner-nodes and outer-nodes. First, they ha
 
 \begin{itemize}
 \item
-Inner nodes are intialized with (Uninitialized, Uninitialized)
+Inner nodes are initialized with (Uninitialized, Uninitialized)
 \item
 `Sequence` and `Repeat` outer nodes are initialized with (Uninitialized, Uninitialized)
 \item
@@ -156,19 +156,19 @@ Given outer-node `o`, there are a few cases to consider.
 
 \subsection{Hole Reachability Algorithm}
 
-Before initiating graph traversal, should first verify if `LeafHole` node is actually in `V`. If there's no such node, that means the source pattern does not match any `hole` and thus each non-terminal should be annotated with `Zero,Zero` number of holes.
+Before initiating graph traversal, verify if `LeafHole` node is actually in `V`. If there is no such node, that means the source pattern does not match any `hole` and thus each non-terminal should be annotated with `Zero,Zero` number of holes.
 
-Otherwise, the graph is traversed in reverse direction starting from nodes `LeafHole` and `LeafNotHole` using breath-first strategy. Maintain queue Q that initially stores all `LeafHole` and `LeafNotHole` nodes.
+Otherwise, the graph is traversed in reverse direction starting from nodes `LeafHole` and `LeafNotHole` using breadth-first strategy. Maintain queue Q that initially stores all `LeafHole` and `LeafNotHole` nodes.
 
 The algorithm is as follows:
 \begin{enumerate}
 \item
-Remove outer node `o` from the queue `Q`. 
+Remove outer node `o` from the queue `Q`.
 \item
 * For each inner-node `i` such that `i->o`:
 	\begin{enumerate}
 	\item
-	if `parent(i) = o` then $update(i, o_min, o_max)$ and `update(o)`. What this means that if inner node contains an edge to the outer-node `o` `i` is a child of, thus can be considered a "self-loop". The reason for doing this will be discussed later. (TODO is this actually needed aside from really degenerate patterns?)
+	if `parent(i) = o` then $update(i, o_min, o_max)$ and `update(o)`. This means that if the inner node contains an edge to the outer-node `o` `i` is a child of, thus can be considered a "self-loop". The reason for doing this will be discussed later. (TODO is this actually needed aside from really degenerate patterns?)
 	\end{enumerate}
 
 \item
@@ -193,11 +193,11 @@ After completing all computations, each non-terminal definition `nt` is annotate
 
 \subsection{Edge cases}.
 
-This algorithm doesn't one very specific thing - infinite terms and presense of `hole`. Consider the language below
+This algorithm doesn't do one very specific thing - infinite terms and presence of `hole`. Consider the language below
 
 \begin{lstlisting}
 (define-lagnuge Infinite
-     (P ::= (E))      
+     (P ::= (E))
      (E ::= P hole))
 \end{lstlisting}
 

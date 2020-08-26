@@ -1,9 +1,9 @@
 \section{Constraint Check Insertion}
 \label{section:constraint-check}
 \subsection{Motivation}
-As mentioned before, Redex supports a few different forms of constraint checking; however, for the initial PyRedex implementation only "equality of terms" constraint check will be supported. For example, in pattern \texttt{(number\_1 number\_1)} both terms bound to \texttt{number\_1} must be the same meaning the term \texttt{(1 1)} does match the pattern but \texttt{(1 2)} does not. 
+As mentioned before, Redex supports a few different forms of constraint checking; however, for the initial PyRedex implementation only "equality of terms" constraint check will be supported. For example, in pattern \texttt{(number\_1 number\_1)} both terms bound to \texttt{number\_1} must be the same meaning the term \texttt{(1 1)} does match the pattern but \texttt{(1 2)} does not.
 
-However, since current design of \texttt{Match} class explained in Section \ref{section:Match} does not allow assigning multiple terms to the same pattern-variable, and thus certain pattern variables have to be renamed. Given $n$ occurences of a pattern-variable, $n-1$ occurences are to be renamed. After completion of pattern matching these $n-1$ pattern-variables must be removed from all returned \texttt{Match} instances.
+However, since current design of \texttt{Match} class explained in Section \ref{section:Match} does not allow assigning multiple terms to the same pattern-variable, and thus certain pattern variables have to be renamed. Given $n$ occurrences of a pattern-variable, $n-1$ occurrences are to be renamed. After completion of pattern matching these $n-1$ pattern-variables must be removed from all returned \texttt{Match} instances.
 
 Finally, actual equality checks have to be inserted. There are two obvious strategies that could be employed:
 
@@ -17,20 +17,20 @@ Finally, actual equality checks have to be inserted. There are two obvious strat
 Pattern variable $pv$ is renamed in the following manner: $pv + \# + freshint()$, $freshint()$ if $freshint() > 0$ otherwise $pv$. $freshint$ operation was defined previously in Section \ref{section:id-rewrite}. For example, assuming $freshint()=0$, renaming \texttt{m} results in \texttt{m}. Successive application of renaming operation results in \texttt{$m\#1$}
 
 \subsection{Pattern Transformation}
-Since the algorithm is based in renaming (or modification) of pattern-variables, let $v^{\prime}$ be a new pattern-variable after modifying $v$. There's a need to maintain pairs $(pv, pv^{\prime})$ to be able to decide where to insert equality checks. Let $M$ be a set containing such pairs. Furthermore, to be able to remove renamed pattern-variables after matching, need to maintain set $R$ containing such pattern-variables.
+Since the algorithm is based in renaming (or modification) of pattern-variables, let $v^{\prime}$ be a new pattern-variable after modifying $v$. The pairs $(pv, pv^{\prime})$ need to be maintained in order to decide where to insert equality checks. Let $M$ be a set containing such pairs. Furthermore, to remove renamed pattern-variables after matching, the set $R$ containing such pattern-variables has to be maintained.
 
 Given some pattern $p$, \Visit{$p$}. The following kinds of $p$ are of interest.
 \begin{itemize}
 \item $p=$\BuiltInPattern. Let $pv^{\prime}$ be a renamed variable and let $M=\{(pv, pv^{\prime})\}$. If $pv \neq pv^{\prime}$, $R=R \cup \{pv^{\prime}\}$. Return \BuiltInPattern[$tag$][$pv^{\prime}$][false] and $M$.
 \item $p=$\NonTerminal. Let $pv^{\prime}$ be a renamed variable and let $M=\{(pv, pv^{\prime})\}$. If $pv \neq pv^{\prime}$, $R=R \cup \{pv^{\prime}\}$. Return \NonTerminal[$nt$][$pv^{\prime}$][false] and $M$.
-\item $p=$\LiteralPattern contains to no assignable symbols and thus $p$ and $\emptyset$ are returned.
+\item $p=$\LiteralPattern contains no assignable symbols and thus $p$ and $\emptyset$ are returned.
 \item $p=$\PatternRepeat. Let $p_r^{\prime}, M =$\Visit{$p_r$}. Return \PatternRepeat[$p_r^{\prime}$], $M$.
 \item
-$p=$\PatternSequence. If sequence contains no child patterns, return $p$, $\emptyset$. Now, define \texttt{merge} operation that, given two sets $M_i, M_j$ returns two sets $M_k$ and $M_r$; this operation will be discussed below. 
+$p=$\PatternSequence. If the sequence contains no child patterns, return $p$, $\emptyset$. Define \texttt{merge} operation that, given two sets $M_i, M_j$ returns two sets $M_k$ and $M_r$; this operation will be discussed below.
 Let $p^{\prime}$ be the pattern sequence that replaces $p$.
 Let $p_1^{\prime}, M_1$=\Visit{$p_1$}. Insert $p_1^{\prime}$ into $p^{\prime}$. For $p_i \in p_2, ..., p_n$, let $p_i^{\prime}, M_i$=\Visit{$p_i$}.
 	\begin{enumerate}
-	\item 
+	\item
 	Insert $p_i^{\prime}$ into $p^{\prime}$.
 	\item
 	Let $M_1$, $M_r$ = \texttt{merge}($M_1$, $M_i$). For each pair of pattern-variables $(pv_a, pv_b) \in M_r$, insert \PatternCheckConstraint[$pv_a$][$pv_b$][false] into $p^{\prime}$.
@@ -44,11 +44,11 @@ $p=$\PatternInHole.\\ Let $p_1^{\prime}, M_1$= \Visit($p_1$) and $p_2^{\prime}, 
 Finally, make annotation \MakeAnnotation{$p$}{"PatConstraintCheckRemoveVars"}{$R$}.
 
 \subsection{\texttt{merge} Operation}
-Before proceeding with pattern traversal, need to define \texttt{merge} operation. Given two sets $M_1$ and $M_2$ it produces two sets $M$ and $M_r$. Those sets are constructed in the following manner:
+Before proceeding with pattern traversal, define \texttt{merge} operation. Given two sets $M_1$ and $M_2$ it produces two sets $M$ and $M_r$. Those sets are constructed in the following manner:
 
 \begin{enumerate}
 \item Let $M=\emptyset$ and $M_r=\emptyset$.
-\item For each $(pv, pv^{\prime}) \in M_1$, find pair $(pv, pv^{\prime\prime}) \in M_2$. 
+\item For each $(pv, pv^{\prime}) \in M_1$, find pair $(pv, pv^{\prime\prime}) \in M_2$.
 \begin{enumerate}
 \item If such pair exists, then $M_r=M_r \cup \{(pv^{\prime},  pv^{\prime\prime})\}$ and $M=M \cup \{(pv,  pv^{\prime\prime})\}$.
 \item Otherwise, $M=M \cup \{(pv,  pv^{\prime})\}$
@@ -65,6 +65,4 @@ Before proceeding with pattern traversal, need to define \texttt{merge} operatio
 \label{transformation-pattern-constraintcheck}
 \end{figure}
 
-Figure \ref{transformation-pattern-constraintcheck} shows an effect of described transformation on pattern \texttt{((n\_1 ...) ... (in-hole ((n\_1 ...) hole (n\_1 ...)) (n\_1 ...)) ...)}. Notice that all occurences of \texttt{n\_1} have ellipsis depth of two. The first occurence of \texttt{n\_1} goes unmodified. Then, when processing the first pattern inside \texttt{in-hole} pattern, there are two occurences of \texttt{n\_1}. The first occurence is renamed to \texttt{n\_1\#1}, the second to \texttt{n\_1\#2}, and \texttt{CheckConstraint(n\_1\#1, n\_1\#2)} is appended to the \texttt{PatternSequence}. The final occurence of \texttt{n\_1} is seen in the second pattern of \texttt{in-hole} and is renamed to \texttt{n\_1\#3}. \texttt{CheckConstraint(n\_1\#2, n\_1\#3)} is then added to the \texttt{in-hole}. Finally after exiting \texttt{in-hole}, \texttt{CheckConstraint(n\_1, n\_1\#3)} is appended to \texttt{PatternSequence}.
-
-
+Figure \ref{transformation-pattern-constraintcheck} shows an effect of described transformation on pattern \texttt{((n\_1 ...) ... (in-hole ((n\_1 ...) hole (n\_1 ...)) (n\_1 ...)) ...)}. Notice that all occurrences of \texttt{n\_1} have ellipsis depth of two. The first occurrence of \texttt{n\_1} goes unmodified. Then, when processing the first pattern inside \texttt{in-hole} pattern, there are two occurrences of \texttt{n\_1}. The first occurrence is renamed to \texttt{n\_1\#1}, the second to \texttt{n\_1\#2}, and \texttt{CheckConstraint(n\_1\#1, n\_1\#2)} is appended to the \texttt{PatternSequence}. The final occurrence of \texttt{n\_1} is seen in the second pattern of \texttt{in-hole} and is renamed to \texttt{n\_1\#3}. \texttt{CheckConstraint(n\_1\#2, n\_1\#3)} is then added to the \texttt{in-hole}. Finally after exiting \texttt{in-hole}, \texttt{CheckConstraint(n\_1, n\_1\#3)} is appended to \texttt{PatternSequence}.
