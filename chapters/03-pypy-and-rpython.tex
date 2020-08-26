@@ -30,9 +30,7 @@ Statements such as \texttt{while} and \texttt{for} loops, \texttt{if} statements
 Expressions such as arithmetic operations, array element access, literal values such as integers or strings, etc.
 \end{enumerate}
 
-This allows for deeply nested expressions and can be quite tedious to work with. PyPltRedex's AST definition is modified to include \texttt{PyValue} - subset of expressions that includes only variables and literals. Expressions such as additions are thus now required to use \texttt{PyValue}, thus making resulting RPython code similar to typical three-address code intermediate representation that most compilers employ.
-
-Creational design patterns are used to simplify AST creation; see Appendix TODO. Figure \ref{class-diagram-rpython} shows class diagram of all RPython abstract syntax tree nodes.
+This allows for deeply nested expressions and can be quite tedious to work with. PyPltRedex's AST definition is modified to include \texttt{PyValue} - subset of expressions that includes only variables and literals. Expressions such as additions are thus now required to use \texttt{PyValue}, thus making resulting RPython code similar to typical three-address code intermediate representation that most compilers employ. Figure \ref{class-diagram-rpython} shows class diagram of all RPython abstract syntax tree nodes.
 
 \begin{figure}[ht]
 	\centering

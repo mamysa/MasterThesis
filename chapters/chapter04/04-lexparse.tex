@@ -1,5 +1,5 @@
 \section{Processing Input}
-
+\label{section:lex-parse}
 
 \subsection{Lexical Analysis and Parsing}
 nitially, input to PyPltRedex is read from the file and stored as a string. To apply reduction-relation, the string needs to be analyzed.
@@ -42,7 +42,7 @@ Class diagram for both \texttt{Tokenizer} and \texttt{Parser} can be seen in Fig
 \label{class-diagram-lexer-parser}
 \end{figure}
 
-The lexer implementation doesn't use regular expressions that were described above but implements their functionality using a manually implemented state machine. Functions that classify characters can be seen in Figure \ref{char-predicates}.
+The lexer implementation doesn't use regular expressions that were described above but implements their functionality using a manually implemented state machine. Functions that classify characters can be seen in Figure \ref{characterpredicates}.
 
 \begin{figure}[h]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=::,mathescape=true,fontsize=\normalsize]{python}
@@ -71,7 +71,7 @@ def is_rightparen(c):
 	return c in [')', ']', '}']
 \end{minted}
 \caption{Predicates for character identification.}
-\label{char-predicates}
+\label{characterpredicates}
 \end{figure}
 
 
@@ -104,7 +104,7 @@ def is_rightparen(c):
 \label{lexical-analysis-tokenize}
 \end{figure}
 
-Edges of the graph represent calls to \texttt{peek()} and ensure the character satisfies a predicate an edge is labeled with (see Figure \texttt{char-predicates}). Unlike more traditional state machines such as finite automatons in which moving from one state to another is associated with input consumption, the one above consumes input only after switching to some state. There are different state kinds which consume input in different ways.
+Edges of the graph represent calls to \texttt{peek()} and ensure the character satisfies a predicate an edge is labeled with (see Figure \ref{characterpredicates}). Unlike more traditional state machines such as finite automatons in which moving from one state to another is associated with input consumption, the one above consumes input only after switching to some state. There are different state kinds which consume input in different ways.
 \begin{itemize}
 \item States that return tokens annotated with their types are highlighted in green. After moving to this state no input is consumed.
 \item States that raise Exceptions are highlighted in red. After moving to this state no input is consumed.
@@ -199,7 +199,7 @@ This completes the description of the tokenizer. The parser is implemented as a 
 \end{itemize}
 
 \subsection{Implementation: Difficulties}
-The implementation of the initial lexical analysis relied on a regular expression library provided by RPython used to identify integers, floating point numbers and identifiers using regular expressions described in section TODO. While the library works fine while running the lexer using \texttt{python2.7}, attempting to compile the lexer code using \texttt{rpython} toolchain results in the following compilation error:
+The implementation of the initial lexical analysis relied on a regular expression library provided by RPython used to identify integers, floating point numbers and identifiers using regular expressions shown in Figure \ref{tok-lex-grammar}. While the library works fine while running the lexer using \texttt{python2.7}, attempting to compile the lexer code using \texttt{rpython} toolchain results in the following compilation error:
 
 \begin{minted}[tabsize=2,obeytabs,fontsize=\normalsize]{python}
 [translation:ERROR] AttributeError: 'FrozenDesc' object has no attribute 'pycall'

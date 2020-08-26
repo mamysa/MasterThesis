@@ -34,7 +34,7 @@ read-from-stdin-and-apply-reduction-relation ::= (read-from-stdin-and-apply-redu
 
 This form had to be modified due to the fact that PyPltRedex doesn't interpret Racket in any way and thus \texttt{define} form is not supported. Thus, \texttt{define} and \texttt{reduction-relation} forms had to be collapsed into a single \texttt{define-reduction-relation} form.
 
-\item \ReadFromStdinAndApplyReductionRelation \space is self-explanatory -  it reads a string from standard input or file, parses it into a term using logic outlined in Section TODO, and applies reduction-relation with name $r$. Optionally, one can provide metafunction with name $f$ to apply to the parsed term before application of $r$. This allows to separate specification of "code" from everything else that is required to evaluate the "code" (such as model of the heap/stack, etc).
+\item \ReadFromStdinAndApplyReductionRelation \space is self-explanatory -  it reads a string from standard input or file, parses it into a term using logic outlined in Section \ref{section:lex-parse}, and applies reduction-relation with name $r$. Optionally, one can provide metafunction with name $f$ to apply to the parsed term before application of $r$. This allows to separate specification of "code" from everything else that is required to evaluate the "code" (such as model of the heap/stack, etc).
 \end{itemize}
 
 PyPltRedex provides several additional forms with testing functionality. The goal is to run individual components of PyPltRedex, such as pattern matcher and term generator, and compare the results against expected ones. These additional forms are \texttt{redex-match-assert-equal}, \texttt{term-let-assert-equal} and \\ \texttt{apply-reduction-relation-assert-equal}. 
@@ -43,7 +43,7 @@ PyPltRedex provides several additional forms with testing functionality. The goa
 \item \RedexMatchAssertEqual. Given a term instantiated from term-template $t$, it is matched against a pattern $p$ containing non-terminal symbols from language $l$. Resulting list of matches is then compared against the list of expected matches $m_1,...,m_n$, potentially empty, where $m_i$=\Match. Term instantiated from term-template $t_i$ is assigned to pattern-variable $s_i$. An Exception is raised under the following conditions:
 	\begin{enumerate}
 	\item Lengths of both lists do not match.
-	\item Given two matches from both lists at position $i$, $m_i^{expected} \neq m_i^{actual}$, with equality operation defined in TODO.
+	\item Given two matches from both lists at position $i$, $m_i^{expected} \neq m_i^{actual}$, with equality operation defined in Section \ref{section:Match}.
 	\end{enumerate}
 	This form is based on the \texttt{redex-match} form provided by PLT Redex.
 
@@ -52,7 +52,7 @@ PyPltRedex provides several additional forms with testing functionality. The goa
 \item \ApplyReductionRelationAssertEqual. This form takes a term produced by term-template $t$, applies reduction relation with name $r$, and then compares resulting terms against a list of terms instantiated from term-templates $e_1,...,e_n$.
 	\begin{enumerate}
 	\item Lengths of both lists do not match.
-	\item Given two terms from both lists at position $i$, $t_i^{expected} \neq t_i^{actual}$, with equality operation defined in TODO.
+	\item Given two terms from both lists at position $i$, $t_i^{expected} \neq t_i^{actual}$, with equality operation defined in Section \ref{section:runtime-terms}
 	\end{enumerate}
 \end{itemize}
 

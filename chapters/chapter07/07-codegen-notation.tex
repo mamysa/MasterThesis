@@ -1,27 +1,21 @@
 \section{Notation}
 
-Few words about notation. The original intent was to simply reuse actual Python code but it turned out to be not particularly space-friendly. Instead, to stay consistent with notation described in Chapter TODO, the following notation for code-generation is used, as seen in code snippet below.
+Few words about notation. The original intent was to simply reuse actual Python code but it turned out to be not particularly space-friendly. Instead, to stay consistent with notation described in Chapter \ref{chapter05}, the following notation for code-generation is used, as seen in code snippet below.
 
 
-\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{python}
-{% def codegenBuiltInPattern(p): %}
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
+{% def codegenSomething(p): %}
 	{% |$f_p$| = Symgen("match_pattern") %}
-	{% |$isa_p$| = selectIsa(p) %}
 def |$f_p$|(match, term, head, tail):
-	tmp0 = |$isa_p$|(term)
-	{% for |$x_i$| in p[|$x_1, ..., x_n$|]: %}
-	if tmp0 == True:
-		tmp1 = match.addtobinding(|$s$|, term) 
-		head = head + 1
-		return [(match, head, tail)]
-return []
+	return None
 {% return |$f_p$| %}
 {% enddef %}
 \end{minted} 
 
 \begin{itemize}
-\item Statements between \texttt{bla} and \texttt{bla} are Python statements executed by the compiler. Statements that are not between is the generated Python code.
-\item Variables such as $f_p$ are \textit{meta-variables}; when meta-variable is used in description of generated Python code, actual value assigned to it will be emitted instead. 
+\item Statements between \texttt{\{\%} and \texttt{\%\}} are Python statements executed by the compiler. Statements that are not is generated RPython code.
+\item Variables such as $f_p$ are \textit{meta-variables}; when meta-variable is used in description of generated RPython code, actual value assigned to it will be emitted instead. 
 \item Special \texttt{endfor}, \texttt{enddef}, \texttt{endif} are used to indicate an end of Python block.
-\item Occasionally, there's a need for iterative Python statement generation, based on contents of PAttern or TermTemplate. Array reference is used to retrieve fields of compile-time objects.
+\item Occasionally, there's a need for iterative Python statement generation, based on contents of a pattern or term-template. Array reference is used to retrieve fields of compile-time objects.
+
 \end{itemize}

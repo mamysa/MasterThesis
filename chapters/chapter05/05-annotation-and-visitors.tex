@@ -1,4 +1,5 @@
 \section{Visitors}
+\label{section:visitors}
 Since patterns, term-templates and top-level forms require analysis or transformations applied to them, visitors for each \texttt{TermTemplate}, \texttt{Pattern} and \texttt{TopLevelForm} are provided, as seen in Figure \ref{class-diagram-visitors}. 
 
 In other programming languages \texttt{Visitor} design pattern would require each \texttt{TermTemplate}, \texttt{Pattern} or \texttt{TopLevelForm} class to implement \texttt{accept} method with \texttt{Visitor} passed as parameter. However, since Python is a dynamic language, meaning it is possible to invoke methods given their names as strings. \texttt{\_visit} method does exactly that - it looks up type-name of passed element, constructs the string, attempts to retrieve the method, and calls it. For example, given \texttt{PatternSequence} instance, resulting method name would be \texttt{\_visitPatternSequence}.

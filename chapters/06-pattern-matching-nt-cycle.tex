@@ -27,8 +27,6 @@ The problem with the language above (aside from it being completely useless) is 
 \subsection{Algorithm}
 To detect such cycles, \DefineLanguageNoArg needs to be interpreted as directed graph and some cycle-detecting algorithm must be used. The graph is constructed in the following manner.
 
-TODO fix notation here
-
 \begin{enumerate}
 \item
 For each \NtDefinitionN[n], create a vertex  labeled $n$.
@@ -72,16 +70,15 @@ Pick a random vertex $u$ from set $U$. Create empty set $V$. Starting from $u$ p
 Continue until $U$ is empty.
 \end{enumerate}
 
-Code for this can be seen in Appendix TODO.
-
+It should be noted that the algorithm described does not report all the cycles in the graph but the first one it manages to find. One improvement could be finding all cycles in the graph.
 
 \subsection{Example}
 
-Figure \ref{ntcycle-dfs-example} demonstrates cycle searching using the graph shown in Figure \ref{dl-ntcyclegraph} starting from the non-terminal $s$. Initially $U=\{s,p,n,e\}$. Its color becomes \texttt{Grey} as seen in (a). Since it has no successor vertices, its color becomes \texttt{Black}, as seen in (b). 
+Figure \ref{ntcycle2-dfs-example} demonstrates cycle searching using the graph shown in Figure \ref{dl-ntcyclegraph} starting from the non-terminal $s$. Initially $U=\{s,p,n,e\}$. Its color becomes \texttt{Grey} as seen in (a). Since it has no successor vertices, its color becomes \texttt{Black}, as seen in (b). 
 
 Since $V = \{ s \}$, $U=\{p,n,e\}$. Pick vertex $p$ for expansion and color it \texttt{Grey}. Then, visit the only successor of $s$, vertex $e$ and color it \texttt{Grey}. Visit the only successor of $e$, vertex $n$ and color it \texttt{Grey}. Finally, visit the only successor of $n$, vertex $p$. But since it is already colored \texttt{Grey}, the cycle  $p \rightarrow p \rightarrow n$ has been found and a compilation error should be raised.
 
-\begin{figure}[H]
+\begin{figure}[h]
 \begin{subfigure}{0.32\linewidth}
 	\centering
 	\includegraphics[scale=0.18]{transformation-pattern-ntgraph-example-1.png}
@@ -113,10 +110,7 @@ Since $V = \{ s \}$, $U=\{p,n,e\}$. Pick vertex $p$ for expansion and color it \
 	\includegraphics[scale=0.18]{transformation-pattern-ntgraph-example-6.png}
 	\caption{}
 \end{subfigure}
-\label{ntcycle-dfs-example}
-\caption{Cycle searching using DFS}
+\label{ntcycle2-dfs-example}
+\caption{Cycle searching using DFS.}
 \end{figure}
-\subsection{Improvements}
-Note that the described algorithm does not report all the cycles in the graph but the first one it manages to find. §
 
-report all potential cycles in the graph

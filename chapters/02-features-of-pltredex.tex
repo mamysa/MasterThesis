@@ -41,7 +41,7 @@ Similarly, for boolean expressions single-step evaluation relation $\langle b, \
 \label{infer-bool}
 \end{figure}
 
-Finally, single-step evaluation relation for commands is defined: $\langle c, \sigma \rangle \rightarrow \langle b^\prime, \sigma^\prime \rangle$. Inference rules can been seen in Figure \ref{infer-comm}.
+Finally, single-step evaluation relation for commands is defined: $\langle c, \sigma \rangle \rightarrow \langle c^\prime, \sigma^\prime \rangle$. Inference rules can been seen in Figure \ref{infer-comm}.
 
 \begin{figure}[h]
 \input{chapters/chapter02/02-imp-smallstep-com.tex}
@@ -49,7 +49,37 @@ Finally, single-step evaluation relation for commands is defined: $\langle c, \s
 \label{infer-comm}
 \end{figure}
 
-TODO define reflexive-transitive relation.
+To be able to sequence single-step evaluation steps, a reflexive transitive closure on relation $\langle c, \sigma \rangle \rightarrow \langle c^\prime, \sigma^\prime \rangle$ needs to be defined, as seen in Figure
+
+\begin{figure}[h]
+\[
+\begin{prooftree}
+\infer0{
+	\langle c, \sigma \rangle 
+	\rightarrow^{*} \langle 
+	c, \sigma \rangle
+}
+\end{prooftree} \; \; \; [\text{Reflexive}]
+\]
+\[
+\begin{prooftree}
+\hypo{
+	\langle c, \sigma \rangle \rightarrow \langle c^\prime, \sigma^\prime \rangle
+} 
+\hypo{
+	\langle c^\prime, \sigma^\prime \rangle \rightarrow^{*} \langle c^{\prime\prime}, \sigma^{\prime\prime} \rangle
+}
+\infer2{
+	\langle c, \sigma \rangle \rightarrow^{*} \langle c^{\prime\prime}, \sigma^{\prime\prime} \rangle
+}
+\end{prooftree} \; \; \; [\text{Transitive}]
+\]
+
+\caption{Reflexive/transitive closure on single-step evaluation relation of commands.}
+\label{infer-arith}
+\end{figure}
+
+
 
 
 
@@ -99,7 +129,7 @@ First, need to define the grammar of the language. PLTRedex provides \texttt{def
 
 \texttt{Program} models $\langle c, \sigma \rangle$; that is, locations and potenially empty list of commands.
 
-Non-terminals \texttt{P} and \texttt{E} specify evaluation contexts $E$, as described in Section TODO. \texttt{hole} represents hole $\bullet$.
+Non-terminals \texttt{P} and \texttt{E} specify evaluation contexts $E$, as described in Section \ref{02-evaluation-context}. \texttt{hole} represents hole $\bullet$.
 
 \begin{figure}[h]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{racket}

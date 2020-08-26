@@ -1,7 +1,8 @@
 \section{Pattern: Pattern-Variable Extraction}
+\label{section:pv-extraction}
 
 \subsection{Motivation}
-Since \texttt{Match} instances are initialized with pattern-variables, all pattern-variables used by some pattern $p$ need to be known. TODO
+Since \texttt{Match} instances are initialized with pattern-variables, all pattern-variables used by some pattern $p$ need to be known. 
 
 \subsection{Term Traversal}
 The algorithm recursively traverses the pattern and at each step returns a set of pattern-variables $V$. Given some pattern $p$, $V=$\Visit{$p$}. The following kinds of $p$ are of interest.

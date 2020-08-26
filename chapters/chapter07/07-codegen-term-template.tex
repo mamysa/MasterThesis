@@ -2,7 +2,7 @@
 
 \subsection{Term Literals}
 
-Given \TermLiteral, return new term instance based on \texttt{TermLiteralKind}, as defined in section TODO. Term-templates of this kind are guaranteed to not have \texttt{ForEach} and \texttt{InArg} annotations, by construction.
+Given \TermLiteral, return new term instance based on \texttt{TermLiteralKind}, as defined in Section \ref{section:term-templates}. Term-templates of this kind are guaranteed to not have \texttt{ForEach} and \texttt{InArg} annotations, by construction.
 
 \begin{figure}[H]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
@@ -155,7 +155,7 @@ sequence.append(t)
 Given \TermRepeat, generate function $f_{t_r}$ for $t_r$. Since repetitions are handled in \TermSequenceNoArg, no special code generation is required here.
 
 \subsection{InHole}
-Given $t=$ \TermInHole, generate $f_{p_1}$ and $f_{p_2}$ for term-templates $p_1$ and $p_2$. Call $f_{p_1}$ and $f_{p_2}$ with appropriate arguments and then call \texttt{plughole} function as described in Section TODO. 
+Given $t=$ \TermInHole, generate $f_{p_1}$ and $f_{p_2}$ for term-templates $p_1$ and $p_2$. Call $f_{p_1}$ and $f_{p_2}$ with appropriate arguments and then call \texttt{plughole} function as described in Section \ref{section:runtime-terms}. 
 
 \begin{figure}
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}

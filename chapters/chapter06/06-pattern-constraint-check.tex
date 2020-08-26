@@ -1,8 +1,9 @@
 \section{Constraint Check Insertion}
+\label{section:constraint-check}
 \subsection{Motivation}
 As mentioned before, Redex supports a few different forms of constraint checking; however, for the initial PyRedex implementation only "equality of terms" constraint check will be supported. For example, in pattern \texttt{(number\_1 number\_1)} both terms bound to \texttt{number\_1} must be the same meaning the term \texttt{(1 1)} does match the pattern but \texttt{(1 2)} does not. 
 
-However, since current design of \texttt{Match} class explained in Section TODO does not allow assigning multiple terms to the same pattern-variable, and thus certain pattern variables have to be renamed. Given $n$ occurences of a pattern-variable, $n-1$ occurences are to be renamed. After completion of pattern matching these $n-1$ pattern-variables must be removed from all returned \texttt{Match} instances.
+However, since current design of \texttt{Match} class explained in Section \ref{section:Match} does not allow assigning multiple terms to the same pattern-variable, and thus certain pattern variables have to be renamed. Given $n$ occurences of a pattern-variable, $n-1$ occurences are to be renamed. After completion of pattern matching these $n-1$ pattern-variables must be removed from all returned \texttt{Match} instances.
 
 Finally, actual equality checks have to be inserted. There are two obvious strategies that could be employed:
 
@@ -13,9 +14,7 @@ Finally, actual equality checks have to be inserted. There are two obvious strat
 \end{itemize}
 
 \subsection{Pattern-Variable Renaming}
-Pattern variable $pv$ is renamed in the following manner: $pv + \# + freshint()$, $freshint()$ if $freshint() > 0$ otherwise $pv$. $freshint$ operation was defined previously in Section TODO. For example, assuming $freshint()=0$, renaming \texttt{m} results in \texttt{m}. Successive application of renaming operation results in \texttt{$m\#1$}
-
-
+Pattern variable $pv$ is renamed in the following manner: $pv + \# + freshint()$, $freshint()$ if $freshint() > 0$ otherwise $pv$. $freshint$ operation was defined previously in Section \ref{section:id-rewrite}. For example, assuming $freshint()=0$, renaming \texttt{m} results in \texttt{m}. Successive application of renaming operation results in \texttt{$m\#1$}
 
 \subsection{Pattern Transformation}
 Since the algorithm is based in renaming (or modification) of pattern-variables, let $v^{\prime}$ be a new pattern-variable after modifying $v$. There's a need to maintain pairs $(pv, pv^{\prime})$ to be able to decide where to insert equality checks. Let $M$ be a set containing such pairs. Furthermore, to be able to remove renamed pattern-variables after matching, need to maintain set $R$ containing such pattern-variables.
@@ -42,7 +41,7 @@ Finally, return $p^{\prime}, M_1$.
 $p=$\PatternInHole.\\ Let $p_1^{\prime}, M_1$= \Visit($p_1$) and $p_2^{\prime}, M_2$= \Visit($p_2$). Let $M, M_r$=\texttt{merge}($M_1$, $M_2$). For each pair of pattern-variables $(pv_a, pv_b) \in M_r$, let $c_i$=\PatternCheckConstraint[$pv_a$][$pv_b$][false]. Return \PatternInHole[$p_1^{\prime}$][$p_2^{\prime}$][$c_1$][$c_n$][false], $M$.
 \end{itemize}
 
-Finally, make annotation \MakeAnnotation{$p$}{"PatternVariable2Remove"}{$R$}.
+Finally, make annotation \MakeAnnotation{$p$}{"PatConstraintCheckRemoveVars"}{$R$}.
 
 \subsection{\texttt{merge} Operation}
 Before proceeding with pattern traversal, need to define \texttt{merge} operation. Given two sets $M_1$ and $M_2$ it produces two sets $M$ and $M_r$. Those sets are constructed in the following manner:

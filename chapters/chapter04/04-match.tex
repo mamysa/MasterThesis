@@ -1,4 +1,5 @@
 \section{Runtime Representation of Matches}
+\label{section:Match}
 
 To implement matches, two classes are defined - \texttt{Match} and \texttt{Binding}, as seen in Figure \ref{class-diagram-match-binding}.
 
@@ -53,7 +54,7 @@ To implement matches, two classes are defined - \texttt{Match} and \texttt{Bindi
 \texttt{addtobinding} calls \texttt{add} method of relevant \texttt{Binding} instance with \texttt{term}.
 
 \item
-\texttt{comparekeys(key1, key2)}. Given two keys, appropriate \texttt{Binding} instances are retrieved.
+\texttt{comparekeys(key1, key2)}. Given two keys, appropriate \texttt{Binding} instances are retrieved and then topmost terms on the stack are compared.
 
 \item
 \texttt{deepcopy} creates a new Match instance with all \texttt{Binding} and \texttt{Term} instances contained within copied using \texttt{deepcopy}.

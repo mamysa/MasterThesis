@@ -1,4 +1,5 @@
-\section{Terms}
+\section{Term-Templates}
+\label{section:term-templates}
 
 The compile-time representation of terms differs greatly from the runtime representation described previously. The reason for this is the necessity to handle ellipses; or, more specifically substitution of pattern variables under ellipses - \texttt{PltRedex} handles this dynamically and erroneous ellipses aren't detected until term creation time.
 It is desirable to handle ellipsis depth checking of pattern variables at compile time to be able to provide compile time error messages. Doing this allows for the complete elimination of ellipses from the runtime (with variable \texttt{...} being a reserved symbol that throws an Exception). In addition, this also allows for detection of metafunction applications statically.
@@ -50,7 +51,7 @@ term-sequence = term
 
 \section{Compile-time Representation of Term-Templates}
 
-Throughout the report the following notation will be used to represent actual Python classes used to implement the term-templates. Actual Python source code can be seen on page (TODO-appendix reference). 
+Throughout the report the following notation will be used to represent actual Python classes used to implement the term-templates. 
 
 \begin{figure}[H]
 	\centering

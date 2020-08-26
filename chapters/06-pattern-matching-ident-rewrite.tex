@@ -1,8 +1,9 @@
 \section{Transformation: Identifier Rewriting}
+\label{section:id-rewrite}
 
 \subsection{Motivation}
 
-Recall that for patterns in \DefineLanguageNoArg constraint-checking is not performed. This means, for instance, that in this context patterns \texttt{(+ e e)} as \texttt{(+ e\_1 e\_1)} are equivalent. Due to design of \texttt{Match} class described in Section TODO, PyPltRedex needs to modify all such pattern-variables to be unique. Given pattern variable $pv$, $prefix_{pv}$ (defined in Section TODO) is extracted and concatenated with some previously unused integer - $freshint()$. 
+Recall that for patterns in \DefineLanguageNoArg constraint-checking is not performed. This means, for instance, that in this context patterns \texttt{(+ e e)} as \texttt{(+ e\_1 e\_1)} are equivalent. Due to design of \texttt{Match} class described in Section \ref{section:Match}, PyPltRedex needs to modify all such pattern-variables to be unique. Given pattern variable $pv$, $prefix_{pv}$ (defined in Section \ref{section:pv-resolve}) is extracted and concatenated with some previously unused integer - $freshint()$. 
 
 \subsection{Algorithm}
 Given \LetDefineLanguage{$l$}, each pattern in $NtDefinition$ is visited recursively.
