@@ -3,19 +3,19 @@
 
 \subsection{Algorithm}
 
-Immediately after parsing PLTRedex specification, it is unknown whether certain elements of pattern are built-in patterns or non-terminal symbols or just literals. These elements are represented with \UnresolvedSymbol instances and will have to be resolved either one of the following: \BuiltInPatternNoArg, \NonTerminalNoArg, or \LiteralPatternNoArg.
+Immediately after parsing the PLTRedex specification, it is unknown whether certain elements of a pattern are built-in patterns or non-terminal symbols or just literals. These elements are represented with \UnresolvedSymbol instances and will have to be resolved in one of the following ways: \BuiltInPatternNoArg, \NonTerminalNoArg, or \LiteralPatternNoArg.
 
-This transformation is applicable to all patterns as well as patterns in \texttt{define-language} form. For \texttt{define-language} form, all sub-patterns that resolve to \LiteralPatternNoArg need to be stored in set $V$, initially empty, which the set of all variables used by the given language.
+This transformation is applicable to all patterns as well as patterns in \texttt{define-language} form. For \texttt{define-language} form, all sub-patterns that resolve to \LiteralPatternNoArg need to be stored in set $V$, initially empty, which is the set of all variables used by the given language.
 
-Given \LetDefineLanguage{$l$}, let $Nt_{l}$ be the set of all non-terminal symbols of the language. Given string $sym$, the prefix of $sym$ needs to be extracted. Let $prefix_{sym}$ be a string of characters up to the first occurence of underscore character in $sym$. There are several cases to consider.
+Given \LetDefineLanguage{$l$}, let $Nt_{l}$ be the set of all non-terminal symbols of the language. Given string $sym$, the prefix of $sym$ needs to be extracted. Let $prefix_{sym}$ be a string of characters up to the first occurrence of an underscore character in $sym$. There are several cases to consider.
 
 \begin{itemize}
-\item $prefix_{sym}$ does not exist; that is there are no underscore characters in $sym$. Let $prefix_{sym}=sym$.
-\item $prefix_{sym}$ is empty; that is the first character of $sym$ is underscore. Raise an Exception because Redex doesn't consider such symbols valid.
+\item $prefix_{sym}$ does not exist; there are no underscore characters in $sym$. Let $prefix_{sym}=sym$.
+\item $prefix_{sym}$ is empty; the first character of $sym$ is underscore. Raise an Exception because Redex doesn't consider such symbols valid.
 \item Otherwise, $prefix_{sym}$ is the prefix.
 \end{itemize}
 
-Resolution algorithm proceeds in the following manner. The pattern is traversed recursively. When coming across \UnresolvedSymbol node, extract $prefix_{sym}$. One of the following cases may happen.
+The resolution algorithm proceeds in the following manner. The pattern is traversed recursively. When coming across \UnresolvedSymbol node, extract $prefix_{sym}$. One of the following cases may happen.
 
 \begin{itemize}
 \item Prefix is \texttt{number}, return \BuiltInPattern[Number][$sym$][false].
@@ -27,7 +27,7 @@ Resolution algorithm proceeds in the following manner. The pattern is traversed 
 \item Prefix is \texttt{variable-not-otherwise-mentioned}, \\ return \BuiltInPattern[Variable][$sym$][false]
 \item Prefix is \texttt{hole}. Since PltRedex doesn't allow underscores for \texttt{hole} patterns check if $prefix(sym) \neq sym$ and raise an Exception accordingly. \\ Return \BuiltInPattern[Hole][$sym$][false].
 \item $prefix_{sym} \in Nt_l$, return \NonTerminal[$prefix_{sym}$][$sym$][false].
-\item Finally, check that symbol contains no underscores. Redex only allows underscores after non-terminal symbols and built-in patterns. Abort compilation if that is the case. Otherwise, $V=V\cup\{sym\}$ and return \LiteralPattern[Variable][$sym$][false]
+\item Finally, ensure that symbol does not contain underscores. Redex only allows underscores after non-terminal symbols and built-in patterns. Abort compilation if that is the case. Otherwise, $V=V\cup\{sym\}$ and return \LiteralPattern[Variable][$sym$][false]
 \end{itemize}
 
 Finally, if this transformation was performed on \LetDefineLanguage{$l$}, 

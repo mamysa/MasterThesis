@@ -3,7 +3,7 @@
 
 \subsection{Motivation}
 
-Recall that for patterns in \DefineLanguageNoArg constraint-checking is not performed. This means, for instance, that in this context patterns \texttt{(+ e e)} as \texttt{(+ e\_1 e\_1)} are equivalent. Due to design of \texttt{Match} class described in Section \ref{section:Match}, PyPltRedex needs to modify all such pattern-variables to be unique. Given pattern variable $pv$, $prefix_{pv}$ (defined in Section \ref{section:pv-resolve}) is extracted and concatenated with some previously unused integer - $freshint()$. 
+Patterns in \DefineLanguageNoArg constraint-checking is not performed. This means that in this context, patterns \texttt{(+ e e)} as \texttt{(+ e\_1 e\_1)} are equivalent. Due to design of \texttt{Match} class described in Section \ref{section:Match}, PyPltRedex needs to modify all such pattern-variables to be unique. Given the pattern variable $pv$, $prefix_{pv}$ (defined in Section \ref{section:pv-resolve}) is extracted and concatenated with some previously unused integer - $freshint()$.
 
 \subsection{Algorithm}
 Given \LetDefineLanguage{$l$}, each pattern in $NtDefinition$ is visited recursively.
@@ -14,14 +14,14 @@ Given \LetDefineLanguage{$l$}, each pattern in $NtDefinition$ is visited recursi
 
 \subsection{Example}
 
-Figure \ref{id-rewrite-example} shows an example of the transformation on \DefineLanguage form. To all non-terminals \texttt{e}, \texttt{n} and built-in pattern \texttt{number} numerical suffixes are added.
+Figure \ref{id-rewrite-example} shows an example of the transformation on the \DefineLanguage form. To all non-terminals \texttt{e}, \texttt{n} and built-in pattern \texttt{number} numerical suffixes are added.
 
 \begin{figure}[h]
 	\begin{minipage}{0.5\linewidth}
 		\centering
 		\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{Racket}
 (define-language L
-	(e ::= (+ |\colorbox{identbefore}{e} \colorbox{identbefore}{e}|) 
+	(e ::= (+ |\colorbox{identbefore}{e} \colorbox{identbefore}{e}|)
 	       (* |\colorbox{identbefore}{e} \colorbox{identbefore}{e}|) |\colorbox{identbefore}{n}|)
 	(n ::= |\colorbox{identbefore}{number}|))
 		\end{minted}
@@ -30,7 +30,7 @@ Figure \ref{id-rewrite-example} shows an example of the transformation on \Defin
 		\centering
 		\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\small]{Racket}
 (define-language L
-	(e ::= (+ |\colorbox{identafter}{e\_0} \colorbox{identafter}{e\_1}|) 
+	(e ::= (+ |\colorbox{identafter}{e\_0} \colorbox{identafter}{e\_1}|)
 	       (* |\colorbox{identafter}{e\_2} \colorbox{identafter}{e\_3}|) |\colorbox{identafter}{n\_0}|)
 	(n ::= |\colorbox{identafter}{number\_0}|))
 		\end{minted}
@@ -38,5 +38,3 @@ Figure \ref{id-rewrite-example} shows an example of the transformation on \Defin
 	\caption{\texttt{define-language} before and afte renaming of identifiers.}
 	\label{id-rewrite-example}
 \end{figure}
-
-

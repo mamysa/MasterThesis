@@ -1,17 +1,17 @@
 \section{Pattern: \lstinline{in-hole} Pattern Checker}
 
-Having computed `min/max` numbers for each non-terminal in the language, now the question of whether `pattern1` in pattern \InHolePattern actually matches exactly one hole. Doing so involves two stages: 
+Having computed `min/max` numbers for each non-terminal in the language, now the question is whether `pattern1` in pattern \InHolePattern actually matches exactly one hole. Doing so involves two stages:
 
 \begin{enumerate}
 \item
 Locating \InHolePattern in the top-level pattern.
 \item
-Checking if $p_1$ matches exactly one hole. Since $pattern1$ doesn't necessarily have to be a non-terminal, extra work will have to be required.
+Checking if $p_1$ matches exactly one hole. Since $pattern1$ doesn't necessarily have to be a non-terminal, extra work will be required.
 \end{enumerate}
 
 \subsection{Checking pattern for number of holes}
 
-Assuming \InHolePattern pattern has already found, $p_1$ has to be visited recursively. One of the following nodes may be visited.
+Assuming \InHolePattern pattern has already been found, $p_1$ has to be visited recursively. One of the following nodes may be visited.
 
 \begin{itemize}
 \item
