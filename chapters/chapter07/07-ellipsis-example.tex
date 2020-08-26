@@ -1,5 +1,5 @@
 
-Given pattern \texttt{((n ...) ...)} (\texttt{n} is shorthand for \texttt{number}) and term \texttt{((1 2 3)())}, the matching algorithm should return a \texttt{Match} instance pattern-variable assignment \texttt{number = ((1 2 3) ())}. The diagram below shows how using the \texttt{increasedepth} and \texttt{decreasedepth} methods provided by `Match` facilitate the matching. 
+Given pattern \texttt{((n ...) ...)} (\texttt{n} is shorthand for \texttt{number}) and term \texttt{((1 2 3)())}, the matching algorithm should return a \texttt{Match} instance pattern-variable assignment \texttt{number = ((1 2 3) ())}. The diagram below shows how using the \texttt{increasedepth} and \texttt{decreasedepth} methods provided by `Match` facilitate the matching.
 
 \begin{figure}[h]
 \includegraphics[scale=0.25]{ellipsis-example-callgraph.png}
@@ -147,4 +147,3 @@ Finally, the \textit{outer} ellipsis produces matches shown in Figure \ref{ellip
 \caption{Matches returned after matching term \texttt{((1 2 3)())} against pattern \texttt{(n ...) ...} }
 \label{ellipsis-example-matches-3}
 \end{figure}
-

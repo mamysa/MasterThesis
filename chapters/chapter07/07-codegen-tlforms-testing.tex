@@ -2,9 +2,9 @@
 Given \RedexMatchAssertEqual code generation proceeds in the following manner.
 
 \begin{enumerate}
-\item First, generate a list of expected matches $m$. For each $m_i =$ \Match, 
+\item First, generate a list of expected matches $m$. For each $m_i =$ \Match,
 \begin{enumerate}
-\item generate function $f_{t_i}$ for $t_i$ and let resulting term be $tt_i = f_{t_i}(Match())$ 
+\item Generate function $f_{t_i}$ for $t_i$ and let resulting term be $tt_i = f_{t_i}(Match())$
 \item Create empty \texttt{Match} instance $match$, call $match$.\texttt{AddBinding}$(s_i)$ and $match$.\texttt{AddToBinding}$(tt_i)$ and then Append $match$ to \texttt{matches}.
 \end{enumerate}
 \item Generate top-level matching function $f_p^{top}$ for pattern $p$ and term-generating function $f_t$ for term-template $t$.
@@ -33,7 +33,7 @@ def |$f_{rm}$|():
 	assert_compare_match_lists(actualmatches, expectedmatches)
 {% return |$f_{rm}$| %}
 {% enddef %}
-\end{minted} 
+\end{minted}
 \caption{Code generation for \RedexMatchAssertEqualNoArgs \space form.}
 \label{codegen-redexmatch}
 \end{figure}
@@ -42,7 +42,7 @@ def |$f_{rm}$|():
 
 Given $tl=$ \TermLetAssertEqual code generation proceeds in the following manner.
 \begin{enumerate}
-\item First, need to produce $Match()$ instance containing all pattern-variable $v_i$ assignments. Let $m=Match()$. For each $(v_i, n_i, t_i)$
+\item First, produce $Match()$ instance containing all pattern-variable $v_i$ assignments. Let $m=Match()$. For each $(v_i, n_i, t_i)$
 	\begin{enumerate}
 	\item Generate $f_{t_i}$ function for term $t_i$.
 	\item $m$.\texttt{AddBinding}$(v_i)$ and $m$.\texttt{AddToBinding}$(v_i, f_{t_i}(Match()))$
@@ -70,7 +70,7 @@ def |$f_{tl}$|():
 	asserttermsequal(expected, actual)
 {% return |$f_{tl}$|  %}
 {% enddef %}
-\end{minted} 
+\end{minted}
 \caption{Code generation for \TermLetAssertEqualNoArgs \space form.}
 \label{codegen-termlet}
 \end{figure}
@@ -80,7 +80,7 @@ def |$f_{tl}$|():
 
 Given \ApplyReductionRelationAssertEqual
 \begin{enumerate}
-\item First, need to generate a list of expected terms \texttt{expected}, potentially empty.
+\item First, generate a list of expected terms \texttt{expected}, potentially empty.
 	\begin{enumerate}
 	\item Generate function $f_{e_i}$ for each term-template $e_i$.
 	\item Concatenate results of $f_{e_i}(Match())$ to \texttt{expected}.
@@ -105,9 +105,7 @@ def |$f_{ar}$|():
 	asserttermlistsequal(expected, actual)
 {% return |$f_{ar}$| %}
 {% enddef %}
-\end{minted} 
+\end{minted}
 \caption{Code generation for \ApplyReductionRelationAssertEqualNoArgs \space form.}
 \label{codegen-applyred}
 \end{figure}
-
-
