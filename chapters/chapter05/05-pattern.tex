@@ -5,16 +5,17 @@ This section describes subset of PltRedex's pattern specification language suppo
 \begin{figure}[h]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=//,mathescape=true,fontsize=\normalsize]{text}
 pattern = number 
-		| integer 
-		| real 
-		| natural 
-		| string 
-		| boolean 
-		| variable-not-otherwise-mentioned 
-		| hole 
-		| symbol
-		| (in-hole pattern pattern)
-		| (pattern-sequence *) 
+        | integer 
+        | real 
+        | natural 
+        | string 
+        | boolean 
+        | variable-not-otherwise-mentioned 
+        | hole 
+        | symbol
+        | (in-hole pattern pattern)
+        | (pattern-sequence *) 
+
 pattern-sequence : pattern 
                  | pattern ...  # literal ellipsis
 \end{minted}

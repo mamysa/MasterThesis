@@ -4,20 +4,18 @@ PyPltRedex supports two forms lifted directly from PLTRedex: \texttt{define-lang
 
 \begin{figure}
 \begin{minted}[tabsize=2,obeytabs,escapeinside=//,mathescape=true,fontsize=\normalsize]{text}
-define-language ::= (define-language language-name non-terminal-definition ... +)
-non-terminal-definition ::= (non-terminal-name ::= pattern ... +)
+define-language = ( define-language language-name non-terminal-definition+ )
+non-terminal-definition = ( non-terminal-name ::= pattern+ )
 
-define-metafunction ::= (define-metafunction language-name
-  metafunction-contract
-  metafunction-case ...
-metafunction-contract =	id : pattern-sequence ... -> pattern
-metafunction-case =  [(name pattern ...) term]
+define-metafunction = ( define-metafunction language-name metafunction-contract metafunction-case+ )
+metafunction-contract =	id : pattern-sequence* -> pattern
+metafunction-case =  [( name pattern* ) term-template]
 
-reduction-relation ::= (reduction-relation language domain reduction-case ...)
-reduction-case     ::= (-> pattern term reduction-case-name)
-domain ::= #:domain pattern
+reduction-relation = ( reduction-relation language domain reduction-case+ )
+reduction-case = (-> pattern term-template reduction-case-name)
+domain = #:domain pattern
 
-read-from-stdin-and-apply-reduction-relation ::= (read-from-stdin-and-apply-reduction-relation :#mf string)
+read-from-stdin-and-apply-reduction-relation = ( read-from-stdin-and-apply-reduction-relation :#mf metafunction-name )
 \end{minted}
 \caption{Grammar for primary top-level forms.}
 \label{grammar-tlmain}

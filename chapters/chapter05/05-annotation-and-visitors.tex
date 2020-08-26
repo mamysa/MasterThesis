@@ -8,7 +8,7 @@ The only method of interest left is \texttt{run}. It is expected to be overridde
 
 \section{\texttt{Annotatable} Class}
 
-When applying transformations/analyses passes to top-level forms, patterns, and term-template, additional information needs to be stored pertaining to those elements. One more obvious idea is to store those bits of information in a separate hash-map or dictionary, with \texttt{TermTemplate}, \texttt{Pattern} or \texttt{TopLevelForm} elements acting as keys. Unfortunately, the problem with this approach is that transformation passes may completely replace these elements, making keys in the dictionary invalid.
+When applying Transform/Analysis Passes to top-level forms, patterns, and term-templates, additional information needs to be stored pertaining to those elements. One more obvious idea is to store those bits of information in a separate hash-map or dictionary, with \texttt{TermTemplate}, \texttt{Pattern} or \texttt{TopLevelForm} instances acting as keys. However, since during transformation a given instance may be completely replaced with something else, the key of the dictionary has to also be updated, making dictionary management a necessity.
 
 PyPltRedex solves this by storing these bits of information directly into the nodes. \texttt{TermTemplate}, \texttt{Pattern}, and \texttt{TopLevelForm} are subclasses of the \texttt{Annotatable} class. The class diagram can be seen in Figure \ref{class-diagram-visitors}.
 
