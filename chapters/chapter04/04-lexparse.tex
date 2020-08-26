@@ -123,16 +123,16 @@ The state machine proceeds in the following manner:
 \item If the current character starts with pound sign indicating a possible boolean, the transition to the yellow state would be taken. However, these yellow states do not consume input on character by character basis like blue states do but utilize \texttt{extract\_if\_contains} method to peek and consume multiple characters at once. This method is called in the following manner:
 \begin{itemize}
 \item
-if \texttt{extract\_if\_contains("\#t")} return (Boolean "\#t)
+if \texttt{extract\_if\_contains("\#t")} return \texttt{(Boolean, \#t)}
 \item
-if \texttt{extract\_if\_contains("\#f")} return (Boolean "\#f)
+if \texttt{extract\_if\_contains("\#f")} return \texttt{(Boolean, \#f)}
 \item
-if \texttt{extract\_if\_contains("\#true")} return (Boolean "\#t)
+if \texttt{extract\_if\_contains("\#true")} return \texttt{(Boolean, \#t)}
 \item
-if \texttt{extract\_if\_contains("\#false")} return (Boolean "\#f)
+if \texttt{extract\_if\_contains("\#false")} return \texttt{(Boolean, \#f)}
 \end{itemize}
 
-\item If the current character is a double quote, consume any character until the closing double quote is found. Escape sequences are supported expecting a single character after a backward slash. If end-of-string is encountered prematurely, in Exception is raised. Otherwise, \texttt{String, self.extract()} token is returned.
+\item If the current character is a double quote, consume any character until the closing double quote is found. Escape sequences are supported expecting a single character after a backward slash. If end-of-string is encountered prematurely, in Exception is raised. Otherwise, \texttt{(String, self.extract())} token is returned.
 
 \item Finally, the only token kinds remaining are \texttt{Integer}, \texttt{Float} and \texttt{Identifier}. First, need to ensure that the current character is not a special reserved one, raising an Exception. Otherwise, state machine moves to the last \texttt{If} statement. Explanation of state machine for these three token kinds would be too verbose to explain, but essentially it attempts to match an \texttt{Integer} or \texttt{Float} first but once a character that may not be in these two token kinds is seen, resulting token immediately becomes \texttt{Identifier}. All input from that point on is consumed greedly until some delimiter character.
 \end{enumerate}
