@@ -27,7 +27,7 @@
 \[
 \begin{prooftree}
 \infer0{
-	\langle n_1 \oslash n_2, \sigma \rangle \rightarrow  
+	\langle n_1 \leq n_2, \sigma \rangle \rightarrow  
 	\langle t, \sigma \rangle
 }
 \end{prooftree} \; \; \; \; t \in \{ \textbf{true}, \textbf{false} \} \; \; \; [\text{BExp-}\leq]
@@ -87,7 +87,7 @@
 	\langle \neg t_1, \sigma \rangle \rightarrow  
 	\langle t_2,  \sigma \rangle
 }
-\end{prooftree} \; \; \; \; \oslash = \{\land,\lor\}, t_1, t_2 \in \{ \textbf{true}, \textbf{false} \}  \; \; \; [\text{BExp-}\neg]
+\end{prooftree} \; \; \; \; t_1, t_2 \in \{ \textbf{true}, \textbf{false} \}  \; \; \; [\text{BExp-}\neg]
 \]
 
 

@@ -80,44 +80,21 @@ To be able to sequence single-step evaluation steps, a reflexive transitive clos
 \end{figure}
 
 
-
-
-
 \section{Evaluation Contexts}
 \label{02-evaluation-context}
-TODO finish this off.
+As it can be seen above, inference rules above are quite verbose. PLTRedex uses \texttt{evaluation contexts}, originally introduced in ~\cite{felleisen1992revised}.
 
-Inference rules above are verbose and can be tricky to evaluate. PLTRedex uses \texttt{evaluation contexts}, originally introduced in \texttt{https://www2.ccs.neu.edu/racket/pubs/tcs92-fh.pdf}. 
+An evaluation context $E[\bullet]$ is an expression containing a single occurence of special symbol $\bullet$ called "hole". $E[r]$ is the expression that results from replacing some expression $r$ with $\bullet$. The expression $r$ is reduced using some local reduction rule in one step obtaining expression $r^\prime$. Finally, $E[r^\prime]$ is the expression that results after replacing $\bullet$ with $r^\prime$. This way, only a single global general inference rule is required, as seen in Figure \ref{infer-evaluation}. 
 
-An evaluation context $E[.]$ is an expression containing a single occurence of special symbol $.$ called "hole".$E[e]$ is the expression that results from replacing $.$ with some expression $e$. Evaluation contexts are usually specified using EBNF grammar. 
+\begin{figure}[h]
+\input{chapters/chapter02/02-evalcontext.tex}
+\caption{Evaluation contexts, local reductions and generalized inference rule.}
+\label{infer-evaluation}
+\end{figure}
 
-Using evaluation contexts, the following inference is introduced
+\section{Imp: PLTRedex Implementation}
 
-$(r, \sigma) \rightarrow (t\prime, \sigma) THEN (E[r], \sigma\prime) \rightarrow (E[t\prime], \sigma\prime)$. Where redex $r$ reduces to some expression $r$ in a single step.
-
-This allows for specification one one global reduction rule seen above and reduction rule for each redex $r$. These are shown in Figure TODO.
-
-\begin{lstlisting}
-
-(x, sigma) -> (n, sigma) where n = sigma(x)
-(n1 + n2, sigma) -> (n, sigma) where n = n1 + n2, n1, n2, n in Z.
-(b1 and b2, sigma) -> (b, sigma) where b = b1 and b2.
-(skip;c, sigma) -> (c, sigma)
-
-E = []
-  | (x = E)
-  | E;c
-  | (E + e)
-  | (n + E)
-  | (E * e)
-  | (n + E)
-  | if E c else c
- 
-TODO complete this.
-\end{lstlisting}
-
-
-\subsection{Imp: PLTRedex Implementation}
+This section describes how Imp could be implemented using PLTRedex ~\cite{redexreference}. 
 
 First, need to define the grammar of the language. PLTRedex provides \texttt{define-language} form to do that, as seen in Figure \ref{imp-define-language}. Grammar is specified in EBNF-like manner. \texttt{define-language} consists of several \textit{non-terminal definitions}. Each non-terminal definition contains a number of \textit{patterns} that are matched against a term. 
 
@@ -181,7 +158,11 @@ Careful reader might notice that the pattern of the first clause in \texttt{var-
 \label{imp-define-mf}
 \end{figure}
 
-Finally, need to specify evaluation relation. PLTRedex utilizes evaluation contexts as described in Section \ref{02-evaluation-context}. Reduction relation can be seen in Figure \ref{imp-define-red} and is defined using \texttt{reduction-relation} form.
+Finally, need to specify evaluation relation. PLTRedex utilizes evaluation contexts as described in Section \ref{02-evaluation-context}. Reduction relation can be seen in Figure \ref{imp-define-red} and is defined using \texttt{reduction-relation} form. Similarly to metafunctions, it contains a series of reduction cases, each consting of a pattern and a term. It may be the case that multiple reduction cases may apply to the provided term, indicating non-deterministic behavior of a language.
+
+The \texttt{(in-hole pattern1 pattern2)} pattern and \texttt{(in-hole term1 term2)} term implements evaluation contexts as described in Section \ref{02-evaluation-context}. The term is recursively traversed to find the redex matching \texttt{pattern2}. Once it has been found, it is replaced with \texttt{hole} and the term is matched against \texttt{pattern1} to ensure that it is indeed a valid evaluation context. After matching of redex and context, redex is rewritten according to local inference rules. They can be implented through metafunctions or by calling Racket functions, like it is done for addition and multiplication operations. Finally, after reducing the term \texttt{term2}, it is plugged back into the context \texttt{term1}, thus replacing the \texttt{hole}.
+
+All terms that are arguments to the \texttt{reduction-relation} and all resuling terms after applying \texttt{reduction-relation} must match pattern \texttt{Program}.
 
 \begin{figure}[ht]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{racket}
@@ -226,6 +207,24 @@ Finally, need to specify evaluation relation. PLTRedex utilizes evaluation conte
          (Loc ((in-hole P ,(<= (term int_1) (term int_2))) Com ...))
          "less-equal"]))
 \end{minted}
-\caption{Metafunctions for retrieving and storing integers.}
+\caption{Reduction relation for Imp.}
 \label{imp-define-red}
+\end{figure}
+
+Finally, reduction-relation defined above is applied to some term using \texttt{apply-reduction-relation} function, as seen in Figure \ref{imp-red-apply}
+
+\begin{figure}[ht]
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{racket}
+(apply-reduction-relation* imp-red 
+(term (() {
+	(i = 0)
+	[while (i <= 1)
+		[if (i <= 0) (y = 1335) else (z = 1)]
+		(i = (i + 1))]
+})))
+
+; '((((i 2) (y 1335) (z 1)) ()))
+\end{minted}
+\caption{Applying reduction relation to a term.}
+\label{imp-red-apply}
 \end{figure}
