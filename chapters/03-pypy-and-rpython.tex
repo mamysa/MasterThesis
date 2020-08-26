@@ -1,9 +1,9 @@
 \chapter{PyPy and RPython}
 PyPy consists of two parts.
 
-The PyPy Python Interpreter is an alternative to the standard CPython implementation that aims to closely emulate the behavior of CPython, written in RPython. It consists of three components: (1) a bytecode compiler that takes the source code of a user application and turns it into Python code objects; (2) a Python code object interpreter; (3) a standard object space that creates or manipulates Python objects.
+The PyPy Python Interpreter ~\cite{pypy-intro} is an alternative to the standard CPython implementation that aims to closely emulate the behavior of CPython, written in RPython. It consists of three components: (1) a bytecode compiler that takes the source code of a user application and turns it into Python code objects; (2) a Python code object interpreter; (3) a standard object space that creates or manipulates Python objects.
 
-RPython is a subset of Python that can be analyzed statically. The goal of the RPython toolchain is to translate RPython programs into more efficient programs for various target platforms, generally those that are considerably lower-level than Python. Compilation is carried out in the following stages:
+RPython ~\cite{rpython-doc} is a subset of Python that can be analyzed statically. The goal of the RPython toolchain is to translate RPython programs into more efficient programs for various target platforms, generally those that are considerably lower-level than Python. Compilation is carried out in the following stages:
 
 \begin{enumerate}
 \item Annotation pass performs a global analysis starting from a specified entry point inferring type of each variable and building a control flow graph. Control flow graphs consist of \textit{basic blocks} that do not contain Python bytecode but rather operations after performing \textit{abstract interpretation} of the Python bytecode. Basic blocks always end with jumps to other basic blocks. After construction of the flow graph, each encountered variable is annotated with the types of all possible Python objects that can be assigned to it.
