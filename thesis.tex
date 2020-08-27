@@ -303,19 +303,17 @@ mathescape=true}
 \frontmatter %generates the frontmatter, this is FIXED
 
 \begin{abstract}
-\textbf{PLT Redex} is a domain-specific language, embedded into Racket, designed for specifying and debugging operational semantics.  By specifying a language and reduction rules,PltRedex is able to apply reduction rules to terms by rewriting them. 
-\textbf{PyPyPLTRedex} is a tool that given a PLT Redex language specification, constucts a stand-alone interpreter   
-
+\textbf{PLT Redex} is a domain-specific language, embedded into Racket, designed for specifying and debugging operational semantics.  By specifying a language and a set of reduction rules, PLT Redex is able to apply reduction rules to terms by rewriting them. \textbf{PyPltRedex} is a tool that accepts aforementioned language specificaton, performs analysis on it and constructs a stand-alone interpreter backed by RPython - a statically analyzable subset of Python that RPython toolchain can effectively optimize thus producing fast executables.
 \end{abstract}
 
 
 \begin{acknowledgements}
-	Hi Mom!
+I would like to thank Samantha Rosso, Emma Grinfors, and Elias Kronwitter for proof-reading the thesis (and complaining about missing articles!) and my parents, Andrey and Irina, for putting up with me for \textit{this} long.
 \end{acknowledgements}
 
 \tableofcontents 
-\listoffigures %optional
-\listoftables %optional
+%\listoffigures %optional
+%\listoftables %optional
 
 \mainmatter
 \input{chapters/01-introduction.tex}

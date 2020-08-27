@@ -74,42 +74,36 @@ It should be noted that the algorithm described does not report all the cycles i
 
 \subsection{Example}
 
-Figure \ref{ntcycle2-dfs-example} demonstrates cycle searching using the graph shown in Figure \ref{dl-ntcyclegraph} starting from the non-terminal $s$. Initially $U=\{s,p,n,e\}$. Its color becomes \texttt{Grey} as seen in (a). Since it has no successor vertices, its color becomes \texttt{Black}, as seen in (b).
+Figure \ref{nt-cycle-example} demonstrates cycle searching using the graph shown in Figure \ref{dl-ntcyclegraph} starting from the non-terminal $s$. Initially $U=\{s,p,n,e\}$. Its color becomes \texttt{Grey} as seen in (a). Since it has no successor vertices, its color becomes \texttt{Black}, as seen in (b).
 
-Since $V = \{ s \}$, $U=\{p,n,e\}$. Pick vertex $p$ for expansion and color it \texttt{Grey}. Then, visit the only successor of $s$, vertex $e$ and color it \texttt{Grey}. Visit the only successor of $e$, vertex $n$ and color it \texttt{Grey}. Finally, visit the only successor of $n$, vertex $p$. But since it is already colored \texttt{Grey}, the cycle  $p \rightarrow p \rightarrow n$ has been found and a compilation error should be raised.
+Since $V = \{ s \}$, $U=\{p,n,e\}$. Pick vertex $p$ for expansion and color it \texttt{Grey}. Then, visit the only successor of $s$, vertex $e$ and color it \texttt{Grey}. Visit the only successor of $e$, vertex $n$ and color it \texttt{Grey}. Finally, visit the only successor of $n$, vertex $p$. But since it is already colored \texttt{Grey}, the cycle  $p \rightarrow e \rightarrow n$ has been found and a compilation error should be raised.
 
 \begin{figure}[h]
 \begin{subfigure}{0.32\linewidth}
 	\centering
 	\includegraphics[scale=0.18]{transformation-pattern-ntgraph-example-1.png}
-	\caption{}
 \end{subfigure}
 \begin{subfigure}{0.32\linewidth}
 	\centering
 	\includegraphics[scale=0.18]{transformation-pattern-ntgraph-example-2.png}
-	\caption{}
 \end{subfigure}
 \begin{subfigure}{0.32\linewidth}
 	\centering
 	\includegraphics[scale=0.18]{transformation-pattern-ntgraph-example-3.png}
-	\caption{}
 \end{subfigure}
 
 \begin{subfigure}{0.32\linewidth}
 	\centering
 	\includegraphics[scale=0.18]{transformation-pattern-ntgraph-example-4.png}
-	\caption{}
 \end{subfigure}
 \begin{subfigure}{0.32\linewidth}
 	\centering
 	\includegraphics[scale=0.18]{transformation-pattern-ntgraph-example-5.png}
-	\caption{}
 \end{subfigure}
 \begin{subfigure}{0.32\linewidth}
 	\centering
 	\includegraphics[scale=0.18]{transformation-pattern-ntgraph-example-6.png}
-	\caption{}
 \end{subfigure}
-\label{ntcycle2-dfs-example}
 \caption{Cycle searching using DFS.}
+\label{nt-cycle-example}
 \end{figure}

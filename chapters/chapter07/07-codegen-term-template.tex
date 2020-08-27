@@ -175,8 +175,8 @@ def |$f_t$|(match, |$arg_1, ..., arg_n$|):
 \end{figure}
 
 
-\subsection{\PythonCallNoArg}
-Given $t$ =\PythonCall generate functions $f_1$, ..., $f_n$ for $t_1$, ..., $t_n$. Call procedures $f_{t_1}$, ..., $f_{t_n}$ with appropriate arguments and let $t_1^{\prime}$, ..., $t_1^{\prime}$ be resulting terms. Call $pyfunc$ with arguments $t_i^{\prime}$. Note that $t$ has neither \texttt{InArg} nor \texttt{MatchRead} annotations, by construction.
+\subsection{PythonCall}
+Given $t$ =\PythonCall \space generate functions $f_1$, ..., $f_n$ for $t_1$, ..., $t_n$. Call procedures $f_{t_1}$, ..., $f_{t_n}$ with appropriate arguments and let $t_1^{\prime}$, ..., $t_1^{\prime}$ be resulting terms. Call $pyfunc$ with arguments $t_i^{\prime}$. Note that $t$ has neither \texttt{InArg} nor \texttt{MatchRead} annotations, by construction.
 
 \begin{figure}
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
@@ -195,7 +195,7 @@ def |$f_t$|(match):
 \end{figure}
 
 
-\subsection{\MetafunctionApplicationNoArgs}
+\subsection{MetafunctionApplication}
 The metafunction application is very similar to python calls, except that there's only one term-template to be passed as an argument to the metafunction instead of many.
 
 Given the term-template $t=$ \ApplyMetafunction, generate function $f_t$ for $t$. Then, generate function $f_{t_m}$ for term-template $t_m$. Call $f_{t_m}$ with appropriate arguments, and feed results of $f$ into the metafunction with name $mf$.

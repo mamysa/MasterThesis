@@ -29,9 +29,6 @@ The resolution algorithm proceeds in the following manner. The pattern is traver
 \item $prefix_{sym} \in Nt_l$, return \NonTerminal[$prefix_{sym}$][$sym$][false].
 \item Finally, ensure that symbol does not contain underscores. Redex only allows underscores after non-terminal symbols and built-in patterns. Abort compilation if that is the case. Otherwise, $V=V\cup\{sym\}$ and return \LiteralPattern[Variable][$sym$][false]
 \end{itemize}
-
-Finally, if this transformation was performed on \LetDefineLanguage{$l$}, 
-
 If transformation was performed on \texttt{define-language}, \MakeAnnotation{$l$}{"ReservedVariables"}{$V$}.
 
 \subsection{Example}

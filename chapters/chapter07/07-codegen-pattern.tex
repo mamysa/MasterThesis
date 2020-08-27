@@ -146,7 +146,7 @@ return []
 \label{codegen-builtin-nt-1}
 \end{figure}
 
-\subsection{Matching Functions: \RepeatNoArg}
+\subsection{Matching Functions: Repeat}
 \label{section:pattern-repeat}
 Recall that patterns under ellipsis match lists of terms and can only be contained in pattern sequences and thus \texttt{term} argument is always to be expected to be \PatternSequence. Given $p=$ \PatternRepeat \space pattern, non-deterministic matching repetition of terms is handled in the following way. Let $pv_1^{(p)}, ..., pv_n^{(p)}$ be a set pattern-variables assigned in $p_r$. These are read from \texttt{PatternVariables} annotation.  Let $f_p$ be matching function for $p$ with usual parameters. Generate  matching function for $p_r$, $f_{p_r}$.
 
@@ -198,7 +198,7 @@ def |$f_p$|(term, match, head, tail):
 \end{figure}
 
 
-\subsection{Matching Functions: \PatternSequenceNoArg}
+\subsection{Matching Functions: PatternSequence}
 Given $p = $\PatternSequence, generate matching functions $f_{p_1}, ..., f_{p_n}$ for patterns $p_1, ..., p_n$. Code generation for pattern sequences is more involved and a requires a bit of setup.
 
 \begin{enumerate}
@@ -267,7 +267,7 @@ for m, h, t in |$matches_{i}$|:
 if len(|$matches_{i+1}$|) == 0: return []
 	{% endif %}
 \end{minted}
-\caption{Matching \RepeatNoArg \space on \texttt{Sequence}.}
+\caption{Matching \RepeatNoArg \space in \texttt{Sequence}.}
 \label{codegen-pattern-seq-2}
 \end{figure}
 
@@ -306,7 +306,7 @@ if len(|$matches_i$|) == 0: return []
 \end{figure}
 \end{itemize}
 
-\subsection{Match Functions: \PatternInHoleNoArg}
+\subsection{Match Functions: InHole}
 Given pattern \PatternInHole, let $f_p^{impl}$ name of the function for \texttt{in-hole} pattern. Recall that \texttt{in-hole} pattern is annotated with pattern-variables during "Pattern Variable Extraction" pass described in Section \ref{section:pv-extraction}. Let $pv_i^{(p_1)}$ and $pv_i^{(p_2)}$ be annotations for $p_1$ and $p_2$. Finally, generate functions for $p_1$ and $p_2$ and let them be $f_{p_1}$ and $f_{p_2}$ respectively.
 
 Notice that this function contains an extra parameter \texttt{path}, which is used to keep track of path to possible \texttt{hole}. To conform to the established interface, a wrapper function will be generated later.
@@ -421,5 +421,5 @@ def |$f_p$|(term):
 \label{pat-toplevel}
 \end{figure}
 
-\subsection{\RepeatNoArg: Example}
+\subsection{Repeat: Example}
 \input{chapters/chapter07/07-ellipsis-example.tex}

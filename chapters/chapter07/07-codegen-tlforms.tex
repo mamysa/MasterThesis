@@ -1,4 +1,4 @@
-\section{\DefineLanguageNoArg \space Form.}
+\section{DefineLanguage Form.}
 Given \DefineLanguage, the only thing left to do here is to generate a \texttt{isa} function for each $nt_i=$\NtDefinition:
 \begin{enumerate}
 \item Generate a matching function $f_{p_i}$ for pattern $p_i$ and let $f_{p_i}^{top}$ be the top-level matching function.
@@ -27,7 +27,7 @@ def |$f_{nt_i}$|(term):
 \label{codegen-ntdef}
 \end{figure}
 
-\section{\DefineMetafunctionNoArgs \space Form.}
+\section{DefineMetafunction Form}
 
 Given $mf=$ \DefineMetafunction, generate a function $f_{mf}$ that accepts a single \texttt{Term} instance.
 
@@ -87,7 +87,7 @@ def |$f_{c_i}$|(term):
 \label{codegen-define-metafunc}
 \end{figure}
 
-\section{\DefineReductionRelationNoArgs \space Form.}
+\section{DefineReductionRelation Form}
 Given $red=$ \TlDefineReductionRelation, generate function $f_{red}$ accepting a single term. The function returns a list of terms. Code generation algorithm works in the following manner:
 
 \begin{enumerate}
