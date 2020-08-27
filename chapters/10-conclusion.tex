@@ -28,7 +28,7 @@ This merging of patterns would allow for handling of \PatternInHoleNoArg pattern
 While describing code-generation for \texttt{define-metafunction} form, it was mentioned that PyPltRedex doesn't support \texttt{where} and \texttt{side-condition} clauses. Implementing an actual language without these clauses becomes more tricky and dropping an assumption that user-defined Python functions must return a \texttt{Term} doesn't result in clean solution.
 
 \subsection{Evaluation}
-While implementing PyPltRedex, most of the time was focused on how pattern matching and term-generation works and testing those functionalities separately. The assumption was, if both of those are well-tested and produce expected results then chaining them would also produce correct results. However, while focusing on correctness, the performance was left out. (TODO FINISH ME)
-
+While implementing PyPltRedex, most of the time was focused on how pattern matching and term-generation works and testing those functionalities separately. The assumption was, if both of those are well-tested and produce expected results then chaining them would also produce correct results. However, while focusing on correctness, the performance aspect was left out it's evaluation had to be cut short due to time constraints. 
 
 \section{Conclusion}
+This thesis has described functionalities provided by PLTRedex, has described how PyPltRedex implements subset of PLTRedex, and has described algorithms used to implement various functionalities. Unfortunitely, due to time constraints evaluation of PyPltRedex with respect to performance has suffered due to time constraints. Unfortunitely, due to time constraints evaluation of PyPltRedex with respect to performance has suffered due to time constraints.
