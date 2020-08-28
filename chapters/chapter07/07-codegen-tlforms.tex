@@ -1,8 +1,8 @@
 \section{DefineLanguage Form.}
-Given \DefineLanguage, the only thing left to do here is to generate a \texttt{isa} function for each $nt_i=$\NtDefinition:
+Given \DefineLanguage, the only thing left to do here is to generate an \texttt{IsA} function for each $nt_i=$\NtDefinition:
 \begin{enumerate}
 \item Generate a matching function $f_{p_i}$ for pattern $p_i$ and let $f_{p_i}^{top}$ be the top-level matching function.
-\item Call $f_{p_i}^{top}$ with \texttt{term} as argument. If resulting list of matches is non-empty, return True.
+\item Call $f_{p_i}^{top}$ with \texttt{term} as an argument. If the resulting list of matches is non-empty, return True.
 \item Otherwise, none of the patterns $p_i$ match the \texttt{term} and False is returned.
 \end{enumerate}
 
@@ -14,7 +14,7 @@ Figure \ref{codegen-ntdef} demonstrates this.
 	{% |$f_{nt_i}$| =  symgen("isa_nt") %}
 def |$f_{nt_i}$|(term):
 	{% for |$p_i$| in |$nt_i$|=|$p_1, ..., p_n$|: %}
-		{% |$f_{p_i}^{top}$| = codegenTopLevel($p_i$)
+		{% |$f_{p_i}^{top}$| = codegenTopLevel(|$p_i$|)
 	matches = |$f_{p_i}^{top}$|(term)
 	if len(matches) > 0:
 		return True
@@ -33,16 +33,16 @@ Given $mf=$ \DefineMetafunction, generate a function $f_{mf}$ that accepts a sin
 
 \begin{enumerate}
 \item Generate matching functions $f_d$ for $domain$, $f_c$ for $codomain$ pattern, and let $f_d^{top}$, $f_c^{top}$ be top-level matching functions for $domain$ and $codomain$, respectively.
-\item Code generation begins by call $f_d^{top}$ with term and ensuring that resulting list of matches isn't empty, otherwise an Exception is raised.
-\item For each $c_i =$ \MetafunctionCase, generate function $f_{c_i}$, passing term as an argument.
+\item Code generation begins by calling $f_d^{top}$ with the term and ensuring that resulting list of matches isn't empty, otherwise an Exception is raised.
+\item For each $c_i =$ \MetafunctionCase, generate function $f_{c_i}$, passing the term as an argument.
 \begin{enumerate}
-	\item Generate matching function $f_{p_i}$ for pattern $p_i$, and term-creation function $f_{t_i}$ for term-template $t_i$. Let $f_{p_i}^{top}$ be top-level matching function for pattern $p_i$.
-	\item Call $f_{p_i}^{top}$ with the term passed as argument. For each \texttt{match} in \texttt{matches}, call $f_{t_i}$ and if result is not \texttt{None}, accumulate resulting terms into list \texttt{terms}. If resulting list of matches \texttt{matches} is empty then return empty list. Even though user-implemented Python functions are always expected to return \texttt{Term} instance, since currently there's no support for \texttt{side-condition} clauses, returning \texttt{None} thus is the only way to "emulate" \texttt{side-condition} clauses.
-	\item Have to ensure that all terms in \texttt{terms} are the same term. Metafunctions allow for non-deterministic behavior during pattern-matching but resulting \texttt{Match} instances must always produce the same term. Call function \texttt{aretermsequalpairwise} with \texttt{terms} and raise \texttt{Exception} if False is returned. Otherwise, pick any term from \texttt{terms}, and return it.
+	\item Generate the matching function $f_{p_i}$ for pattern $p_i$, and the term-creation function $f_{t_i}$ for term-template $t_i$. Let $f_{p_i}^{top}$ be top-level matching function for pattern $p_i$.
+	\item Call $f_{p_i}^{top}$ with the term passed as argument. For each \texttt{match} in \texttt{matches}, call $f_{t_i}$ and if the result is not \texttt{None}, accumulate resulting terms into the list \texttt{terms}. If the resulting list \texttt{terms} is empty then return empty list. Even though user-implemented Python functions are always expected to return \texttt{Term} instance, since currently there's no support for \texttt{side-condition} clauses, returning \texttt{None} thus is the only way to "emulate" \texttt{side-condition} clauses.
+	\item Ensure that all terms in \texttt{terms} are the same term. Metafunctions allow for non-deterministic behavior during pattern-matching but resulting \texttt{Match} instances must always produce the same term. Call function \texttt{aretermsequalpairwise} with \texttt{terms} and raise \texttt{Exception} if False is returned. Otherwise, pick any term from \texttt{terms}, and return it.
 	This completes code generation of \MetafunctionCase.
 \end{enumerate}
-\item If $f_{c_i}$ returns a term, call $codomain$ function $f_c^{top}$ with the term as argument. If resulting list of matches is empty, then raise Exception, otherwise call $f_c^{top}$ with the only term in the list. If resulting list of matches is empty, raise Exception, otherwise return the term. If $f_{c_i}$ doesn't return anything, continue with next metafunction case $f_{c_{i+1}}$
-\item If after calling $f_{c_1}, ..., f_{c_n}$ no terms are returned, none of the metafucntion cases were matches and Exception is thrown.
+\item If $f_{c_i}$ returns a term, call the $codomain$ function $f_c^{top}$ with the term as the argument. If resulting list of matches is empty, then raise Exception, otherwise call $f_c^{top}$ with the only term in the list. If the resulting list of matches is empty, raise Exception, otherwise return the term. If $f_{c_i}$ doesn't return anything, continue with next metafunction case $f_{c_{i+1}}$
+\item If after calling $f_{c_1}, ..., f_{c_n}$ no terms are returned, none of the metafunction cases were matches and an Exception is thrown.
 \end{enumerate}
 
 Code generated for \DefineMetafunctionNoArgs \space can be seen in Figure \ref{codegen-define-metafunc}.
@@ -88,13 +88,13 @@ def |$f_{c_i}$|(term):
 \end{figure}
 
 \section{DefineReductionRelation Form}
-Given $red=$ \TlDefineReductionRelation, generate function $f_{red}$ accepting a single term. The function returns a list of terms. Code generation algorithm works in the following manner:
+Given $red=$ \TlDefineReductionRelation, generate the function $f_{red}$ accepting a single term. The function returns a list of terms. The code generation algorithm works in the following manner:
 
 \begin{enumerate}
-\item Generate top-level matching function $f_d^{top}$ for $domain$, if $domain$ is present, add call $f_d^{top}$ with \texttt{term}. If resulting list of matches is empty, raise Exception.
+\item Generate the top-level matching function $f_d^{top}$ for $domain$, if $domain$ is present, add call $f_d^{top}$ with \texttt{term}. If the resulting list of matches is empty, raise an Exception.
 \item For each $r_i= $ \ReductionCase, generate function $f_{r_i}$.
 	\begin{enumerate}
-	\item Generate top-level matching function $f_p^{top}$ for pattern $p$, and generate function $f_t$ for term-template $t$.
+	\item Generate the top-level matching function $f_p^{top}$ for pattern $p$, and generate the function $f_t$ for term-template $t$.
 	\item Inside $f_{r_i}$, $f_p^{top}$(term) is called, and each match in resulting lists of matches is fed into $f_t$ resulting in a term. Apply $f_d$ to the term, and if resulting list of matches is empty, raise Exception, otherwise append the term to list \texttt{terms}.
 	\item return \texttt{terms}
 	\end{enumerate}
@@ -108,7 +108,7 @@ Code generated for \DefineReductionRelationNoArgs \space can be seen in Figure \
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
 {% def codegenDefineReductionRelation(|$red$|): %}
 	{% |$f_{red}$| =  symgen("reductionrelation") %}
-	{% |$f_d^{top}$| = codegenTopLevel($domain(r)$) %}
+	{% |$f_d^{top}$| = codegenTopLevel(|$domain(r)$|) %}
 def |$f_{mf}$|(term):
 	outterms = []
 	{% for |$r_i$| in |$red$|[|$r_1, ..., r_n$|]: %}

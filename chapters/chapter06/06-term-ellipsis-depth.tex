@@ -2,7 +2,7 @@
 
 \subsection{Motivation}
 
-Immediately after parsing PLTRedex specification, it is unknown whether certain elements of a term-template are pattern-variables or just literal variables. These elements are represented with \UnresolvedSymbol instances. Since pattern-variables may be under ellipsis, all occurrences of the pattern-variable must have consistent \textit{ellipsis depths}. Finally, since ellipses produce lists of terms, it has to be decided how and where these sub-terms are to be extracted from the last and plugged into the term-template. Ellipsis depth of each pattern-variable is assumed to be known - it comes from \textbf{EllipsisDepths} annotation of related pattern $p$.
+Immediately after parsing the PLTRedex specification, it is unknown whether certain elements of a term-template are pattern-variables or just literal variables. These elements are represented with \UnresolvedSymbol \space instances. Since pattern-variables may be under ellipsis, all occurrences of the pattern-variable must have consistent \textit{ellipsis depths}. Finally, since ellipses produce lists of terms, it has to be decided how and where these sub-terms are to be extracted from the last and plugged into the term-template. Ellipsis depth of each pattern-variable is assumed to be known - it comes from \textbf{EllipsisDepths} annotation of related pattern $p$.
 
 These goals are achieved by introducing the following term-template annotations. for term-template $t$,
 
@@ -21,13 +21,13 @@ To perform annotation, a \textbf{path} of term-templates must be maintained to b
 \begin{itemize}
 
 \item
-$t=$\TermUnresolvedSymbol. First, check if pattern-variable $sym$ is present in provided \texttt{Match} instance. If it is not, then $sym$ is just a literal variable and is resolved to \TermLiteral[Variable][$sym$]{false}.
+$t=$\TermUnresolvedSymbol. First, check if the pattern-variable $\mathit{sym}$ is present in the provided \texttt{Match} instance. If it is not, then $sym$ is just a literal variable and is resolved to \TermLiteral[Variable][$sym$]{false}.
 Otherwise, $sym$ is a pattern-variable with \textit{expected ellipsis depth} $d_e$. Let $d_a$ be \textit{actual ellipsis depth}, initially zero. Let $d_p$ be a number of \RepeatNoArg term-templates on the \texttt{path}. In the end it must be true that $d_p \geq d_e$ and $d_a = d_e$. There is a number of cases to consider. Let $x$ be a fresh symbol.
 	\begin{itemize}
 	\item
 	$d_e=0$. Add the following annotation to $t$: \MakeAnnotation{$t$}{"MatchRead"}{$(n, sym)$} and return.
 	\item
-	$d_e>0$. Add the following annotation to $t$: \MakeAnnotation{$t$}{"InArg"}{$n$}. Now, contents of the the \texttt{path} has to be inspected to be able to determine $d_a$. Top-most element of the \texttt{path} is $t$; iterate over the \texttt{path} in reverse order ignoring the topmost term-template. Let $t^{\prime}$ be a term-template on the \texttt{path}.
+	$d_e>0$. Add the following annotation to $t$: \MakeAnnotation{$t$}{"InArg"}{$n$}. Now, contents of the \texttt{path} has to be inspected to be able to determine $d_a$. The top-most element of the \texttt{path} is $t$; iterate over the \texttt{path} in reverse order ignoring the topmost term-template. Let $t^{\prime}$ be a term-template on the \texttt{path}.
 		\begin{enumerate}
 		\item
 		$t^{\prime}=$\texttt{TermSequence} or $t^{\prime}=$\texttt{InHole}; and $d_a \neq d_e$. Add the following annotation to $t^{\prime}$: \MakeAnnotation{$t^{\prime}$}{"InArg"}{$n$}.

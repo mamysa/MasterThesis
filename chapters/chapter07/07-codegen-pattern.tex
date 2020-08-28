@@ -6,7 +6,7 @@ To be able to generate code for patterns, three kinds of functions are required.
 
 \begin{enumerate}
 \item
-\texttt{IsA} function that accepts a term and returns a boolean if it matches the desired pattern. This is done by ensuring that each term instance is of an expected class (e.g. \texttt{Integer}) and additionally verifying side conditions (e.g. \texttt{natural} term must of class \texttt{Integer} and its value must be greater or equal to zero). All \texttt{IsA} functions have the following signature:
+The \texttt{IsA} function that accepts a term and returns a boolean if it matches the desired pattern. This is done by ensuring that each term instance is of an expected class (e.g. \texttt{Integer}) and additionally verifying side conditions (e.g. \texttt{natural} term must of class \texttt{Integer} and its value must be greater or equal to zero). All \texttt{IsA} functions have the following signature:
 
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
 isA(term: Term) -> boolean
@@ -61,14 +61,14 @@ def term_is_variable_not_otherwise_mentioned(term, variableset):
 \label{codegen-builtin-isa}
 \end{figure}
 
-The figure above shows the \texttt{IsA} procedures for \texttt{number}, \texttt{real}, \texttt{natural}, \texttt{string}, \texttt{boolean} and \texttt{variable-not-otherwise-mentioned} patterns. All of these use Python's built-in \texttt{isinstance} function to check if given term is of proper subclass of \texttt{Term} described in Section \ref{section:runtime-terms}.
+The figure above shows the \texttt{IsA} procedures for \texttt{number}, \texttt{real}, \texttt{natural}, \texttt{string}, \texttt{boolean} and \texttt{variable-not-otherwise-mentioned} patterns. All of these use Python's built-in \texttt{isinstance} function to check if a given term is of the proper subclass of \texttt{Term} described in Section \ref{section:runtime-terms}.
 
 Most of these functions can be called directly. The only function that looks different is \texttt{term\_is\_variable\_not\_otherwise\_mentioned} and that is because a set of variables used by related \texttt{define-language} form is required and is not known until compile time. This is solved by creating a wrapper function.
 
 This completes the description of \texttt{IsA} functions. \texttt{IsA} functions are also generated for each non-terminal definition in \texttt{define-language} form and their generation will be explained later.
 
 \subsection{Matching Functions: Literals}
-Matching $p=$\LiteralPattern \space is very similar to \texttt{IsA} functions described above - they first check if passed \texttt{term} is of expected class and then compare value of the term to the value $v$, passed in the place of \texttt{literal} parameter. These functions are also a part of the runtime library and can be seen in Figure \ref{codegen-pat-literal}.
+Matching $p=$\LiteralPattern \space is very similar to \texttt{IsA} functions described above - they first check if passed \texttt{term} is of expected class and then they compare the value of the term to the value $v$, passed in the place of \texttt{literal} parameter. These functions are also a part of the runtime library and can be seen in Figure \ref{codegen-pat-literal}.
 
 \begin{figure}[H]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,linenos,fontsize=\normalsize]{python}
@@ -124,7 +124,7 @@ Generated code does the following:
 
 \begin{enumerate}
 \item Call appropriate \texttt{IsA} procedure.
-\item If result is True, add term to the \texttt{match} under appropriate pattern-variable, increment \texttt{head} by one and return a list containing \texttt{(match, head, tail)} tuple.
+\item If the result is True, add the term to the \texttt{Match} instance under appropriate pattern-variable, increment \texttt{head} by one and return a list containing \texttt{(match, head, tail)} tuple.
 \item Otherwise, return an empty list.
 \end{enumerate}
 \begin{figure}[H]
@@ -148,7 +148,7 @@ return []
 
 \subsection{Matching Functions: Repeat}
 \label{section:pattern-repeat}
-Recall that patterns under ellipsis match lists of terms and can only be contained in pattern sequences and thus \texttt{term} argument is always to be expected to be \PatternSequence. Given $p=$ \PatternRepeat \space pattern, non-deterministic matching repetition of terms is handled in the following way. Let $pv_1^{(p)}, ..., pv_n^{(p)}$ be a set pattern-variables assigned in $p_r$. These are read from \texttt{PatternVariables} annotation.  Let $f_p$ be matching function for $p$ with usual parameters. Generate  matching function for $p_r$, $f_{p_r}$.
+Recall that patterns under ellipsis match lists of terms and can only be contained in pattern sequences and thus the \texttt{term} argument is always to be expected to be \PatternSequence. Given $p=$ \PatternRepeat \space pattern, non-deterministic matching repetition of terms is handled in the following way. Let $pv_1^{(p)}, ..., pv_n^{(p)}$ be a set pattern-variables assigned in $p_r$. These are read from \texttt{PatternVariables} annotation.  Let $f_p$ be the matching function for $p$ with usual parameters. Generate the matching function for $p_r$, $f_{p_r}$.
 
 \begin{enumerate}
 \item
@@ -160,8 +160,8 @@ Pack \texttt{match}, \texttt{head}, \texttt{tail} back into a tuple, and initial
 	\item
 	Remove \texttt{(m, h, t)} from the queue. If \texttt{h == t} then all elements of the sequence have been matched and there's nothing left to do.
 	\item
-	Retrieve an element at index \texttt{head} of the term sequence and call $f_{p_r}$ with resulting \texttt{Match} instance after calling \texttt{m.deepcopy}.
-	\item Append resulting list of matches to \texttt{matches} and \texttt{queue}.
+	Retrieve an element at index the \texttt{head} of the term sequence and call $f_{p_r}$ with the resulting \texttt{Match} instance after calling \texttt{m.deepcopy}.
+	\item Append the resulting list of matches to \texttt{matches} and \texttt{queue}.
 	\end{enumerate}
 
 \item
@@ -199,7 +199,7 @@ def |$f_p$|(term, match, head, tail):
 
 
 \subsection{Matching Functions: PatternSequence}
-Given $p = $\PatternSequence, generate matching functions $f_{p_1}, ..., f_{p_n}$ for patterns $p_1, ..., p_n$. Code generation for pattern sequences is more involved and a requires a bit of setup.
+Given $p = $\PatternSequence, generate matching functions $f_{p_1}, ..., f_{p_n}$ for patterns $p_1, ..., p_n$. Code generation for pattern sequences is more involved and requires a bit of setup.
 
 \begin{enumerate}
 \item
@@ -209,7 +209,7 @@ First, ensure that the \texttt{term} is a \texttt{Sequence}.  Then, the term has
 \item
 Depending on the kind of pattern $p_i$, different matching strategies are required and are to be explained later. For now, assume all the patterns $p_i$ have been matched.
 \item
-After matching all patterns $p_i$, \texttt{TermSequence} has to be "exited"; that is, original \texttt{head} and \texttt{tail} have to be restored. Let \texttt{matches\_m} be a list of matches after matching the last pattern $p_n$. For each resulting match tuple (m, h, t) in \texttt{matches\_m}, need to ensure that \texttt{h = t}, that is all terms in \texttt{TermSequence} have been matched. If that is the case, tuple \texttt{(m, head+1, tail)} is appended to the list of resulting matches, indicating that \texttt{TermSequence} itself has been matched.
+After matching all patterns $p_i$, \texttt{TermSequence} has to be "exited"; that is, the original \texttt{head} and \texttt{tail} have to be restored. Let \texttt{matches\_m} be a list of matches after matching the last pattern $p_n$. For each resulting match tuple (m, h, t) in \texttt{matches\_m}, need to ensure that \texttt{h = t}, that is all terms in \texttt{TermSequence} have been matched. If that is the case, tuple \texttt{(m, head+1, tail)} is appended to the list of resulting matches, indicating that \texttt{TermSequence} itself has been matched.
 \end{enumerate}
 Figure \ref{codegen-pattern-seq-1} demonstrates this.
 
@@ -223,7 +223,7 @@ Figure \ref{codegen-pattern-seq-1} demonstrates this.
 def |$f_p$|(term, match, head, tail):
 	if not isinstance(term, Sequence): return []
 	subtail, subhead = 0, term.length()
-	if subtail - subhead < $n$ : return []
+	if subtail - subhead < |$n$| : return []
 	|$matches_0$|= [(match, subtail, subhead)]
 	{% for |$p_i$| in |$p_1, ..., p_n$|: %}
 		{% if isinstance (|$p_i$|, |\Repeat|) %}
@@ -247,7 +247,7 @@ def |$f_p$|(term, match, head, tail):
 Now, different code is emitted for different kinds of $p_i$.
 
 \begin{itemize}
-\item $p_i=$ \PatternRepeat. Matching function $f_{p_i}$ is called with \texttt{term} (i.e. \texttt{Sequence}) for each \texttt{(m,h,t)} in $matches_{i-1}$. Results of matching is accumulated into list $matches_{i}$. Additionally, ensure that the remaining number of terms in the \texttt{Sequence} is greater than the remaining number of non-optional patterns to be matched; that is $n-i$. Matches that pass this test are accumulated into list $matches_{i+1}$ Finally, ensure that $matches_{i+1}$ is non-empty, otherwise return an empty list. Figure \ref{codegen-pattern-seq-2} demonstrates this.
+\item $p_i=$ \PatternRepeat. The matching function $f_{p_i}$ is called with \texttt{term} (i.e. \texttt{Sequence}) for each \texttt{(m,h,t)} in $matches_{i-1}$. Results of matching is accumulated into list $matches_{i}$. Additionally, ensure that the remaining number of terms in the \texttt{Sequence} is greater than the remaining number of non-optional patterns to be matched; that is $n-i$. Matches that pass this test are accumulated into the list $matches_{i+1}$ Finally, ensure that $matches_{i+1}$ is non-empty, otherwise return an empty list. Figure \ref{codegen-pattern-seq-2} demonstrates this.
 
 \begin{figure}[htb]
 \centering
@@ -262,7 +262,7 @@ for m, h, t in |$matches_{i-1}$|:
 		{% |$matches_{i+1}$| = symgen("matches") %}
 |$matches_{i+1}$| = []
 for m, h, t in |$matches_{i}$|:
-	if tail - head >= $r$:
+	if tail - head >= |$r$|:
 		|$matches_{i+1}$|.append((m, h, t))
 if len(|$matches_{i+1}$|) == 0: return []
 	{% endif %}
@@ -289,7 +289,7 @@ if len(|$matches_i$|) == 0: return []
 \label{codegen-pattern-seq-3}
 \end{figure}
 
-\item Any other pattern kind $p_i$, given list of matches $matches_{i-1}$, call $f_{p_i}$ for each \texttt{(m, h, t)} in $match_{i-1}$ with term at position \texttt{h} and accumulate resulting matches into new list $match_{i}$. If $match_{i}$ is empty, matching \texttt{TermSequence} has failed and empty list is returned. Figure \ref{codegen-pattern-seq-3} demonstrates this.
+\item Any other pattern kind $p_i$, given a list of matches $matches_{i-1}$, call $f_{p_i}$ for each \texttt{(m, h, t)} in $match_{i-1}$ with term at position \texttt{h} and accumulate resulting matches into new list $match_{i}$. If $match_{i}$ is empty, matching \texttt{TermSequence} has failed and empty list is returned. Figure \ref{codegen-pattern-seq-3} demonstrates this.
 
 \begin{figure}[htb]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
@@ -307,15 +307,15 @@ if len(|$matches_i$|) == 0: return []
 \end{itemize}
 
 \subsection{Match Functions: InHole}
-Given pattern \PatternInHole, let $f_p^{impl}$ name of the function for \texttt{in-hole} pattern. Recall that \texttt{in-hole} pattern is annotated with pattern-variables during "Pattern Variable Extraction" pass described in Section \ref{section:pv-extraction}. Let $pv_i^{(p_1)}$ and $pv_i^{(p_2)}$ be annotations for $p_1$ and $p_2$. Finally, generate functions for $p_1$ and $p_2$ and let them be $f_{p_1}$ and $f_{p_2}$ respectively.
+Given pattern \PatternInHole, let $f_p^{impl}$ name of the function for \texttt{in-hole} pattern. Recall that the \texttt{in-hole} pattern is annotated with pattern-variables during "Pattern Variable Extraction" pass described in Section \ref{section:pv-extraction}. Let $pv_i^{(p_1)}$ and $pv_i^{(p_2)}$ be annotations for $p_1$ and $p_2$. Finally, generate functions for $p_1$ and $p_2$ and let them be $f_{p_1}$ and $f_{p_2}$ respectively.
 
-Notice that this function contains an extra parameter \texttt{path}, which is used to keep track of path to possible \texttt{hole}. To conform to the established interface, a wrapper function will be generated later.
+Notice that this function contains an extra parameter \texttt{path}, which is used to keep track of a path to possible \texttt{hole}. To conform to the established interface, a wrapper function will be generated later.
 
 Since $p_1$ and $p_2$ are self-contained patterns with possible non-deterministic behavior, \texttt{match} cannot be passed to $f_{p_1}$ and $f_{p_2}$ as is. Instead, create special \texttt{Match} instances to be passed to $f_{p_1}$ and $f_{p_2}$ that are initialized with $pv_i^{(p_1)}$ or $pv_i^{(p_2)}$ accordingly.
 
-First, call $f_{p_2}$ with appropriate match, if resulting list of matches is non-empty, do the following: (1) append current term to the path; (2) call path copying function thus replacing the term with \texttt{hole} and (3) call $f_{p1}$ with appropriate match. If resulting set of matches is not empty, increment \texttt{head} (without overwriting it!) by one signaling successful matching of \texttt{in-hole} pattern, combine resulting matches of $f_{p_1}$ and $f_{p_2}$ with initial \texttt{match} as explained in Section \ref{section:Match}, and append to \texttt{matches}.
+First, call $f_{p_2}$ with the appropriate match, if the resulting list of matches is non-empty, do the following: (1) append the current term to the path; (2) call the path copying function thus replacing the term with \texttt{hole} and (3) call $f_{p1}$ with an appropriate \texttt{match}. If the resulting set of matches is not empty, increment \texttt{head} (without overwriting it!) by one signaling successful matching of the \texttt{in-hole} pattern, combine resulting matches of $f_{p_1}$ and $f_{p_2}$ with initial \texttt{match} as explained in Section \ref{section:Match}, and append to \texttt{matches}.
 
-If the given \texttt{term} is \texttt{Sequence}, continue matching \texttt{in-hole} pattern. Each element of the sequence is added to the path, $f_p^{impl}$ is called with said element, resulting matches are added to \texttt{matches} and topmost term in the \texttt{path} is popped. Resulting \texttt{matches} are returned. This logic is shown in Figure \ref{pat-inhole-1}.
+If the given \texttt{term} is \texttt{Sequence}, continue matching the \texttt{in-hole} pattern. Each element of the sequence is added to the path, $f_p^{impl}$ is called with said element, resulting matches are added to \texttt{matches} and topmost term in the \texttt{path} is popped. Resulting \texttt{matches} are returned. This logic is shown in Figure \ref{pat-inhole-1}.
 
 \begin{figure}[H]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
@@ -389,13 +389,13 @@ def |$f_p$|(term, match, head, tail):
 Given some pattern $p$, generating a top-level function for a pattern involves the following steps:
 
 \begin{itemize}
-\item Retrieve a set of pattern-variables $pv_1^{p}, ..., pv_n^{p}$ assigned in the pattern from annotation \texttt{PatternVariables}.
+\item Retrieve a set of pattern-variables $pv_1^{p}, ..., pv_n^{p}$ assigned in the pattern from the annotation \texttt{PatternVariables}.
 \item Retrieve a set of pattern-variables $pvr_1^{p}, ..., pvr_m^{p}$ that are to be removed after matching from annotation \texttt{PatConstraintCheckRemoveVars} (see Section \ref{section:constraint-check}).
 \item Let $f_p$ be the top-level function for pattern $p$.
 \item Generate matching function $fm_p$ for pattern $p$.
 \end{itemize}
 
-Now, we get to the code-generation. Initialize \texttt{Match} object with pattern-variables $pv_i^{p}$ and call $f_p$ with said \texttt{Match} instance, \texttt{head} and \texttt{tail} set to zero and one, respectively. After a list of matches is returned, need to strip out resulting \texttt{Match} from \texttt{(Match, int, int)}  tuples as well as remove symbols $pvr_i^{p}$ from \texttt{Match} instances. Resulting \texttt{Match} instances are appended to an array. The array is then returned.
+Now, we get to the code-generation. Initialize the \texttt{Match} object with pattern-variables $pv_i^{p}$ and call $f_p$ with said \texttt{Match} instance, set \texttt{head} and \texttt{tail} to zero and one, respectively. After a list of matches is returned, strip out the resulting \texttt{Match} from \texttt{(Match, int, int)}  tuples as well as remove symbols $pvr_i^{p}$ from the \texttt{Match} instances. Resulting \texttt{Match} instances are appended to an array. The array is then returned.
 
 
 \begin{figure}

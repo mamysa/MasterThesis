@@ -2,13 +2,16 @@
 \label{section:lex-parse}
 
 \subsection{Lexical Analysis and Parsing}
-nitially, input to PyPltRedex is read from the file and stored as a string. To apply reduction-relation, the string needs to be analyzed.
+Since user-provided programs for a given language are initially stored as a string, it first needs to be transformed into something that could be interpreted, which in this case are \texttt{Term} instances, described in Section \ref{section:runtime-terms}. 
 
-Lexical analysis breaks up the string into individual tokens and decides which kind of token it is. Most commonly tokens are described using regular expressions. 
+\begin{enumerate}
+\item
+\textit{Lexical analysis} breaks up the string into individual tokens and decides which kind of token it is. Most commonly tokens are described using regular expressions. 
+\item 
+Parsing takes individual lexemes and based on lexeme kind appropriate \texttt{Term} instance is returned.
+\end{enumerate}
 
-Parsing takes individual lexemes and creates structured data out of them. In this case, it produces \texttt{Term} instances. 
-
-The grammar can be seen in Figure \ref{tok-lex-grammar}.
+However, since PLTRedex is embedded into Racket, all user-defined languages use either atoms such as integers and identifiers or potentially nested lists of atoms. The grammar for such expressions can be seen in Figure \ref{tok-lex-grammar}.
 
 \begin{figure}[h]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=::,mathescape=true,fontsize=\normalsize]{text}
@@ -33,7 +36,7 @@ rparen = [\]\}\)]             :$\langle closing \text{ } parentheses \rangle$:
 \end{figure}
 
 \subsection{Implementation}
-Class diagram for both \texttt{Tokenizer} and \texttt{Parser} can be seen in Figure \ref{class-diagram-lexer-parser}.
+The class diagram for both \texttt{Tokenizer} and \texttt{Parser} can be seen in Figure \ref{class-diagram-lexer-parser}.
 
 \begin{figure}[h]
 	\centering
@@ -80,7 +83,7 @@ def is_rightparen(c):
 \texttt{string} is the string that requires lexical analysis.
 
 \item
-\texttt{start} and \texttt{end} are indices indicating an interval within the \texttt{string}. The substring that ends with index \texttt{start} has already been analyzed. A substring between \texttt{start} and \texttt{end} is a potential token. Any substring after \texttt{end} requires analysis.
+\texttt{start} and \texttt{end} are indices indicating an interval within the \texttt{string}. The substring that ends with the index \texttt{start} has already been analyzed. A substring between \texttt{start} and \texttt{end} is a potential token. Any substring after \texttt{end} requires analysis.
 
 \item
 \texttt{advance()} method increments \texttt{end} by one.
@@ -104,12 +107,12 @@ def is_rightparen(c):
 \label{lexical-analysis-tokenize}
 \end{figure}
 
-Edges of the graph represent calls to \texttt{peek()} and ensure the character satisfies a predicate an edge is labeled with (see Figure \ref{characterpredicates}). Unlike more traditional state machines such as finite automatons in which moving from one state to another is associated with input consumption, the one above consumes input only after switching to some state. There are different state kinds which consume input in different ways.
+Edges of the graph represent calls to \texttt{peek()} and ensures the character satisfies a predicate that an edge is labeled with (see Figure \ref{characterpredicates}). Unlike more traditional state machines such as finite automatons (in which moving from one state to another is associated with input consumption), the one above consumes input only after switching to some state. There are different state kinds which consume input in different ways.
 \begin{itemize}
 \item States that return tokens annotated with their types are highlighted in green. After moving to this state no input is consumed.
 \item States that raise Exceptions are highlighted in red. After moving to this state no input is consumed.
 \item \texttt{If} states correspond to \texttt{if} statements. They consume no characters.
-\item Circled blue states actually consume characters that satisfy a predicate the incoming edge is labeled with. They can also have self-loops indicating consumption of one or more characters satisfying a given predicate.
+\item Circled blue states actually consume characters that satisfy a predicate that the incoming edge is labeled with. They can also have self-loops indicating consumption of one or more characters satisfying a given predicate.
 \item Circled yellow states are conceptually identical to blue states but are handled differently as explained below.
 \end{itemize}
 
@@ -118,9 +121,9 @@ The state machine proceeds in the following manner:
 \begin{enumerate}
 \item First it ensures the end of the string has not been reached, otherwise \texttt{EOF} token is returned. 
 \item Then, if the current character is whitespace, greedily consume all whitespace characters and move to initial state.
-\item If the current character is semicolon thus thus indicating the beginning of a comment, greedily consume all characters until newline or end of the string, thus returning \texttt{EOF} token. 
-\item The next two If statements the detect opening and closing parantheses/braces/brackets and return \texttt{LParen} or \texttt{RParen} tokens accordingly.
-\item If the current character starts with pound sign indicating a possible boolean, the transition to the yellow state would be taken. However, these yellow states do not consume input on character by character basis like blue states do but utilize \texttt{extract\_if\_contains} method to peek and consume multiple characters at once. This method is called in the following manner:
+\item If the current character is a semicolon thus thus indicating the beginning of a comment, greedily consume all characters until a newline character or end of the string, thus returning \texttt{EOF} token. 
+\item The next two \texttt{If} statements the detect opening and closing parentheses/braces/brackets and return \texttt{LParen} or \texttt{RParen} tokens accordingly.
+\item If the current character starts with a pound sign indicating a possible boolean, the transition to the yellow state would be taken. However, these yellow states do not consume input on character by character basis like blue states do but utilize \texttt{extract\_if\_contains} method to peek and consume multiple characters at once. This method is called in the following manner:
 \begin{itemize}
 \item
 if \texttt{extract\_if\_contains("\#t")} return \texttt{(Boolean, \#t)}
@@ -132,14 +135,14 @@ if \texttt{extract\_if\_contains("\#true")} return \texttt{(Boolean, \#t)}
 if \texttt{extract\_if\_contains("\#false")} return \texttt{(Boolean, \#f)}
 \end{itemize}
 
-\item If the current character is a double quote, consume any character until the closing double quote is found. Escape sequences are supported expecting a single character after a backward slash. If end-of-string is encountered prematurely, in Exception is raised. Otherwise, \texttt{(String, self.extract())} token is returned.
+\item If the current character is a double quote, consume any character until the closing double quote is found. Escape sequences are supported expecting a single character after a backward slash. If end-of-string is encountered prematurely, an Exception is raised. Otherwise, a \texttt{(String, self.extract())} token is returned.
 
-\item Finally, the only token kinds remaining are \texttt{Integer}, \texttt{Float} and \texttt{Identifier}. First, need to ensure that the current character is not a special reserved one, raising an Exception. Otherwise, state machine moves to the last \texttt{If} statement. Explanation of state machine for these three token kinds would be too verbose to explain, but essentially it attempts to match an \texttt{Integer} or \texttt{Float} first but once a character that may not be in these two token kinds is seen, resulting token immediately becomes \texttt{Identifier}. All input from that point on is consumed greedly until some delimiter character.
+\item Finally, the only token kinds remaining to process are \texttt{Integer}, \texttt{Float} and \texttt{Identifier}. First, need to ensure that the current character is not a special reserved one, raising an Exception. Otherwise, state machine moves to the last \texttt{If} statement. Explanation of state machine for these three token kinds would be too verbose to explain, but essentially it attempts to match an \texttt{Integer} or \texttt{Float} first but once a character that may not be in these two token kinds is seen, resulting token immediately becomes \texttt{Identifier}. All input from that point on is consumed greedily until some delimiter character.
 \end{enumerate}
 
 \end{itemize}
 
-This completes the description of the tokenizer. The parser is implemented as a very simple recursive descent parser. Below follows the description of its methods and their functionalities.
+This completes the description of the \texttt{Tokenizer}. The parser is implemented as a very simple recursive descent parser. Below follows the description of its methods and their functionalities.
 
 \begin{itemize}
 \item
@@ -199,7 +202,7 @@ This completes the description of the tokenizer. The parser is implemented as a 
 \end{itemize}
 
 \subsection{Implementation: Difficulties}
-The implementation of the initial lexical analysis relied on a regular expression library provided by RPython used to identify integers, floating point numbers and identifiers using regular expressions shown in Figure \ref{tok-lex-grammar}. While the library works fine while running the lexer using \texttt{python2.7}, attempting to compile the lexer code using \texttt{rpython} toolchain results in the following compilation error:
+The implementation of the initial lexical analysis relied on a regular expression library provided by RPython used to identify integers, floating point numbers, and identifiers using regular expressions shown in Figure \ref{tok-lex-grammar}. While the library works fine while running the lexer using \texttt{python2.7}, attempting to compile the lexer code using \texttt{rpython} toolchain results in the following compilation error:
 
 \begin{minted}[tabsize=2,obeytabs,fontsize=\normalsize]{python}
 [translation:ERROR] AttributeError: 'FrozenDesc' object has no attribute 'pycall'
@@ -218,4 +221,4 @@ There appears to be a bug within RPython's \texttt{RegexParser} functionality. A
 
 \subsection{Future Improvements}
 
-Since lexical analysis and parsing were implemented very early on, some of the regular expressions were hacked together to make everything work in short amount of time. In certain cases tokenization is not performed correctly with respect to Racket's tokenization logic. For example, Racket allows for specification of floating point numbers such as \texttt{.045} or \texttt{1.} (that is there must be either a digit before or after a decimal), which current implementation doesn't support (and are identified as Identifier instead). Scientific notation isn't supported, either.
+Since lexical analysis and parsing were implemented very early on, some of the regular expressions were hacked together to make everything work in short amount of time. In certain cases tokenization is not performed correctly with respect to Racket's tokenization logic. For example, Racket allows for the specification of floating point numbers such as \texttt{.045} or \texttt{1.} (that is there must be either a digit before or after a decimal), which current implementation doesn't support (and are identified as Identifier instead). Scientific notation isn't supported, either.

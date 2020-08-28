@@ -6,11 +6,11 @@ To implement matches, two classes are defined - \texttt{Match} and \texttt{Bindi
 \begin{figure}[H]
 	\centering
 	\makebox[\textwidth][c] { \includegraphics[scale=0.27]{class-diagram-match-binding.png} }
-	\caption{Representation of matches.}
+	\caption{\texttt{Match} and \texttt{Binding} class diagram.}
 \label{class-diagram-match-binding}
 \end{figure}
 
-\texttt{Binding} class encapsulates a stack of terms and provides three methods for its manipulation:
+The \texttt{Binding} class encapsulates a stack of terms and provides three methods for its manipulation:
 
 \begin{itemize}
 \item 
@@ -20,24 +20,24 @@ To implement matches, two classes are defined - \texttt{Match} and \texttt{Bindi
 \texttt{decrease\_depth} has the following behaviour:
 	\begin{enumerate}
 		\item
-        if the stack is empty, raise an Exception.
+        if the stack is empty, raises an Exception.
 		\item
-		if the stack size is 1 and the topmost element is not \texttt{Sequence}, raise an Exception.
+		if the stack size is 1 and the topmost element is not a \texttt{Sequence}, raises an Exception.
 		\item
-		if the stack size is 1 and the topmost element is \texttt{Sequence}, do nothing.
+		if the stack size is 1 and the topmost element is a \texttt{Sequence}, does nothing.
 		\item
-        if the stack size is greater than one, pop the topmost \texttt{Sequence} and append it to \texttt{Sequence} below. (this works because \texttt{increasedepth} must be called beforehand)
+        if the stack size is greater than one, pops the topmost \texttt{Sequence} and append it to \texttt{Sequence} below. (this works because \texttt{increasedepth} must be called beforehand)
 	\end{enumerate}
 
 \item
 \texttt{add(term)} has the following behaviour:
 	\begin{enumerate}
 		\item
-         if the stack is empty, add \texttt{term}. 
+         if the stack is empty, adds \texttt{term}. 
 		\item
-         if the stack is not empty and the topmost term is not \texttt{Sequence}, raise an Exception
+         if the stack is not empty and the topmost term is not \texttt{Sequence}, raises an Exception
 		\item
-        if the stack is not empty and the topmost term is \texttt{Sequence}, add \texttt{term} to the \texttt{Sequence}.
+        if the stack is not empty and the topmost term is \texttt{Sequence}, adds \texttt{term} to the \texttt{Sequence}.
 	\end{enumerate}
 \end{itemize}
 
@@ -54,8 +54,8 @@ To implement matches, two classes are defined - \texttt{Match} and \texttt{Bindi
 \texttt{addtobinding} calls \texttt{add} method of relevant \texttt{Binding} instance with \texttt{term}.
 
 \item
-\texttt{comparekeys(key1, key2)}. Given two keys, appropriate \texttt{Binding} instances are retrieved and then topmost terms on the stack are compared.
+\texttt{comparekeys(key1, key2)}. Given two keys, appropriate \texttt{Binding} instances are retrieved and then the topmost terms on the stack are compared.
 
 \item
-\texttt{deepcopy} creates a new Match instance with all \texttt{Binding} and \texttt{Term} instances contained within copied using \texttt{deepcopy}.
+\texttt{deepcopy} creates a new \texttt{Match} with deep-copies of \texttt{Binding} and \texttt{Term}. 
 \end{itemize}

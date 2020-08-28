@@ -3,13 +3,13 @@
 
 \subsection{Motivation}
 
-Patterns in \DefineLanguageNoArg constraint-checking is not performed. This means that in this context, patterns \texttt{(+ e e)} as \texttt{(+ e\_1 e\_1)} are equivalent. Due to design of \texttt{Match} class described in Section \ref{section:Match}, PyPltRedex needs to modify all such pattern-variables to be unique. Given the pattern variable $pv$, $prefix_{pv}$ (defined in Section \ref{section:pv-resolve}) is extracted and concatenated with some previously unused integer - $freshint()$.
+For patterns in the \DefineLanguageNoArg \space constraint-checking is not performed. This means that in this context, patterns \texttt{(+ e e)} as \texttt{(+ e\_1 e\_1)} are equivalent. Due to design of \texttt{Match} class described in Section \ref{section:Match}, PyPltRedex needs to modify all such pattern-variables to be unique. Given the pattern variable $pv$, $\mathit{prefix_{pv}}$ (defined in Section \ref{section:pv-resolve}) is extracted and concatenated with some previously unused integer - $\mathit{freshint()}$.
 
 \subsection{Algorithm}
-Given \LetDefineLanguage{$l$}, each pattern in $NtDefinition$ is visited recursively.
+Given \LetDefineLanguage{$l$}, each pattern $p_i$ in \NtDefinitionN \space is visited recursively.
 \begin{itemize}
-\item Given \BuiltInPattern, \\ return \BuiltInPattern[$tag$][$prefix_{pv}+freshint()$][false].
-\item Given \NonTerminal, \\ return \NonTerminal[$nt$][$prefix_{pv}+freshint()$][false].
+\item Given \BuiltInPattern, \\ return \BuiltInPattern[$\mathit{tag}$][$\mathit{prefix_{pv}+freshint()}$][false].
+\item Given \NonTerminal, \\ return \NonTerminal[$\mathit{nt}$][$\mathit{prefix_{pv}+freshint()}$][false].
 \end{itemize}
 
 \subsection{Example}

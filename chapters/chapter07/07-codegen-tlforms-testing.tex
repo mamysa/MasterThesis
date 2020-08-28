@@ -20,7 +20,7 @@ Given \RedexMatchAssertEqual code generation proceeds in the following manner.
 def |$f_{rm}$|():
 	{% for |$m_i$| in |$rm$|[|$m_1, ..., m_n$|]: %}
 	|$mi_i$| = Match()
-		{% for |$(s_i, t_i)$| in |$m_i$|[$(s_1, t_1), ..., (s_m, t_m)$]:
+		{% for |$(s_i, t_i)$| in |$m_i$[$(s_1, t_1), ..., (s_m, t_m)$]|:
 			{% |$f_{t_i}$| = CodegenTermTemplate(|$t_i$|) %}
 	term = |$f_{t_i}$|(Match())
 	|$mi_i$|.addkey(|$s_i$|)

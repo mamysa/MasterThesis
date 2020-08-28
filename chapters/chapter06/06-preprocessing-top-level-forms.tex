@@ -2,8 +2,6 @@
 
 Having defined and explained transformation/analysis passes for both patterns and term-templates, these are combined according to the needs of top-level forms.
 
-Identify three strategies for processing patterns.
-
 \includegraphics[scale=0.32]{pipeline-pattern-strat-1.png}
 
 \includegraphics[scale=0.32]{pipeline-pattern-strat-2.png}
@@ -12,7 +10,7 @@ Identify three strategies for processing patterns.
 
 \includegraphics[scale=0.32]{pipeline-term-strat.png}
 
-Notice that non-terminal resolution occurs with respect to non-terminal definitions on some \DefineLanguageNoArg form. Similarly, during "Metafunction Application Rewriting" pass requires set $Mf$ containing all meta-functions defined until this point. 
+Notice that non-terminal resolution occurs with respect to non-terminal definitions on some \DefineLanguageNoArg form. Similarly, during the "Metafunction Application Rewriting" pass requires set $Mf$ containing all meta-functions defined until this point. 
 
 \begin{enumerate}
 \item All $tl=$\TlDefineLanguage \space forms. Maintain a set $L$ that stores ($n, tl$) pairs.
@@ -33,8 +31,8 @@ Given $tl=$\TlDefineLanguage
 
 \item $tl=$ \TlDefineMetafunction:
 	\begin{enumerate}
-	\item Ensure that there exists tuple $(l, tl) \in L$, otherwise raise Exception.
-	\item apply strategy (2) to $domain$ and $codomain$ patterns resulting in $domain^\prime$ and $codomain^\prime$.
+	\item Ensure that there exists tuple $(l, tl) \in L$, otherwise raise an Exception.
+	\item Apply strategy (2) to $domain$ and $codomain$ patterns resulting in $domain^\prime$ and $codomain^\prime$.
 	\item For each $mc_i=$ \MetafunctionCase, apply strategy (3) to $p$ thus resulting in $p^{\prime}$ and apply term-processing strategy to $t$ resulting in $t^{\prime}$. Let $mc_i^{\prime}$ = \MetafunctionCase[$p^{\prime}$][$t^{\prime}$].
 	\item Let $tl^\prime$  = \TlDefineMetafunction[$n$][$l$][$domain^\prime$][$codomain^\prime$][$mc_1^\prime$][$mc_n^\prime$][false].
 	\item $M = M \cup \{ (n, tl^\prime)\}$ and return $tl^\prime$.
@@ -42,9 +40,9 @@ Given $tl=$\TlDefineLanguage
 
 \item $red=$ \TlDefineReductionRelation:
 \begin{enumerate}
-\item ensure that there exists tuple $(l, df) \in L$ otherwise raise Exception.
+\item Ensure that there exists tuple $(l, df) \in L$ otherwise raise an Exception.
 \item Apply strategy (3) to $domain$ pattern resulting in $domain^\prime$, if it exists.
-\item For each $rc_i=$ \ReductionCase \space in $r$, apply strategy (3) to $p$ resuling in $p^{\prime}$ and apply the only term-processing strategy to $t$ resulting in $t^\prime$. Let $rc_i^\prime=$\ReductionCase[$p^{\prime}$][$t^{\prime}$][$n$][false].
+\item For each $rc_i=$ \ReductionCase \space in $r$, apply strategy (3) to $p$ resulting in $p^{\prime}$ and apply the only term-processing strategy to $t$ resulting in $t^\prime$. Let $rc_i^\prime=$\ReductionCase[$p^{\prime}$][$t^{\prime}$][$n$][false].
 \item Let $tl^\prime=$\TlDefineReductionRelation[$n$][$l$][$domain^\prime$][$rc_1^\prime$][$rc_n^\prime$]
 \item $R = R \cup \{ (n, tl^\prime) \}$ and return $tl^\prime$.
 
@@ -53,7 +51,7 @@ Given $tl=$\TlDefineLanguage
 \item $tl=$ \ReadFromStdinAndApplyReductionRelation
 \begin{enumerate}
 \item If $mf$ is present, ensure there exists tuple $(f, mf) \in M$, otherwise raise Exception.
-\item Ensure there exists tuple $(r, red) \in R$, otherwise raise Exception.
+\item Ensure there exists tuple $(r, red) \in R$, otherwise raise an Exception.
 \item Return $tl$.
 \end{enumerate}
 
@@ -61,7 +59,7 @@ Given $tl=$\TlDefineLanguage
 \item
 $r=$ \RedexMatchAssertEqual.
 	\begin{enumerate}
-	\item Ensure that there exists tuple $(l, d) \in L$, otherwise raise Exception.
+	\item Ensure that there exists tuple $(l, d) \in L$, otherwise raise an Exception.
 	\item Process $p$ according to strategy (3) resulting in $p^\prime$.
 	\item Process $t$ according to the only specified strategy, resulting in $t^\prime$.
 	\item For each $m_i=$ \Match, process each $t_i$ according to the only specified strategy resulting in $t_i^\prime$. Let $m_i^\prime=$\Match[$s_1$][$t_1^\prime$][$s_n$][$t_n^\prime$][false].

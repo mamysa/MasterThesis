@@ -1,5 +1,5 @@
 \section{Fresh Variable Generation}
-PltRedex provides a very convenient form \texttt{(variables-not-in t p)}. Term \texttt{p} is expected to contain a single variable \texttt{v} such as \texttt{(term a)}. Given term \texttt{t}, \texttt{variables-not-in} form produces a term containing a fresh variable \texttt{v\_out} with prefix \texttt{p\_out} and some suffix \texttt{s\_out} such that there's no variable \texttt{v\_prime} in \texttt{t} with \texttt{v\_out = v\_prime}; or \texttt{v\_out not in Variables(t)} where \texttt{Variables(t)} is the set of all variables in \texttt{t}. Suffix \texttt{s\_out} may contain only digits or be empty. 
+PLTRedex provides a very convenient form \texttt{(variables-not-in t p)}. Term \texttt{p} is expected to contain a single variable \texttt{v} such as \texttt{(term a)}. Given term \texttt{t}, \texttt{variables-not-in} form produces a term containing a fresh variable \texttt{v\_out} with prefix \texttt{p\_out} and some suffix \texttt{s\_out} such that there's no variable \texttt{v\_prime} in \texttt{t} with \texttt{v\_out = v\_prime}; or \texttt{v\_out not in Variables(t)} where \texttt{Variables(t)} is the set of all variables in \texttt{t}. Suffix \texttt{s\_out} may contain only digits or be empty. 
 
 For example, variable \texttt{abc1xyz123} is decomposed into prefix \texttt{abc1xyz} and suffix \texttt{123}.
 

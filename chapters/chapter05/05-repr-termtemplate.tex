@@ -32,7 +32,7 @@ term-sequence = term
 \item
 \texttt{,(functionname term*)} calls a user-implemented RPython function with zero or more terms as arguments.
 \item
-\texttt{,@(functionname term*)} calls a user-implemented RPython function with zero or more terms as arguments that must return a list. Contents of the returned list are then inserted into term-sequence at that position.
+\texttt{,@(functionname term*)} calls a user-implemented RPython function with zero or more terms as arguments that must return a list. The content of the returned list are then inserted into term-sequence at that position.
 \item
 \texttt{(in-hole term term)} locates \lstinline{hole} in the first term and replaces it with the second term.
 \item
@@ -46,7 +46,7 @@ term-sequence = term
 \item
 \texttt{boolean}  represents any literal boolean.
 \item
-\texttt{term-sequence} represents a list of term.  Each individual term within the sequence can be suffixed with ...(literal ellipsis) indicating ellipsis depth of the term-template.
+\texttt{term-sequence} represents a list of term-templates.  Each individual term-template within the sequence can be suffixed with ...(literal ellipsis) indicating the ellipsis depth of some pattern-variable in that term-template.
 \end{itemize}
 
 \section{Compile-time Representation of Term-Templates}
@@ -64,11 +64,11 @@ Figure \ref{class-diagram-termtemplate} shows class diagram for all term-templat
 
 
 \begin{itemize}
-\item \TermSequence \space represents term sequences and may contain zero or more child term-templates $t_i$.
-\item \TermRepeat \space represents term sequence under ellipsis.
-\item \TermInHole \space represents \texttt{in-hole} term template
+\item \TermSequence \space represents term-template sequences and may contain zero or more child term-templates $t_i$.
+\item \TermRepeat \space represents a term-template under ellipsis.
+\item \TermInHole \space represents \texttt{in-hole} term-template
 \item \PythonCall \\ represents \texttt{,(functionname term*)} and \texttt{,@(functionname term*)} term-template. $mode$ is used to indicate which one of those it is - $m$ is set to \texttt{Normal} if it is the first, otherwise \texttt{Splice} if it is the latter. $pyfunc$ is expected to be a defined RPython-compatible function.
-\item \TermLiteral - represents any literal in term-template. It is initialized with the appropriate tag.
-\item \PatternVariable \space represents all pattern variables.
+\item \TermLiteral \space represents any literal. It is initialized with the appropriate tag.
+\item \PatternVariable \space represents all pattern-variables.
 \item \UnresolvedSymbol \space represents unresolved symbols. Initially it is unknown if a symbol is a pattern-variable or a literal.
 \end{itemize}

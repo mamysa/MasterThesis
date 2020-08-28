@@ -17,26 +17,26 @@ Callgraph for function matching pattern \texttt{((n ...) ...)} can be seen in Fi
 \item function for pattern \texttt{n}
 \end{enumerate}
 
-Figure \ref{ellipsis-example-fig-a} show state of \texttt{Match} object before beginning to match a term (red nodes) against a pattern (blue nodes). Outlined pattern nodes represent the current sub-pattern being matched; and since matching hasn't begun yet the entire pattern is outlined. The same applies to the term. Initially, \texttt{Binding} instance assigned to pattern variable \texttt{n} in \texttt{Match} instance has an empty stack.
+Figure \ref{ellipsis-example-fig-a} show the state of the \texttt{Match} object before beginning to match a term (red nodes) against a pattern (blue nodes). Outlined pattern nodes represent the current sub-pattern being matched; and since matching hasn't begun yet the entire pattern is outlined. The same applies to the term. Initially, the \texttt{Binding} instance assigned to the pattern-variable \texttt{n} in the \texttt{Match} instance has an empty stack.
 
-Figure \ref{ellipsis-example-fig-b} shows state of \texttt{Match} object after entering generated function for \textit{outer} ellipsis and calling \texttt{increasedepth("n")} method. This pushes empty \texttt{Sequence} onto the stack.
+Figure \ref{ellipsis-example-fig-b} shows the state of the \texttt{Match} object after entering generated function for \textit{outer} ellipsis and calling \texttt{increasedepth("n")} method. This pushes an empty \texttt{Sequence} onto the stack.
 
 
-Figure \ref{ellipsis-example-fig-c} shows state of \texttt{Match} object after entering generated function for \textit{inner} ellipsis and calling \texttt{increasedepth("n")} method. This pushes empty \texttt{Sequence} onto the stack. The term now contains two \texttt{Sequence} instances.
+Figure \ref{ellipsis-example-fig-c} shows the state of \texttt{Match} object after entering the generated function for \textit{inner} ellipsis and calling \texttt{increasedepth("n")} method. This pushes an empty \texttt{Sequence} onto the stack. The \texttt{Binding} for pattern-variable $n$ now contains two \texttt{Sequence} instances on the stack.
 
-Figure \ref{ellipsis-example-fig-d} shows matching of term \texttt{Integer(1)}. Need to call \texttt{addtobinding} method with \texttt{"n"} and \texttt{Integer(1)} as arguments. Since topmost term on the stack is \texttt{Sequence}, \texttt{Integer(1)} is appended to it.
+Figure \ref{ellipsis-example-fig-d} shows the matching of term \texttt{Integer(1)}. \texttt{addtobinding} method is called with \texttt{"n"} and \texttt{Integer(1)} as arguments. Since the topmost term on the stack is \texttt{Sequence}, \texttt{Integer(1)} is appended to it.
 
 Figures \ref{ellipsis-example-fig-e} and \ref{ellipsis-example-fig-f} call \texttt{addtobinding} with \texttt{Float(2.01)} and \texttt{Integer(3)}. Both terms are appended to the topmost \texttt{Sequence} on the stack.
 
-All terms in \texttt{Sequence} have been consumed. Figure \ref{ellipsis-example-fig-g} shows state of the match object after calling \texttt{decreasedepth("n")}. Since the stack contains to \texttt{Sequence} instances, topmost one is removed from stack and appended to the first \texttt{Sequence}. Function for \textit{inner} ellipsis is exited.
+All terms in \texttt{Sequence} have been consumed. Figure \ref{ellipsis-example-fig-g} shows the state of the match object after calling \texttt{decreasedepth("n")}. Since the stack contains two \texttt{Sequence} instances, the topmost one is removed from stack and appended to the first \texttt{Sequence}. Function for \textit{inner} ellipsis is exited.
 
 Now, the remaining empty term sequence has to be matched, as seen in Figure \ref{ellipsis-example-fig-h}.
 
-Figure \ref{ellipsis-example-fig-i} shows state of \texttt{Match} object after entering the generated function for \textit{inner} ellipsis. Empty \texttt{Sequence} instance is pushed onto the stack.
+Figure \ref{ellipsis-example-fig-i} shows the state of the \texttt{Match} object after entering the generated function for \textit{inner} ellipsis. An empty \texttt{Sequence} instance is pushed onto the stack.
 
-Since the term sequence is empty, function for \texttt{Number} pattern cannot be called. Figure \ref{ellipsis-example-fig-j} shows the state of the \texttt{Match} object after calling \texttt{decreasedepth("n")}. Since the stack contains two \texttt{Sequence} instances, the topmost one is popped from the stack and appended to previous \texttt{Sequence}. Function for \textit{inner} ellipsis is exited.
+Since the term sequence is empty, the function for the \texttt{number} pattern cannot be called. Figure \ref{ellipsis-example-fig-j} shows the state of the \texttt{Match} object after calling \texttt{decreasedepth("n")}. Since the stack contains two \texttt{Sequence} instances, the topmost one is popped from the stack and appended to the previous \texttt{Sequence}. The function for \textit{inner} ellipsis is exited.
 
-Finally, there are no more terms to match in outermost sequence and \texttt{decreasedepth("n")} has to be called, as shown in Figure \ref{ellipsis-example-fig-k}. Since the stack only contains a single term, no action is performed. The \texttt{Match} contains assignment \texttt{n = ((1 2 3)())}, as expected.
+Finally, there are no more terms to match in the outermost sequence and \texttt{decreasedepth("n")} has to be called, as shown in Figure \ref{ellipsis-example-fig-k}. Since the stack only contains a single term, no action is performed. The \texttt{Match} contains assignment \texttt{n = ((1 2 3)())}, as expected.
 
 \begin{figure}[H]
 \caption{Lifetime of \texttt{Match} object}
@@ -124,9 +124,9 @@ Finally, there are no more terms to match in outermost sequence and \texttt{decr
 
 \end{figure}
 
-One may notice that this example doesn't cover non-determinism when matching patterns under ellipsis. When matching term \texttt{(1 2 3)} against pattern \texttt{n ...} (as shown in Figures \ref{ellipsis-example-fig-d}, \ref{ellipsis-example-fig-e}, \ref{ellipsis-example-fig-f}), the matches shown in Figure \ref{ellipsis-example-matches-1} are returned. To obtain these matches, \texttt{(n ...)} pattern has to be "entered" first, thus setting values of \texttt{head} and \texttt{tail} to zero and the length of \texttt{Sequence}, respectively.Then, pattern \texttt{n ...} is matched in the way explained above (i.e. \texttt{increasedepth}, match pattern \texttt{n}, \texttt{decreasedepth}), resulting in matches in Figure \ref{ellipsis-example-matches-1}.  Now, when exiting function for pattern \texttt{(n ...)}, the only acceptable match among four is the one whose \texttt{head=tail}.
+One may notice that this example doesn't cover non-determinism when matching patterns under ellipsis. When matching term \texttt{(1 2 3)} against pattern \texttt{n ...} (as shown in Figures \ref{ellipsis-example-fig-d}, \ref{ellipsis-example-fig-e}, \ref{ellipsis-example-fig-f}), the matches shown in Figure \ref{ellipsis-example-matches-1} are returned. To obtain these matches, the \texttt{(n ...)} pattern has to be "entered" first, thus setting values of \texttt{head} and \texttt{tail} to zero and the length of \texttt{Sequence}, respectively.Then, pattern \texttt{n ...} is matched in the way explained above (i.e. \texttt{increasedepth}, match pattern \texttt{n}, \texttt{decreasedepth}), resulting in matches in Figure \ref{ellipsis-example-matches-1}.  Now, when exiting function for the pattern \texttt{(n ...)}, the only acceptable match among the four is the one whose \texttt{head=tail}.
 
-After matching pattern \texttt{(n ...)}, the control flow (see callgraph in Figure \ref{ellipsis-example-callgraph} returns to the function that matches pattern \texttt{(n ...) ...}, and the only returned match is added to the queue. Queue at this point contains a single match. This match is dequeued, and the function for pattern \texttt{(n ...) is called} with term \texttt{()}. \texttt{head} and \text{tail} are set to zero and function for pattern \texttt{n ...} is called. \texttt{increasedepth} is called. Since term \texttt{()} contains no numbers, the only possible match returned by this function is shown in Figure \ref{ellipsis-example-matches-2}.
+After matching pattern \texttt{(n ...)}, the control flow (see callgraph in Figure \ref{ellipsis-example-callgraph}) returns to the function that matches pattern \texttt{(n ...) ...}, and the only returned match is added to the queue. The queue at this point contains a single match. This match is dequeued, and the function for pattern \texttt{(n ...)} is called with term \texttt{()}. \texttt{head} and \text{tail} are set to zero and the function for pattern \texttt{n ...} is called. \texttt{increasedepth} is called. Since term \texttt{()} contains no numbers, the only possible match returned by this function is shown in Figure \ref{ellipsis-example-matches-2}.
 
 Finally, the \textit{outer} ellipsis produces matches shown in Figure \ref{ellipsis-example-matches-3} When returning from the function for pattern \texttt{((n ...) ...)}, two of the matches are discarded because \texttt{head != tail}.
 

@@ -2,7 +2,7 @@
 
 Since metafunction applications have the following shape - `(metafunction-name term-template ...)` these can be detected quite trivially given a list of defined metafunctions. 
 
-\subsection{Rewriting Algorithm.}
+\subsection{Rewriting Algorithm}
 Let $Mf$ be the set of metafunction names. Let $t$ be some term-template, \Visit{$t$}. 
 \begin{itemize}
 \item $t=$\TermSequence. Check if $t_1$ is \TermLiteral with $kind=$Variable and $v \in Mf$ and return \\ \ApplyMetafunction[$v$][$t$][false] handling annotations as described below; otherwise return $t$. 
@@ -16,7 +16,7 @@ $t$ may contain \texttt{InArg} and \texttt{MatchRead} annotations and they are m
 \end{itemize}
 \end{itemize}
 \subsection{Example}
-The example shown in Figure \ref{transformation-term-mfapply} displays transformation described above given a set of meta-function names only containing single \texttt{set-contains?}. Since the first element of \texttt{TermSequence} is \texttt{Variable} term-template with suitable name, additional \texttt{MetafunctionApplication} term is added.
+The example shown in Figure \ref{transformation-term-mfapply} displays the transformation described above given a set of meta-function names only containing single \texttt{set-contains?}. Since the first element of \texttt{TermSequence} is a \texttt{Variable} term-template with suitable name, an additional \texttt{MetafunctionApplication} term is added.
 
 \begin{figure}[H]
 \includegraphics[scale=0.20]{transformation-term-mfapply.png}

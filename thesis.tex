@@ -79,7 +79,7 @@ mathescape=true}
 	\mintinline{text}{PatternSequence([|#1|,|$...$|,|#2|] : Pattern?)}}
 
 \newcommandx{\TermSequence}[2][1=$t_1$, 2=$t_n$]{%
-	\mintinline{text}{TernSequence([|#1|,|$...$|,|#2|] : TermTemplate?)}}
+	\mintinline{text}{TermSequence([|#1|,|$...$|,|#2|] : TermTemplate?)}}
 
 \newcommandx{\PatternRepeat}[1][1=$p_r$]{%
 	\mintinline{text}{Repeat(|#1|: Pattern)}}
@@ -303,7 +303,7 @@ mathescape=true}
 \frontmatter %generates the frontmatter, this is FIXED
 
 \begin{abstract}
-\textbf{PLT Redex} is a domain-specific language, embedded into Racket, designed for specifying and debugging operational semantics.  By specifying a language and a set of reduction rules, PLT Redex is able to apply reduction rules to terms by rewriting them. \textbf{PyPltRedex} is a tool that accepts the aforementioned language specificaton, performs analysis on it and constructs a stand-alone interpreter backed by RPython - a statically analyzable subset of Python that the RPython toolchain can effectively optimize thus producing fast executables.
+PyPLTRedex, based on PLTRedex, a Racket-embedded domain specific language, is a framework for specifying programming languages and their operational semantics in the form of reduction rules. Unlike PLTRedex which relies on Racket and its libraries for the application of reduction rules and term-rewriting, PyPLTRedex compiles a  provided specification into RPython, a statically analyzable subset of Python. The RPython toolchain, which is a part of the PyPy project, then compiles the resulting RPython source into a more efficient native executable thus resulting in a stand-alone interpreter. Analysis and transformations applied to the language specification are explained, and RPython code generation is described. However, since most of the work was focused on ensuring that PyPLTRedex behaves in exactly the same way as PLTRedex, the generation of a  more efficient RPython code was not considered. There are several strategies to be employed to make generated interpreters faster.
 \end{abstract}
 
 

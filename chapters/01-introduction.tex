@@ -1,22 +1,14 @@
 \chapter{Introduction}
-\section{Motivation}
-PltRedex~\cite{pltredex} is a domain-specific language, embedded into Racket, designed for specifying and debugging operational semantics. By specifying a language and reduction rules, PltRedex is able to apply reduction rules to terms by rewriting them.
-However, if one were to turn the PltRedex specification into a stand-alone interpreter they would run into problems relating to it's dependency on Racket for the following reasons:
+\section{Motivation and Goals.}
+PLTRedex~\cite{pltredex} is a domain-specific language, embedded into Racket, designed for specifying and debugging operational semantics. By specifying a language and reduction rules, PLTRedex is able to apply reduction rules to terms by rewriting them.
+However, if one were to turn the PLTRedex specification into a stand-alone interpreter they would run into a relating to it's dependency on Racket - the entire Racket runtime has to be shipped in order to run the specification.
 
-\begin{enumerate}
-\item
-The entire Racket runtime has to be shipped in order to run the specification.
-\item
-Racket is not particularly fast.
-\end{enumerate}
+PyPltRedex~\cite{pypltredex-github} \footnote{Link to GitHub repository: \url{https://github.com/mamysa/PyPltRedex}} as a tool that attempts to solve this problem by taking the PltRedex specification and compiling it into the RPython language - a statically analyzable subset of the Python programming language that is used for the implementation of interpreters within the PyPy toolchain. Using the RPython toolchain, the resulting RPython program is then compiled into a stand-alone version that is more efficient and a lower-level of the program. However, by removing Racket from the equation, the specification has to be modified to use RPython instead.
 
-PyPltRedex~\cite{pypltredex-github} \footnote{Link to GitHub repository: \url{https://github.com/mamysa/PyPltRedex}} is a tool that attempts to solve this problem by taking the PltRedex specification and compiling it into the RPython language - a statically analyzable subset of the Python programming language that is used for the implementation of interpreters within the PyPy toolchain. Using the RPython toolchain, the resulting RPython program is then compiled into a stand-alone version that is more efficient and a lower-level of the program. However, by removing Racket from the equation, the specification has to be modified to use RPython instead.
-
-\section{Goals}
-Since PltRedex has existed for a while, it provides a wide range of functionality ranging from language specification, type checking and testing. PyPltRedex implements a tiny subset of PltRedex that is enough to be usable. In particular,
+Since PLTRedex has existed for a while, it provides a wide range of functionality ranging from language specification, type checking and testing. PyPltRedex implements a tiny subset of PLTRedex that is enough to be usable. In particular,
 
 \begin{itemize}
-\item Only a subset of the pattern language provided by PltRedex is supported.
+\item Only a subset of the pattern language provided by PLTRedex is supported.
 \item
 Only the functionality required for term rewriting is supported.
 \end{itemize}
@@ -24,7 +16,7 @@ Only the functionality required for term rewriting is supported.
 \section{Thesis Outline}
 This thesis consists of ten chapters, excluding the introduction.
 
-Chapter 2 provides an overview of what PLTRedex is, describes the programming language called \texttt{Imp}, provides small-step operational semantics of \texttt{Imp} and explains how \texttt{Imp} is implemented using PLTRedex.
+Chapter 2 provides an overview of what PLTRedex is, describes the programming language called \texttt{Imp}, describes small-step operational semantics of \texttt{Imp} and explains how \texttt{Imp} is implemented using PLTRedex.
 
 Chapter 3 provides a description of what PyPy framework and RPython toolchain is, as well as describing the compile-time representation of RPython employed by PyPltRedex.
 
@@ -36,6 +28,6 @@ Chapter 6 describes how patterns, terms, and other forms are preprocessed and an
 
 Chapter 7 describes how RPython code is generated for terms, patterns and other top-level forms.
 
-Chapter 8 describes testing methodology and provides an evaluation. 
+Chapter 8 describes the testing methodology and provides an evaluation. 
 
 Chapter 9 covers the work that is still needed to be done.

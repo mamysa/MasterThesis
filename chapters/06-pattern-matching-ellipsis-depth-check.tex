@@ -2,9 +2,9 @@
 
 \subsection{Motivation}
 
-Pattern-variables with the same symbol should be under a consistent number of ellipses. For example, in pattern \texttt{(((n\_1 ...) n\_1) ...)} the pattern variable \texttt{n\_1} is not under a consistent number of ellipses - one ellipses has \textit{ellipsis depth} of one, whereas the other is two. Such invalid patterns should be reported during the compilation process.
+Pattern-variables with the same symbol should be under a consistent number of ellipses. For example, in pattern \texttt{(((n\_1 ...) n\_1) ...)} the pattern variable \texttt{n\_1} is not under a consistent number of ellipses - one ellipses has an \textit{ellipsis depth} of one, whereas the other is two. Such invalid patterns should be reported during the compilation process.
 
-In addition, after pattern matching, the pattern-variables are plugged into term-templates and the ellipsis depth of each pattern-variable is needed to ensure that given term-template is well-formed.
+In addition, after pattern matching, the pattern-variables are plugged into term-templates and the ellipsis depth of each pattern-variable is needed to ensure that a given term-template is well-formed.
 
 \subsection{Pattern Traversal}
 
@@ -12,7 +12,7 @@ During pattern traversal, the following need to be maintained:
 
 \begin{enumerate}
 \item
-Let $n$ be \textbf{number of ellipses} on the path from the root of the pattern to some child sub-pattern. $n$ is modified accordingly when visiting patterns of king \RepeatNoArg.
+Let $n$ be \textbf{number of ellipses} on the path from the root of the pattern to some child sub-pattern. $n$ is modified accordingly when visiting patterns of kind \RepeatNoArg.
 
 \item Association between pattern-variable $pv$ and its ellipsis depth $d$. Let $E=\emptyset$ containing pairs $(pv, d)$.
 \end{enumerate}

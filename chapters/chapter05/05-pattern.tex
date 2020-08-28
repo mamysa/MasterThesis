@@ -40,7 +40,7 @@ pattern-sequence : pattern
 \textit{string} matches any string.
 
 \item
-\textit{boolean} matches any boolean - \texttt{\#t} or \texttt{\#f}.
+\textit{boolean} matches any boolean \texttt{\#t} or \texttt{\#f}.
 \item
 \textit{variable-not-otherwise-mentioned} matches any symbol that is not used as a literal in the language definition. For example, if language definition contains the pattern \texttt{(+ number number)} \textit{variable-not-otherwise-mentioned} will not match symbol \texttt{+}.
 
@@ -59,13 +59,15 @@ All patterns above, except \textit{hole} can be suffixed with underscore and ide
 
 \item
 \textit{pattern-sequence} pattern matches a term list, where each pattern-sequence element matches an element of the list. Each individual pattern within the sequence can be suffixed with \texttt{...} (literal ellipsis) and that will match zero or more terms matching the pattern.
+
+Ellipses may produce non-deterministic matches. For example, consider a pattern \texttt{(number\_1 ... number\_2)} and a term \texttt{(1 2)}. There are three resulting matches: \texttt{(number\_1 : (), number\_2: (1 2))}, \texttt{(number\_1 : (1), number\_2: (2))}, and \texttt{(number\_1 : (1 2), number\_2: ())}. In the first case, \texttt{number\_1 ...} matches zero terms that match the pattern \texttt{number\_1} and hence pattern \texttt{number\_2} has to match remaining numbers. In the second case, \texttt{number\_1} matches a term \texttt{1}, and hence the term \texttt{2} is matches by \texttt{number\_2 ...}. Lastly, \texttt{number\_1} may match all the numbers in the sequence, leaving nothing for pattern \texttt{number\_2 ...} to consume.
 \end{itemize}
 
-If patterns in the pattern-sequence are suffixed with the same identifier (e.g. \texttt{(number\_1 number\_1)})), then the match is contrained to terms that are equal. That means term \texttt{(1 1)} matches the pattern but \texttt{(1 2)} does not. For patterns in \texttt{define-language} form constraint checking is not performed. PltRedex provides other constraint checks but they will not be considered.
+If patterns in the pattern-sequence are suffixed with the same identifier (e.g. \texttt{(number\_1 number\_1)})), then the match is constrained to terms that are equal. That means term \texttt{(1 1)} matches the pattern but \texttt{(1 2)} does not. For patterns in a \texttt{define-language} form constraint checking is not performed. PLTRedex provides other constraint checks but they will not be considered.
 
 \section{Compile-Time Representation of Patterns}
 
-Throughout the report the following notation will be used to represent the Python classes used in the implementation of the pattern language. It follows the following format: \mintinline{text}{Typename(|$a$|: A, [|$b_1,...,b_n$|]: B, [|$c_1,...,c_m$|]: C?)}. $a$ is a field of type \texttt{A}. \mintinline{text}{[|$b_1,...,b_n$|]} is a sequence containing $n$ fields of type \texttt{B}. \mintinline{text}{[|$c_1,...,c_m$|]} is a sequence containing \textit{zero} or $m$ fields of type \texttt{C} (that is, \texttt{C?} is optional type).
+Throughout the report the following notation will be used to represent the Python classes used in the implementation of the pattern language. It follows the following format: \mintinline{text}{Typename(|$a$|: A, [|$b_1,...,b_n$|]: B, [|$c_1,...,c_m$|]: C?)}. $a$ is a field of type \texttt{A}. \mintinline{text}{[|$b_1,...,b_n$|]} is a sequence containing $n$ fields of type \texttt{B}. \mintinline{text}{[|$c_1,...,c_m$|]} is a sequence containing \textit{zero} or $m$ fields of type \texttt{C} (that is, \texttt{C?} is an optional type).
 
 \begin{figure}[H]
 	\centering
@@ -96,7 +98,7 @@ Figure \ref{class-diagram-pattern} shows class diagram for all patterns.
 \PatternInHole \space represents \texttt{in-hole} pattern where $p_1$ and $p_2$ are patterns, and $c_1, ..., c_n$ are optional \ConstraintCheckNoArg instances.
 
 \item 
-\LiteralPattern \space represents a literal values in patterns. It's $kind$ is chosen from \texttt{PatternLiteralKind} enumeration and $v$ is the value of the literal. Type of the literal must match the $kind$.
+\LiteralPattern \space represents a literal value seen in a pattern. It's $kind$ is chosen from \texttt{PatternLiteralKind} enumeration and $v$ is the value of the literal. Type of the literal must match the $kind$.
 
 \item 
 \UnresolvedSymbol is used to represent symbols that are initially unknown to be non-terminal, built-in pattern, or literal; $sym$ is the symbol.

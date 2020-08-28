@@ -2,16 +2,16 @@
 
 \section{Testing}
 
-To test PyPltRedex, two forms testing is employed: 
+To test PyPltRedex, two forms of testing are employed: 
 
 \begin{enumerate}
 \item Unit testing form most non-trivial transformation / analysis passes.
-\item Integration tests containing \texttt{redex-match-assert-equal}, \texttt{term-let-assert-equal}, \texttt{apply-reduction-relation-assert-equal} forms that test functionality of pattern matching, term-generation and application of reduction relations and metafunctions. Some tests cases were lifted from testing suite that comes with PLTRedex. All test cases use output of PLTRedex for comparison.
+\item Integration tests containing \texttt{redex-match-assert-equal}, \texttt{term-let-assert-equal}, \texttt{apply-reduction-relation-assert-equal} forms that test functionality of pattern matching, term-generation and application of reduction relations and metafunctions. Some tests cases were lifted from testing suite that comes with PLTRedex. All test cases use the output of PLTRedex for comparison.
 \end{enumerate}
 
 \section{Performance}
 
-To get a feel of how PyPyPLTRedex would stack up against PLTRedex, Imp language was used to implement a simple iterative factorial calculator seen in Figure \ref{imp-factorial}. The program correctly computes factorial of 20 producing 2432902008176640000.  The program was evaluated 1000 times to obtain more reliable data. The program was also implemented in plain Python and compiled with RPython toolchain. All programs were run three times and resulting times were averaged. 
+To get a feel of how PyPyPLTRedex would stack up against PLTRedex, Imp language was used to implement a simple iterative factorial calculator seen in Figure \ref{imp-factorial}. The program correctly computes factorial of 20 producing 2432902008176640000.  The program was evaluated 1000 times to obtain more reliable data. The program was also implemented in plain Python and compiled with the RPython toolchain. All programs were run three times and resulting times were averaged. 
 
 Results of profiling can be seen in Figure \ref{perf-fact}.
 
@@ -30,7 +30,7 @@ Results of profiling can be seen in Figure \ref{perf-fact}.
 \label{imp-factorial}
 \end{figure}
 
-Benchmarking is setup in the way seen in Figure \ref{bench-setup}. Actual running time is measured with utility \texttt{perf} and \texttt{chrt} is used to make minimize context switches.
+Benchmarking is set up in the way seen in Figure \ref{bench-setup}. Actual running time is measured with the utility \texttt{perf} and \texttt{chrt} is used to minimize context switches.
 
 \begin{figure}[h]
 \begin{minted}[tabsize=2,obeytabs,fontsize=\normalsize]{text}

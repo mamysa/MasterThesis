@@ -5,29 +5,29 @@
 
 Immediately after parsing the PLTRedex specification, it is unknown whether certain elements of a pattern are built-in patterns or non-terminal symbols or just literals. These elements are represented with \UnresolvedSymbol instances and will have to be resolved in one of the following ways: \BuiltInPatternNoArg, \NonTerminalNoArg, or \LiteralPatternNoArg.
 
-This transformation is applicable to all patterns as well as patterns in \texttt{define-language} form. For \texttt{define-language} form, all sub-patterns that resolve to \LiteralPatternNoArg need to be stored in set $V$, initially empty, which is the set of all variables used by the given language.
+This transformation is applicable to all patterns as well as patterns in \texttt{define-language} form. For \texttt{define-language} form, all sub-patterns that resolve to \LiteralPatternNoArg need to be stored in set $V$ (initially empty) which is the set of all variables used by the given language.
 
-Given \LetDefineLanguage{$l$}, let $Nt_{l}$ be the set of all non-terminal symbols of the language. Given string $sym$, the prefix of $sym$ needs to be extracted. Let $prefix_{sym}$ be a string of characters up to the first occurrence of an underscore character in $sym$. There are several cases to consider.
+Given \LetDefineLanguage{$l$}, let $\mathit{Nt_{l}}$ be the set of all non-terminal symbols of the language. Given string $sym$, the prefix of $\mathit{sym}$ needs to be extracted. Let $\mathit{prefix_{sym}}$ be a string of characters up to the first occurrence of an underscore character in $\mathit{sym}$. There are several cases to consider.
 
 \begin{itemize}
-\item $prefix_{sym}$ does not exist; there are no underscore characters in $sym$. Let $prefix_{sym}=sym$.
-\item $prefix_{sym}$ is empty; the first character of $sym$ is underscore. Raise an Exception because Redex doesn't consider such symbols valid.
-\item Otherwise, $prefix_{sym}$ is the prefix.
+\item $\mathit{prefix_{sym}}$ does not exist; there are no underscore characters in $\mathit{sym}$. Let $\mathit{prefix_{sym}=sym}$.
+\item $\mathit{prefix_{sym}}$ is empty; the first character of $\mathit{sym}$ is underscore. Raise an Exception because PLTRedex doesn't consider such symbols valid.
+\item Otherwise, $\mathit{prefix_{sym}}$ is the prefix.
 \end{itemize}
 
 The resolution algorithm proceeds in the following manner. The pattern is traversed recursively. When coming across \UnresolvedSymbol node, extract $prefix_{sym}$. One of the following cases may happen.
 
 \begin{itemize}
-\item Prefix is \texttt{number}, return \BuiltInPattern[Number][$sym$][false].
-\item Prefix is \texttt{integer}, return \BuiltInPattern[Integer][$sym$][false].
-\item Prefix is \texttt{real}, return \BuiltInPattern[Real][$sym$][false].
-\item Prefix is \texttt{natural}, return \BuiltInPattern[Natural][$sym$][false].
-\item Prefix is \texttt{string}, return \BuiltInPattern[String][$sym$][false].
-\item Prefix is \texttt{boolean}, return \BuiltInPattern[Boolean][$sym$][false].
-\item Prefix is \texttt{variable-not-otherwise-mentioned}, \\ return \BuiltInPattern[Variable][$sym$][false]
-\item Prefix is \texttt{hole}. Since PltRedex doesn't allow underscores for \texttt{hole} patterns check if $prefix(sym) \neq sym$ and raise an Exception accordingly. \\ Return \BuiltInPattern[Hole][$sym$][false].
-\item $prefix_{sym} \in Nt_l$, return \NonTerminal[$prefix_{sym}$][$sym$][false].
-\item Finally, ensure that symbol does not contain underscores. Redex only allows underscores after non-terminal symbols and built-in patterns. Abort compilation if that is the case. Otherwise, $V=V\cup\{sym\}$ and return \LiteralPattern[Variable][$sym$][false]
+\item Prefix is \texttt{number}, return \BuiltInPattern[Number][$\mathit{sym}$][false].
+\item Prefix is \texttt{integer}, return \BuiltInPattern[Integer][$\mathit{sym}$][false].
+\item Prefix is \texttt{real}, return \BuiltInPattern[Real][$\mathit{sym}$][false].
+\item Prefix is \texttt{natural}, return \BuiltInPattern[Natural][$\mathit{sym}$][false].
+\item Prefix is \texttt{string}, return \BuiltInPattern[String][$\mathit{sym}$][false].
+\item Prefix is \texttt{boolean}, return \BuiltInPattern[Boolean][$\mathit{sym}$][false].
+\item Prefix is \texttt{variable-not-otherwise-mentioned}, \\ return \BuiltInPattern[Variable][$\mathit{sym}$][false]
+\item Prefix is \texttt{hole}. Since PLTRedex doesn't allow underscores for \texttt{hole} patterns check if $\mathit{prefix(sym) \neq sym}$ and raise an Exception accordingly. \\ Return \BuiltInPattern[Hole][$\mathit{sym}$][false].
+\item $\mathit{prefix_{sym} \in Nt_l}$, return \NonTerminal[$\mathit{prefix_{sym}}$][$\mathit{sym}$][false].
+\item Finally, ensure that symbol does not contain underscores. PLTRedex only allows underscores after non-terminal symbols and built-in patterns. Abort compilation if that is the case. Otherwise, $V=V\cup\{\mathit{sym}\}$ and return \LiteralPattern[Variable][$\mathit{sym}$][false]
 \end{itemize}
 If transformation was performed on \texttt{define-language}, \MakeAnnotation{$l$}{"ReservedVariables"}{$V$}.
 

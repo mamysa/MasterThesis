@@ -2,7 +2,7 @@
 
 \subsection{Term Literals}
 
-Given \TermLiteral, return new term instance based on \texttt{TermLiteralKind}, as defined in Section \ref{section:term-templates}. Term-templates of this kind are guaranteed to not have \texttt{ForEach} and \texttt{InArg} annotations, by construction.
+Given \TermLiteral, return the new term instance based on \texttt{TermLiteralKind}, as defined in Section \ref{section:term-templates}. Term-templates of this kind are guaranteed to not have \texttt{ForEach} and \texttt{InArg} annotations, by construction.
 
 \begin{figure}[H]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
@@ -32,8 +32,8 @@ def |$f_t$|(match):
 
 Given $t =$ \PatternVariable, let $f_t$ be a term-generating function for $t$. One of two scenarios may happen:
 \begin{itemize}
-\item $t$ has \texttt{InArg(paramname)} annotation, meaning that this pattern-variable originally must have been under ellipsis.
-\item $t$ has \texttt{ReadMatch} annotation, meaning that this pattern-variable must not have been under an ellipsis. Simply return the term bound to pattern-variable $s$.
+\item $t$ has an \texttt{InArg(paramname)} annotation, meaning that this pattern-variable originally must have been under ellipsis.
+\item $t$ has an \texttt{ReadMatch} annotation, meaning that this pattern-variable must not have been under an ellipsis. Simply return the term bound to pattern-variable $s$.
 \end{itemize}
 
 \begin{figure}[htb]
@@ -57,7 +57,7 @@ def |$f_t$|(match):
 
 \subsection{\TermSequenceNoArg}
 
-Given \TermSequence, recursively generate code for term-templates $t_i$, resulting in functions $f_{t_1},..., f_{t_n}$. Let $f_t$ be a term-generating function for $t$. Let $arg_1, ..., arg_n$ be a list of parameters to $f_t$, acquired by reading \texttt{InArg} annotation. Let $mr_1, ..., mr_n$ be a list of \texttt{(id: str, s: str)} acquired by reading \texttt{ReadMatch} annotation. For each such tuple emit assignment to metavariable \texttt{id} the result of calling \texttt{match.getbinding(s)}.
+Given \TermSequence, recursively generate code for term-templates $t_i$, resulting in functions $f_{t_1},..., f_{t_n}$. Let $f_t$ be a term-generating function for $t$. Let $arg_1, ..., arg_n$ be a list of parameters to $f_t$, acquired by reading \texttt{InArg} annotation. Let $mr_1, ..., mr_n$ be a list of \texttt{(id: str, s: str)} acquired by reading \texttt{ReadMatch} annotation. For each such tuple, emit assignment to the metavariable \texttt{id} to the result of calling \texttt{match.getbinding(s)}.
 
 
 \begin{figure}
@@ -90,7 +90,7 @@ Further code is generated based on the type of $t_i$. There are a few cases to c
 
 \begin{itemize}
 \item
-Element is \TermRepeat. Retrieve \texttt{ForEach} annotation and let $fe_1, ..., fe_n$ be resulting set of pattern-variables. Note that these pattern-variables may be read from the match or simply passed as function parameters. First, ensure that the terms that are assigned to these pattern-variables are \texttt{Sequence} instances with equal lengths. An Exception is raised if the test fails. Otherwise, iterate over terms assigned to $fe_1, ..., fe_n$, retrieve term at position $i$ and call $f_{t_i}$.
+The element is \TermRepeat. Retrieve the \texttt{ForEach} annotation and let $fe_1, ..., fe_n$ be the resulting set of pattern-variables. Note that these pattern-variables may be read from the match or simply passed as function parameters. First, ensure that the terms that are assigned to these pattern-variables are \texttt{Sequence} instances with equal lengths. An Exception is raised if the test fails. Otherwise, iterate over terms assigned to $fe_1, ..., fe_n$, retrieve the term at position $i$ and call $f_{t_i}$.
 
 \begin{figure}
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
@@ -113,7 +113,7 @@ for j in range(list(lengths)[0]): # convert set to list
 \end{figure}
 
 \item
-Element is \PythonCall. Call $f_{t_i}$ to obtain the term $t^{\prime}$. Notice that arguments for $f_{t_i}$ are generated using "InArg" annotations of $f_{t_i}$.
+The element is \PythonCall. Call $f_{t_i}$ to obtain the term $t^{\prime}$. Notice that arguments for $f_{t_i}$ are generated using "InArg" annotations of $f_{t_i}$.
 	\begin{enumerate}
 	\item Insertion $mode$ is \texttt{Normal}. Append $t^{\prime}$ to the sequence.
 	\item Insertion $mode$ is \texttt{Splice}. Ensure that $t^{\prime}$ is \texttt{Sequence} and then append each term in $t^{\prime}$ to the \texttt{term} \texttt{Sequence}.
@@ -152,7 +152,7 @@ sequence.append(t)
 \end{itemize}
 
 \subsection{Repeat}
-Given \TermRepeat, generate function $f_{t_r}$ for $t_r$. Since repetitions are handled in \TermSequenceNoArg, no special code generation is required here.
+Given \TermRepeat, generate the function $f_{t_r}$ for $t_r$. Since repetitions are handled in \TermSequenceNoArg, no special code generation is required here.
 
 \subsection{InHole}
 Given $t=$ \TermInHole, generate $f_{p_1}$ and $f_{p_2}$ for term-templates $p_1$ and $p_2$. Call $f_{p_1}$ and $f_{p_2}$ with appropriate arguments and then call \texttt{plughole} function as described in Section \ref{section:runtime-terms}.
@@ -176,7 +176,7 @@ def |$f_t$|(match, |$arg_1, ..., arg_n$|):
 
 
 \subsection{PythonCall}
-Given $t$ =\PythonCall \space generate functions $f_1$, ..., $f_n$ for $t_1$, ..., $t_n$. Call procedures $f_{t_1}$, ..., $f_{t_n}$ with appropriate arguments and let $t_1^{\prime}$, ..., $t_1^{\prime}$ be resulting terms. Call $pyfunc$ with arguments $t_i^{\prime}$. Note that $t$ has neither \texttt{InArg} nor \texttt{MatchRead} annotations, by construction.
+Given $t$ =\PythonCall \space generate functions $f_1$, ..., $f_n$ for $t_1$, ..., $t_n$. Call procedures $f_{t_1}$, ..., $f_{t_n}$ with appropriate arguments and let $t_1^{\prime}$, ..., $t_1^{\prime}$ be the resulting terms. Call $pyfunc$ with the arguments $t_i^{\prime}$. Note that $t$ has neither \texttt{InArg} nor \texttt{MatchRead} annotations, by construction.
 
 \begin{figure}
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
@@ -196,9 +196,9 @@ def |$f_t$|(match):
 
 
 \subsection{MetafunctionApplication}
-The metafunction application is very similar to python calls, except that there's only one term-template to be passed as an argument to the metafunction instead of many.
+The metafunction application is very similar to Python calls, except that there's only one term-template to be passed as an argument to the metafunction instead of many.
 
-Given the term-template $t=$ \ApplyMetafunction, generate function $f_t$ for $t$. Then, generate function $f_{t_m}$ for term-template $t_m$. Call $f_{t_m}$ with appropriate arguments, and feed results of $f$ into the metafunction with name $mf$.
+Given the term-template $t=$ \ApplyMetafunction, generate the function $f_t$ for $t$. Then, generate the function $f_{t_m}$ for term-template $t_m$. Call $f_{t_m}$ with the appropriate arguments, and feed results of $f$ into the metafunction with name $mf$.
 
 \begin{figure}
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}

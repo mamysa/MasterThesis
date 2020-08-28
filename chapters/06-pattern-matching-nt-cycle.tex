@@ -22,7 +22,7 @@ PltRedex doesn't allow language definitions such as the one in Figure \ref{dl-nt
 	\label{dl-ntcyclegraph}
 \end{figure}
 
-The problem with the language above (aside from it being completely useless) is a cycle of non-terminals $n \rightarrow p \rightarrow e$. When testing if some term is a non-terminal, a term is matched against every pattern in non-terminal definition. For example, given term \texttt{String("hello world")} it is matched against non-terminal \texttt{e}. Since  the term doesn't match pattern \texttt{(e e)}, non-terminal \texttt{n} is then matched. Since the term doesn't match any patterns here either, non-terminal \texttt{p} is then matched. Similarly, the term doesn't match any patterns here either, \texttt{e} is then matched, but that's where the matching has started and thus \textit{infinite recursion} becomes an issue. Languages need to be analyzed for presence of non-terminal cycles.
+The problem with the language above (aside from it being completely useless) is a cycle of non-terminals $n \rightarrow p \rightarrow e$. When testing if some term is a non-terminal, a term is matched against every pattern in a non-terminal definition. For example, given term \texttt{String("hello world")} it is matched against non-terminal \texttt{e}. Since  the term doesn't match pattern \texttt{(e e)}, non-terminal \texttt{n} is then matched. Since the term doesn't match any patterns here either, non-terminal \texttt{p} is then matched. Similarly, the term doesn't match any patterns here either, \texttt{e} is then matched, but that's where the matching has started and thus \textit{infinite recursion} becomes an issue. Languages need to be analyzed for presence of non-terminal cycles.
 
 \subsection{Algorithm}
 To detect such cycles, \DefineLanguageNoArg needs to be interpreted as a directed graph and some cycle-detecting algorithm must be used. The graph is constructed in the following manner.
@@ -74,9 +74,9 @@ It should be noted that the algorithm described does not report all the cycles i
 
 \subsection{Example}
 
-Figure \ref{nt-cycle-example} demonstrates cycle searching using the graph shown in Figure \ref{dl-ntcyclegraph} starting from the non-terminal $s$. Initially $U=\{s,p,n,e\}$. Its color becomes \texttt{Grey} as seen in (a). Since it has no successor vertices, its color becomes \texttt{Black}, as seen in (b).
+Figure \ref{nt-cycle-example} demonstrates cycle searching using the graph shown in Figure \ref{dl-ntcyclegraph} starting from the non-terminal $s$. Initially $U=\{s,p,n,e\}$. Its color becomes \texttt{Gray} as seen in (a). Since it has no successor vertices, its color becomes \texttt{Black}, as seen in (b).
 
-Since $V = \{ s \}$, $U=\{p,n,e\}$. Pick vertex $p$ for expansion and color it \texttt{Grey}. Then, visit the only successor of $s$, vertex $e$ and color it \texttt{Grey}. Visit the only successor of $e$, vertex $n$ and color it \texttt{Grey}. Finally, visit the only successor of $n$, vertex $p$. But since it is already colored \texttt{Grey}, the cycle  $p \rightarrow e \rightarrow n$ has been found and a compilation error should be raised.
+Since $V = \{ s \}$, $U=\{p,n,e\}$. Pick vertex $p$ for expansion and color it \texttt{Gray}. Then, visit the only successor of $s$, vertex $e$ and color it \texttt{Gray}. Visit the only successor of $e$, vertex $n$ and color it \texttt{Gray}. Finally, visit the only successor of $n$, vertex $p$. But since it is already colored \texttt{Gray}, the cycle  $p \rightarrow e \rightarrow n$ has been found and a compilation error should be raised.
 
 \begin{figure}[h]
 \begin{subfigure}{0.32\linewidth}
