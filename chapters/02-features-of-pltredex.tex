@@ -25,22 +25,21 @@ c &= \textbf{skip} \text{ | } x = a \text{ | } c1; c2 \text{ | } \textbf{if } b 
 \section{Structural Operational Semantics}
 To be able to prove properties of programs, languages need to be described formally. Operational semantics describe behavior of programming languages in terms execution of programs on abstact machines. Structural operation semantics that was first introduced in ~\cite{plotkin}, represents computation using deductive systems meaning execution of programs on abstract machines turns into system of logical inferences. To define a language, inference rules are used such as ones seen in Figures \ref{infer-arith}, \ref{infer-bool}, \ref{infer-comm}.
 
-\begin{figure}[htb]
+\begin{figure}[H]
 \input{chapters/chapter02/02-imp-smallstep-arith.tex}
 \caption{Evaluation of arithmetic expressions.}
 \label{infer-arith}
+\end{figure}
+\begin{figure}[H]
+\input{chapters/chapter02/02-imp-smallstep-bool.tex}
+\caption{Evaluation of boolean expressions.}
+\label{infer-bool}
 \end{figure}
 
 For arithmetic expressions in Imp, define evaluation relation $\langle a, \sigma \rangle \rightarrow \langle a^\prime, \sigma  \rangle$; meaning evaluation of $a$ under state $\sigma$ in single step yields $a^\prime$. Figure \ref{infer-arith} shows seven distinct inference rules, with rules $[\text{Aexp-}\oplus]$, etc created for each operator in $\{+, \times \}$, and all operators having usual semantics w.r.t. $\mathbb{Z}$. These rules are specified in a way that ensures that all arithmetic expressions will be evaluated from left to right.
 
 
 Similarly, for boolean expressions single-step evaluation relation $\langle b, \sigma \rangle \rightarrow \langle b^\prime, \sigma  \rangle$ is defined and related inference rules can be seen in Figure \ref{infer-bool}. Rules [$\text{BExp-}\oslash]$, etc, created for each operators $\land$ and $\lor$, as above.
-
-\begin{figure}[htb]
-\input{chapters/chapter02/02-imp-smallstep-bool.tex}
-\caption{Evaluation of boolean expressions.}
-\label{infer-bool}
-\end{figure}
 
 Finally, a single-step evaluation relation for commands is defined: $\langle c, \sigma \rangle \rightarrow \langle c^\prime, \sigma^\prime \rangle$. Inference rules can been seen in Figure \ref{infer-comm}.
 
@@ -86,7 +85,7 @@ As it can be seen above, inference rules above are quite verbose. PLTRedex uses 
 
 An evaluation context $E[\bullet]$ is an expression containing a single occurence of special symbol $\bullet$ called "hole". $E[r]$ is the expression that results from replacing some expression $r$ with $\bullet$. The expression $r$ is reduced using some local reduction rule in one step obtaining expression $r^\prime$. Finally, $E[r^\prime]$ is the expression that results after replacing $\bullet$ with $r^\prime$. This way, only a single global general inference rule is required, as seen in Figure \ref{infer-evaluation}. 
 
-\begin{figure}[htb]
+\begin{figure}[!h]
 \input{chapters/chapter02/02-evalcontext.tex}
 \caption{Evaluation contexts, local reductions and generalized inference rule.}
 \label{infer-evaluation}

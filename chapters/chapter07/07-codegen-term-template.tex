@@ -60,7 +60,7 @@ def |$f_t$|(match):
 Given \TermSequence, recursively generate code for term-templates $t_i$, resulting in functions $f_{t_1},..., f_{t_n}$. Let $f_t$ be a term-generating function for $t$. Let $arg_1, ..., arg_n$ be a list of parameters to $f_t$, acquired by reading \texttt{InArg} annotation. Let $mr_1, ..., mr_n$ be a list of \texttt{(id: str, s: str)} acquired by reading \texttt{ReadMatch} annotation. For each such tuple, emit assignment to the metavariable \texttt{id} to the result of calling \texttt{match.getbinding(s)}.
 
 
-\begin{figure}
+\begin{figure}[ht]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
 {% def codegenTermTemplate(t): %}
 	{% |$f_t$| =  symgen("genterm") %}

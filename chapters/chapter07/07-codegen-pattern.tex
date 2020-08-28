@@ -103,7 +103,7 @@ def consume_variable(term, match, head, tail, literal):
 
 Since functions do not conform to the previously described interface, a wrapper function is generated, calling one of the functions based on $kind$, as seen in Figure \ref{codegen-lit-code}.
 
-\begin{figure}[H]
+\begin{figure}[ht]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,linenos,fontsize=\normalsize]{python}
 {% def codegenLiteral(p): %}
 	{% |$f_p$| = Symgen("match_pattern") %}
@@ -113,7 +113,7 @@ def |$f_p$|(match, term, head, tail):
 {% return |$f_p$| %}
 {% enddef %}
 \end{minted}
-\caption{Generated function for a \LiteralPatternNoArg pattern}
+\caption{Generated function for a \LiteralPatternNoArg \space pattern}
 \label{codegen-lit-code}
 \end{figure}
 
@@ -127,7 +127,7 @@ Generated code does the following:
 \item If the result is True, add the term to the \texttt{Match} instance under appropriate pattern-variable, increment \texttt{head} by one and return a list containing \texttt{(match, head, tail)} tuple.
 \item Otherwise, return an empty list.
 \end{enumerate}
-\begin{figure}[H]
+\begin{figure}[ht]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,linenos,fontsize=\normalsize]{python}
 {% def codegenBuiltInPattern(p): %}
 	{% |$f_p$| = Symgen("match_pattern") %}
@@ -168,7 +168,7 @@ Pack \texttt{match}, \texttt{head}, \texttt{tail} back into a tuple, and initial
 For each obtained \texttt{(m, h, t)} in \texttt{matches} call \texttt{m.decreasedepth} method with $pv_i^{p}$. This completes matching the list of terms. \texttt{matches} is returned.
 \end{enumerate}
 
-\begin{figure}
+\begin{figure}[ht]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
 {% def codegenRepeat(p): %}
 	{% |$f_p$| = symgen("match_pattern") %}

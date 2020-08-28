@@ -2,7 +2,7 @@
 
 \section{Future Work}
 \subsection{Ellipsis Determinism}
-The ellipsis (\RepeatNoArg) matching algorithm that was described in Section \ref{section:pattern-repeat} produces non-deterministic results. PyPltRedex provides a transformation pass called \texttt{EllipsisMatchModeRewriter} that analyzes patterns under ellipses and decides if a given ellipsis can be matched deterministically. However, the current algorithm is flawed and doesn't work correctly for all patterns.
+The ellipsis (\RepeatNoArg) matching algorithm that was described in Section \ref{section:pattern-repeat} produces non-deterministic results. PyPltRedex provides a transformation pass called \\ \texttt{EllipsisMatchModeRewriter} that analyzes patterns under ellipses and decides if a given ellipsis can be matched deterministically. However, the current algorithm is flawed and doesn't work correctly for all patterns.
 
 \subsection{\texttt{in-hole} Hole Count}
 Recall that pattern $p_1$ in \PatternInHole \space may only contain a single hole. In fact, PyPltRedex provides two analysis passes to solve this problem: \texttt{HoleReachabilitySolver} and \texttt{InHoleChecker}. \texttt{HoleReachabilitySolver}, given some \DefineLanguageNoArg, computes the minimum/maximum number of holes for all non-terminals of the language. \texttt{InHoleChecker} locates \PatternInHoleNoArg patterns, and computes the minimum and maximum number of holes for $p_1$ and raises an Exception accordingly. While the implementation seems to work fine for most cases, for certain kind of languages it produces very strange results and hence the description of algorithms used was omitted.
