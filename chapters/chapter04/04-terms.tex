@@ -10,7 +10,7 @@ All runtime terms are represented as shown in the class diagram in Figure \ref{c
 \label{class-diagram-runtime-term}
 \end{figure}
 
-These classes are all very similar and essentially just act as a wrapper for some primitive type. \texttt{Term} is the base class. Due to how RPython's type inference works creating a single class to represent all child classes such as \texttt{String} or \texttt{Float} results in the following compilation error.  Since the \texttt{LeafNode} instance is created with \texttt{helloworld!} string, any other instantiation of \texttt{LeafNode} expects it's second argument to be of type \texttt{string}. 
+These classes are all very similar and essentially just act as a wrapper for some primitive type. \texttt{Term} is the base class. Due to how RPython's type inference works creating a single class to represent all child classes such as \texttt{String} or \texttt{Float} results in the following compilation error.  Since the \texttt{LeafNode} instance is created with the \texttt{helloworld!} string, any other instantiation of \texttt{LeafNode} expects its second argument to be of type \texttt{string}. 
 
 One may notice that, for example, \texttt{String} and \texttt{Variable} could be merged into one class and an additional \texttt{tag} field could be introduced to differentiate between strings and variables. However, since \texttt{isinstance} function is supported by RPython, such change would make term comparison logic more complex.
 
@@ -29,11 +29,11 @@ def entrypoint():
 #  SomeFloat(const=12.5)
 \end{minted}
 
-All classes implement following methods.
+All classes implement the following methods.
 \begin{itemize}
 \item \texttt{shallow\_copy} returns an exact copy of the term. This kind of copying is not recursive.
 \item
-\texttt{deep\_copy} copies the term recursively. In practice, it duplicates \texttt{shallow\_copy} for every term type except \texttt{Sequence}; each term in the sequence is deep-copied and new \texttt{Sequence} instance is returned containing copied terms.
+\texttt{deep\_copy} copies the term recursively. In practice, it duplicates \texttt{shallow\_copy} for every term type except \texttt{Sequence}; each term in the sequence is deep-copied and a new \texttt{Sequence} instance is returned containing copied terms.
 \item
 \texttt{equals} compares two terms based on the type of the term and then on the value.
 \item
@@ -48,7 +48,7 @@ In addition, the following utility functions are provided to make implementation
 \item
 	\texttt{locatehole} recursively traverses the term $t$ looking for term of type \texttt{Hole}. Each term on the path to \texttt{Hole} is recorded and upon successful search the path is returned.
 \item
-	\texttt{plughole}. Given two terms $t_1$ and $t_2$, first \texttt{locatehole} is called with $t_1$ as argument. If resulting path is non-empty, the result of \texttt{copy\_path\_and\_replace\_last} called with resulting path and $t_2$ is returned. Otherwise, $t_1$ is returned.
+	\texttt{plughole}. Given two terms $t_1$ and $t_2$, first \texttt{locatehole} is called with $t_1$ as an argument. If a resulting path is non-empty, the result of \texttt{copy\_path\_and\_replace\_last} called with resulting path and $t_2$ is returned. Otherwise, $t_1$ is returned.
 \item
 	\texttt{asserttermsequal}. Given two terms, \texttt{equals} method is called and an Exception is raised if \texttt{equals} returns False.
 \item

@@ -8,7 +8,7 @@ Since user-provided programs for a given language are initially stored as a stri
 \item
 \textit{Lexical analysis} breaks up the string into individual tokens and decides which kind of token it is. Most commonly tokens are described using regular expressions. 
 \item 
-Parsing takes individual lexemes and based on lexeme kind appropriate \texttt{Term} instance is returned.
+Parsing takes individual lexemes and based on lexeme kind the appropriate \texttt{Term} instance is returned.
 \end{enumerate}
 
 However, since PLTRedex is embedded into Racket, all user-defined languages use either atoms such as integers and identifiers or potentially nested lists of atoms. The grammar for such expressions can be seen in Figure \ref{tok-lex-grammar}.
@@ -121,8 +121,8 @@ The state machine proceeds in the following manner:
 \begin{enumerate}
 \item First it ensures the end of the string has not been reached, otherwise \texttt{EOF} token is returned. 
 \item Then, if the current character is whitespace, greedily consume all whitespace characters and move to initial state.
-\item If the current character is a semicolon thus thus indicating the beginning of a comment, greedily consume all characters until a newline character or end of the string, thus returning \texttt{EOF} token. 
-\item The next two \texttt{If} statements the detect opening and closing parentheses/braces/brackets and return \texttt{LParen} or \texttt{RParen} tokens accordingly.
+\item If the current character is a semicolon thus indicating the beginning of a comment, greedily consume all characters until a newline character or end of the string, thus returning \texttt{EOF} token. 
+\item The next two \texttt{If} statements detect opening and closing parentheses/braces/brackets and return \texttt{LParen} or \texttt{RParen} tokens accordingly.
 \item If the current character starts with a pound sign indicating a possible boolean, the transition to the yellow state would be taken. However, these yellow states do not consume input on character by character basis like blue states do but utilize \texttt{extract\_if\_contains} method to peek and consume multiple characters at once. This method is called in the following manner:
 \begin{itemize}
 \item
@@ -137,7 +137,7 @@ if \texttt{extract\_if\_contains("\#false")} return \texttt{(Boolean, \#f)}
 
 \item If the current character is a double quote, consume any character until the closing double quote is found. Escape sequences are supported expecting a single character after a backward slash. If end-of-string is encountered prematurely, an Exception is raised. Otherwise, a \texttt{(String, self.extract())} token is returned.
 
-\item Finally, the only token kinds remaining to process are \texttt{Integer}, \texttt{Float} and \texttt{Identifier}. First, need to ensure that the current character is not a special reserved one, raising an Exception. Otherwise, state machine moves to the last \texttt{If} statement. Explanation of state machine for these three token kinds would be too verbose to explain, but essentially it attempts to match an \texttt{Integer} or \texttt{Float} first but once a character that may not be in these two token kinds is seen, resulting token immediately becomes \texttt{Identifier}. All input from that point on is consumed greedily until some delimiter character.
+\item Finally, the only token kinds remaining to process are \texttt{Integer}, \texttt{Float} and \texttt{Identifier}. First, need to ensure that the current character is not a special reserved one, raising an Exception. Otherwise, state machine moves to the last \texttt{If} statement. Essentially, the state machine attempts to match an \texttt{Integer} or \texttt{Float} first but once a character that may not be in these two token kinds is seen, the resulting token immediately becomes \texttt{Identifier}. All input from that point on is consumed greedily until some delimiter character.
 \end{enumerate}
 
 \end{itemize}
@@ -152,7 +152,7 @@ This completes the description of the \texttt{Tokenizer}. The parser is implemen
 \texttt{peek()} returns kind of the next token. 
 
 \item
-\texttt{peekv()} returns kind of the next token along with it's value.
+\texttt{peekv()} returns kind of the next token along with its value.
 
 \item 
 \texttt{expect(expectedkind, tok=None)} throws Exception when \texttt{currenttoken} is not the one expected. In particular:
@@ -195,14 +195,14 @@ This completes the description of the \texttt{Tokenizer}. The parser is implemen
 		If \texttt{peek()} is a \texttt{Boolean} token, return \texttt{Boolean(expect(Boolean))}
 	\item
 
-		If \texttt{peek()} is an \texttt{Ident} token, then call \texttt{peekv} to retrieve the \texttt{value} of the token. If \texttt{value} of token is \texttt{hole} return \texttt{Hole()}, otherwise \texttt{Variable(value)} is returned
+		If \texttt{peek()} is an \texttt{Ident} token, then call \texttt{peekv} to retrieve the \texttt{value} of the token. If a \texttt{value} of token is \texttt{hole} return \texttt{Hole()}, otherwise \texttt{Variable(value)} is returned
 	\end{itemize}
 	
 
 \end{itemize}
 
 \subsection{Implementation: Difficulties}
-The implementation of the initial lexical analysis relied on a regular expression library provided by RPython used to identify integers, floating point numbers, and identifiers using regular expressions shown in Figure \ref{tok-lex-grammar}. While the library works fine while running the lexer using \texttt{python2.7}, attempting to compile the lexer code using \texttt{rpython} toolchain results in the following compilation error:
+The implementation of the initial lexical analysis relied on a regular expression library provided by RPython used to identify integers, floating point numbers, and identifiers using regular expressions shown in Figure \ref{tok-lex-grammar}. While the library works fine when running the lexer using \texttt{python2.7}, attempting to compile the lexer code using \texttt{rpython} toolchain results in the following compilation error:
 
 \begin{minted}[tabsize=2,obeytabs,fontsize=\normalsize]{python}
 [translation:ERROR] AttributeError: 'FrozenDesc' object has no attribute 'pycall'
@@ -221,4 +221,4 @@ There appears to be a bug within RPython's \texttt{RegexParser} functionality. A
 
 \subsection{Future Improvements}
 
-Since lexical analysis and parsing were implemented very early on, some of the regular expressions were hacked together to make everything work in short amount of time. In certain cases tokenization is not performed correctly with respect to Racket's tokenization logic. For example, Racket allows for the specification of floating point numbers such as \texttt{.045} or \texttt{1.} (that is there must be either a digit before or after a decimal), which current implementation doesn't support (and are identified as Identifier instead). Scientific notation isn't supported, either.
+Since lexical analysis and parsing were implemented very early on, some of the regular expressions were hacked together to make everything work in short amount of time. In certain cases tokenization is not performed correctly with respect to Racket's tokenization logic. For example, Racket allows for the specification of floating point numbers such as \texttt{.045} or \texttt{1.} (that is there must be either a digit before or after a decimal), which the current implementation doesn't support (and are identified as Identifier instead). Scientific notation isn't supported, either.

@@ -17,7 +17,7 @@ The \texttt{Binding} class encapsulates a stack of terms and provides three meth
 \texttt{increase\_depth} pushes the term \texttt{Sequence} onto the stack provided a term on top of the stack is also a \texttt{Sequence}, otherwise it raises an Exception.
 
 \item
-\texttt{decrease\_depth} has the following behaviour:
+\texttt{decrease\_depth} has the following behavior:
 	\begin{enumerate}
 		\item
         if the stack is empty, raises an Exception.
@@ -26,11 +26,11 @@ The \texttt{Binding} class encapsulates a stack of terms and provides three meth
 		\item
 		if the stack size is 1 and the topmost element is a \texttt{Sequence}, does nothing.
 		\item
-        if the stack size is greater than one, pops the topmost \texttt{Sequence} and append it to \texttt{Sequence} below. (this works because \texttt{increasedepth} must be called beforehand)
+        if the stack size is greater than one, pops the topmost \texttt{Sequence} and appends it to \texttt{Sequence} below. (this works because \texttt{increasedepth} must be called beforehand)
 	\end{enumerate}
 
 \item
-\texttt{add(term)} has the following behaviour:
+\texttt{add(term)} has the following behavior:
 	\begin{enumerate}
 		\item
          if the stack is empty, adds \texttt{term}. 
