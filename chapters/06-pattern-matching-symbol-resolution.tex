@@ -15,7 +15,7 @@ Given \LetDefineLanguage{$l$}, let $\mathit{Nt_{l}}$ be the set of all non-termi
 \item Otherwise, $\mathit{prefix_{sym}}$ is the prefix.
 \end{itemize}
 
-The resolution algorithm proceeds in the following manner. The pattern is traversed recursively. When coming across \UnresolvedSymbol node, extract $prefix_{sym}$. One of the following cases may happen.
+The resolution algorithm proceeds in the following manner. The pattern is traversed recursively. When coming across \UnresolvedSymbol \space node, extract $\mathit{prefix_{sym}}$. One of the following cases may happen.
 
 \begin{itemize}
 \item Prefix is \texttt{number}, return \BuiltInPattern[Number][$\mathit{sym}$][false].

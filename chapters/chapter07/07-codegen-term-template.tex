@@ -40,8 +40,8 @@ Given $t =$ \PatternVariable, let $f_t$ be a term-generating function for $t$. O
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
 {% def codegenPatternVariable(t): %}
 	{% |$f_t$| =  symgen("genterm") %}
-	{% |$arg_1$| = t.getannotation("InArg")
-	{% |$rm_1$| = t.getannotation("ReadMatch")
+	{% |$arg_1$| = t.getannotation("InArg") %}
+	{% |$rm_1$| = t.getannotation("ReadMatch") %}
 	{% if |$arg_1$| != None %}
 def |$f_t$|(match, |$arg_1$|):
 	return |$arg_1$|
@@ -96,7 +96,7 @@ The element is \TermRepeat. Retrieve the \texttt{ForEach} annotation and let $fe
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
 {% if isinstance(|$t_i$|, Repeat): %}
 lengths = set([])
-	{% |$fe_1, ..., fe_n$| = |$t_i$|.getannotation("ForEach")
+	{% |$fe_1, ..., fe_n$| = |$t_i$|.getannotation("ForEach") %}
 	{% for |$fe_i$| in |$fe_1, ..., fe_n$|: %}
 assert isinstance(|$fe_i$|, Sequence)
 lengths = lengths.union(|$fe_i$|.length())
@@ -170,7 +170,7 @@ def |$f_t$|(match, |$arg_1, ..., arg_n$|):
 	|$t_2^{\prime}$| = |$f_{t_2}$|(match, |$b_1, ..., b_n$|)
 	return plughole(|$t_1^{\prime}$|, |$t_2^{\prime}$|)
 \end{minted}
-\caption{Code generation for \PatternInHoleNoArg term-templates.}
+\caption{Code generation for \PatternInHoleNoArg \space term-templates.}
 \label{codegen-term-inhole}
 \end{figure}
 

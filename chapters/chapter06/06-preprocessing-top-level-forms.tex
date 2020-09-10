@@ -1,14 +1,18 @@
 \section{Preprocessing Top-Level Forms}
 
-Having defined and explained transformation/analysis passes for both patterns and term-templates, these are combined according to the needs of top-level forms.
+Having defined and explained transformation/analysis passes for both patterns and term-templates, these are combined according to the needs of top-level forms. They are depicted in Figure \ref{transform-pipeline}. 
 
-\includegraphics[scale=0.32]{pipeline-pattern-strat-1.png}
+There are three different strategies that can be applied to patterns. Strategy \textbf{(a)} is applied to all patterns used in \texttt{define-language} form. Strategy \textbf{(b)} is applied to patterns used for domain/codomain testing of terms. Strategy \textbf{(c)} is applied to any other pattern. For term-templates, there's only a single transformation strategy.
 
-\includegraphics[scale=0.32]{pipeline-pattern-strat-2.png}
+\begin{figure}[ht]
+\centering
+	\makebox[\textwidth][c] { 
+		\includegraphics[scale=0.165]{transform-pipeline.png}
+	}
+	\caption{Transformations applied to patterns and term-templates.}
+	\label{transform-pipeline}
+\end{figure}
 
-\includegraphics[scale=0.32]{pipeline-pattern-strat-3.png}
-
-\includegraphics[scale=0.32]{pipeline-term-strat.png}
 
 Notice that non-terminal resolution occurs with respect to non-terminal definitions on some \DefineLanguageNoArg form. Similarly, during the "Metafunction Application Rewriting" pass requires set $Mf$ containing all meta-functions defined until this point. 
 

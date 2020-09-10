@@ -1,4 +1,4 @@
-\chapter{Introduction}
+\chapter{Introduction: PLTRedex and PyPLTRedex}
 \section{Motivation and Goals.}
 PLTRedex~\cite{pltredex} is a domain-specific language, embedded into Racket, designed for specifying and debugging operational semantics. By specifying a language and reduction rules, PLTRedex is able to apply reduction rules to terms by rewriting them.
 However, if one were to turn the PLTRedex specification into a stand-alone interpreter they would run into a relating to it's dependency on Racket - the entire Racket runtime has to be shipped in order to run the specification.
@@ -14,20 +14,23 @@ Only the functionality required for term rewriting is supported.
 \end{itemize}
 
 \section{Thesis Outline}
-This thesis consists of ten chapters, excluding the introduction.
+This thesis consists of eight chapters.
 
-Chapter 2 provides an overview of what PLTRedex is, describes the programming language called \texttt{Imp}, describes small-step operational semantics of \texttt{Imp} and explains how \texttt{Imp} is implemented using PLTRedex.
+The remainder of Chapter 1 provides an overview of what PLTRedex is, describes the programming language called \texttt{Imp}, describes small-step operational semantics of \texttt{Imp} and explains how \texttt{Imp} is implemented using PLTRedex.
 
-Chapter 3 provides a description of what PyPy framework and RPython toolchain is, as well as describing the compile-time representation of RPython employed by PyPltRedex.
+Chapter 2 provides a description of what PyPy framework and RPython toolchain is, as well as describing the compile-time representation of RPython employed by PyPltRedex.
 
-Chapter 4 describes the runtime library of PyPltRedex, the runtime representation of terms and matches, and explains how terms are parsed.
+Chapter 3 describes the runtime library of PyPltRedex, the runtime representation of terms and matches, and explains how terms are parsed.
 
-Chapter 5 describes the compile-time representation of the pattern language provided by PLTRedex, of terms and of top-level forms.
+Chapter 4 describes the compile-time representation of the pattern language provided by PLTRedex, of terms and of top-level forms.
 
-Chapter 6 describes how patterns, terms, and other forms are preprocessed and analyzed.
+Chapter 5 describes how patterns, terms, and other forms are preprocessed and analyzed.
 
-Chapter 7 describes how RPython code is generated for terms, patterns and other top-level forms.
+Chapter 6 describes how RPython code is generated for terms, patterns and other top-level forms.
 
-Chapter 8 describes the testing methodology and provides an evaluation. 
+Chapter 7 describes the testing methodology and provides an evaluation. 
 
-Chapter 9 covers the work that is still needed to be done.
+Chapter 8 covers the work that is still needed to be done.
+
+
+\input{chapters/chapter01/01-plt-redex-imp.tex}

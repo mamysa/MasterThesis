@@ -42,25 +42,25 @@ def |$f_{rm}$|():
 
 Given $tl=$ \TermLetAssertEqual code generation proceeds in the following manner.
 \begin{enumerate}
-\item First, produce $Match()$ instance containing all pattern-variable $v_i$ assignments. Let $m=Match()$. For each $(v_i, n_i, t_i)$
+	\item First, produce \texttt{Match} instance containing all pattern-variable $v_i$ assignments. Let $m=$ \texttt{Match()}. For each $(v_i, n_i, t_i)$
 	\begin{enumerate}
 	\item Generate $f_{t_i}$ function for term $t_i$.
-	\item $m$.\texttt{AddBinding}$(v_i)$ and $m$.\texttt{AddToBinding}$(v_i, f_{t_i}(Match()))$
+	\item $m$.\texttt{AddBinding}$(v_i)$ and $m$.\texttt{AddToBinding}$(v_i, f_{t_i}(\texttt{Match()}))$
 	\end{enumerate}
 \item Generate $f_t$ for term-template $t$ and $f_e$ for term-template $e$.
-\item Call \texttt{asserttermsequal}$(f_t(m), f_e(Match()))$.
+\item Call \texttt{asserttermsequal}$(f_t(m), f_e(\texttt{Match()}))$.
 \end{enumerate}
 
 \begin{figure}[h]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
 {% def codegenTermLetAssertEqual(|$tl$|): %}
 	{% |$f_{tl}$| = symgen("termletassertequal") %}
-	{% |$f_t$| = codegenTermTemplate(|$tl$|[|$t$|])
-	{% |$f_e$| = codegenTermTemplate(|$tl$|[|$e$|])
+	{% |$f_t$| = codegenTermTemplate(|$tl$|[|$t$|]) %}
+	{% |$f_e$| = codegenTermTemplate(|$tl$|[|$e$|]) %}
 def |$f_{tl}$|():
 	match = Match()
 	{% for |$(v_i, n_i, t_i)$| in |$tl$|[|$(v_1, n_1, t_1)$|, ..., |$(v_n, n_n, t_n)$|]: %}
-		{% |$f_{t_i}$| = codegenTermTemplate(|$t_i$|)
+		{% |$f_{t_i}$| = codegenTermTemplate(|$t_i$|) %}
 	term = |$f_{t_i}$|(Match())
 	match.addkey(|$v_i$|)
 	match.addtobinding(|$v_i$|, term)
@@ -83,7 +83,7 @@ Given \ApplyReductionRelationAssertEqual
 \item First, generate a list of expected terms \texttt{expected}, potentially empty.
 	\begin{enumerate}
 	\item Generate function $f_{e_i}$ for each term-template $e_i$.
-	\item Concatenate results of $f_{e_i}(Match())$ to \texttt{expected}.
+	\item Concatenate results of $f_{e_i}(\texttt{Match()})$ to \texttt{expected}.
 	\end{enumerate}
 \item Generate function $f_t$ for term-template $t$.
 \item Let $f_{red}$ be a Python function for \RedexMatchAssertEqualNoArgs \space with name $r$. Let \texttt{actual} =$f_{red}(f_t())$ be the list of terms after the applying reduction relation.
@@ -97,10 +97,10 @@ Given \ApplyReductionRelationAssertEqual
 {% def codegenApplyReductionRelationAssertEqual(|$ar$|): %}
 	{% |$f_{ar}$| = symgen("applyreductionrelationassertequal") %}
 	{% |$f_{red}$| = get_reduction_relation(|$ar$|[|$r$|]) %}
-	{% |$f_t$| = codegenTermTemplate(|$tl$|[|$t$|])
+	{% |$f_t$| = codegenTermTemplate(|$tl$|[|$t$|]) %}
 	{% |$f_{e_1}, ..., f_{e_n}$| = codegenTermTemplates(|$tl$|[|$e_1, ..., e_n $|]) %}
 def |$f_{ar}$|():
-	expected = [|$f_{e_1}(Match()), ..., f_{e_n}(Match())$|]
+	expected = [|$f_{e_1}(\texttt{Match()}), ..., f_{e_n}(\texttt{Match()})$|]
 	actual = |$f_t$|(Match())
 	asserttermlistsequal(expected, actual)
 {% return |$f_{ar}$| %}

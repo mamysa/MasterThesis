@@ -10,7 +10,7 @@ All runtime terms are represented as shown in the class diagram in Figure \ref{c
 \label{class-diagram-runtime-term}
 \end{figure}
 
-These classes are all very similar and essentially just act as a wrapper for some primitive type. \texttt{Term} is the base class. Due to how RPython's type inference works creating a single class to represent all child classes such as \texttt{String} or \texttt{Float} results in the following compilation error.  Since the \texttt{LeafNode} instance is created with \texttt{helloworld!} string, any other instantiation of LeafNode expects it's second argument to be of type \texttt{string}. 
+These classes are all very similar and essentially just act as a wrapper for some primitive type. \texttt{Term} is the base class. Due to how RPython's type inference works creating a single class to represent all child classes such as \texttt{String} or \texttt{Float} results in the following compilation error.  Since the \texttt{LeafNode} instance is created with \texttt{helloworld!} string, any other instantiation of \texttt{LeafNode} expects it's second argument to be of type \texttt{string}. 
 
 One may notice that, for example, \texttt{String} and \texttt{Variable} could be merged into one class and an additional \texttt{tag} field could be introduced to differentiate between strings and variables. However, since \texttt{isinstance} function is supported by RPython, such change would make term comparison logic more complex.
 
