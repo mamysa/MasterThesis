@@ -4,7 +4,7 @@
 
 Given \TermLiteral, return the new term instance based on \texttt{TermLiteralKind}, as defined in Section \ref{section:term-templates}. Term-templates of this kind are guaranteed to not have \texttt{ForEach} and \texttt{InArg} annotations, by construction.
 
-\begin{figure}[H]
+\begin{figure}[ht]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
 {% def codegenTermLiteral(t): %}
 	{% |$f_t$| =  symgen("genterm") %}
@@ -21,6 +21,7 @@ def |$f_t$|(match):
 	return Boolean(|$v$|)
 	{% elif t.|$kind$| == Hole: %}
 	return Hole()
+	{% endif %}
 {% enddef %}
 \end{minted}
 \caption{Code generation form literal terms.}

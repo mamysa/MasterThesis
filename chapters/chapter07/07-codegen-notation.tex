@@ -14,7 +14,7 @@ def |$f_p$|(match, term, head, tail):
 
 \begin{itemize}
 \item Statements between \texttt{\{\%} and \texttt{\%\}} are Python statements executed by the compiler. Statements that are not, are generated RPython code.
-\item Variables such as $f_p$ are \textit{meta-variables}; when meta-variable is used in description of generated RPython code, actual value assigned to it will be emitted instead.
+\item Variables such as $f_p$ are \textit{meta-variables}; when a meta-variable is used in description of generated RPython code, an actual value assigned to it will be emitted instead.
 \item Special \texttt{endfor}, \texttt{enddef}, \texttt{endif} are used to indicate an end of Python block.
 \item Occasionally, there's a need for iterative Python statement generation, based on contents of a pattern or term-template. Array reference is used to retrieve fields of compile-time objects.
 
