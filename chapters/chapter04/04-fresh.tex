@@ -16,7 +16,7 @@ For each \texttt{v\_prime in Variables(t)}, try to decompose \texttt{v\_prime} i
 	If such decomposition is possible, insert \texttt{(p\_prime, s\_prime)} into the dictionary. If \texttt{p\_prime} is not in the dictionary, initialize it to be an empty list and append \texttt{s\_prime} to it.
 
 	\item
-		Otherwise, insert \texttt{(v\_prime, -1)} into the dictionary \texttt{d}. If \texttt{v\_prime} is not in the dictionary, initialize it to be an empty list and append string -1 to it. Special value of -1 is used to indicate that \texttt{v\_prime} does not have a suffix.
+		Otherwise, insert \texttt{(v\_prime, -1)} into the dictionary \texttt{d}. If \texttt{v\_prime} is not in the dictionary, initialize it to be an empty list and append string -1 to it. A special value of -1 is used to indicate that \texttt{v\_prime} does not have a suffix.
 	\end{itemize}
 
 \item
@@ -30,7 +30,7 @@ Decompose \texttt{v} into prefix \texttt{p} and suffix \texttt{s}.
 	\end{itemize}
 
 \item
-Otherwise, the algorithm searches for a unique suffix by interpreting each suffix in \texttt{d[v]} as a number. Let \texttt{N} be list containing prefixes interpreted as a number and sorted in ascending order.  The goal is to find the smallest number \texttt{i > 0} that is not in \texttt{N}. If first \texttt{N[0]} is not \texttt{-1}, then \texttt{v} is not in \texttt{Variables(t)} and is already fresh. Return \texttt{Variable(v)}.
+Otherwise, the algorithm searches for a unique suffix by interpreting each suffix in \texttt{d[v]} as a number. Let \texttt{N} be the list containing prefixes interpreted as a number and sorted in ascending order.  The goal is to find the smallest number \texttt{i > 0} that is not in \texttt{N}. If first \texttt{N[0]} is not \texttt{-1}, then \texttt{v} is not in \texttt{Variables(t)} and is already fresh. Return \texttt{Variable(v)}.
 
 \item
 Initialize \texttt{i=1} and \texttt{j=1}. \texttt{N[0]} is -1. Let \texttt{n} be the length of the list \texttt{N}. While \texttt{j<n}:

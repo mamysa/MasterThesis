@@ -1,22 +1,22 @@
 \section{Visitors}
 \label{section:visitors}
-Since patterns, term-templates and top-level forms require analysis or transformations applied to them, visitors for each \texttt{TermTemplate}, \texttt{Pattern} and \texttt{TopLevelForm} are provided, as seen in Figure \ref{class-diagram-visitors}.
+Since patterns, term-templates, and top-level forms require analysis or transformations applied to them, visitors for each \texttt{TermTemplate}, \texttt{Pattern} and \texttt{TopLevelForm} are provided, as seen in Figure \ref{class-diagram-visitors}.
 
-In other programming languages the \texttt{Visitor} design pattern would require each \texttt{TermTemplate}, \texttt{Pattern} or \texttt{TopLevelForm} class to implement the \texttt{accept} method with \texttt{Visitor} passed as parameter. However, since Python is a dynamic language, it is possible to invoke methods given their names as strings. The \texttt{\_visit} method does exactly that - it looks up the type-name of a passed element, constructs the string, attempts to retrieve the method, and calls it. For example, given the \texttt{PatternSequence} instance, the resulting method name would be \texttt{\_visitPatternSequence}.
+In other programming languages the \texttt{Visitor} design pattern would require each \newline \texttt{TermTemplate}, \texttt{Pattern} or \texttt{TopLevelForm} class to implement the \texttt{accept} method with \texttt{Visitor} passed as a parameter. However, since Python is a dynamic language, it is possible to invoke methods given their names as strings. The \texttt{\_visit} method does exactly that - it looks up the type-name of a passed element, constructs the string, attempts to retrieve the method, and calls it. For example, given the \texttt{PatternSequence} instance, the resulting method name would be \texttt{\_visitPatternSequence}.
 
 The only method of interest left is \texttt{run}. It is expected to be overridden by each transformation or analysis pass.  Since patterns used in \texttt{define-language} form require different treatment, \texttt{run} implementation may contain iteration logic over \texttt{define-language}, calling \texttt{\_visit} on each pattern.
 
 \section{\texttt{Annotatable} Class}
 
-When applying Transform/Analysis Passes to top-level forms, patterns, and term-templates, additional information needs to be stored pertaining to those elements. One more obvious idea is to store those bits of information in a separate hash-map or dictionary, with \texttt{TermTemplate}, \texttt{Pattern} or \texttt{TopLevelForm} instances acting as keys. However, since during transformation a given instance may be completely replaced with something else, the key of the dictionary has to also be updated, making dictionary management a necessity.
+When applying Transform/Analysis Passes to top-level forms, patterns, and term-templates, additional information needs to be stored pertaining to those elements. One more obvious idea is to store those bits of information in a separate hash-map or dictionary, with \texttt{TermTemplate}, \texttt{Pattern} or \texttt{TopLevelForm} instances acting as keys. However, since a given instance may be completely replaced with something else during transformation, the key of the dictionary has to also be updated, making dictionary management a necessity.
 
 PyPltRedex solves this by storing these bits of information directly into the nodes. \texttt{TermTemplate}, \texttt{Pattern}, and \texttt{TopLevelForm} are subclasses of the \texttt{Annotatable} class. The class diagram can be seen in Figure \ref{class-diagram-visitors}.
 
-Python's dynamicity is leveraged to store arbitrary information in the dictionary with \texttt{str} instances acting as keys. \texttt{addmetadata} adds data to the dictionary, \texttt{getmetadata} retrieves it from the dictionary. \texttt{removemetadata} removes key-value pair from the dictionary. \texttt{copymetadatafrom} makes a shallow copy of the dictionary of the provided element, if the element is being replaced by something else.
+Python's dynamicity is leveraged to store arbitrary information in the dictionary with \texttt{str} instances acting as keys. \texttt{addmetadata} adds data to the dictionary, \texttt{getmetadata} retrieves it from the dictionary. \texttt{removemetadata} removes a key-value pair from the dictionary. \texttt{copymetadatafrom} makes a shallow copy of the dictionary of the provided element, if the element is being replaced by something else.
 
 \begin{figure}[ht]
 	\centering
-	\makebox[\textwidth][c] { \includegraphics[scale=0.18]{class-diagram-visitors.png} }
+	\makebox[\textwidth][c] { \includegraphics[scale=0.20]{class-diagram-visitors.png} }
 	\caption{Representation of visitors and \texttt{Annotatable} class.}
 \label{class-diagram-visitors}
 \end{figure}
