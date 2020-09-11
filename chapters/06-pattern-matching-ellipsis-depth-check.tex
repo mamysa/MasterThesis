@@ -2,7 +2,7 @@
 
 \subsection{Motivation}
 
-Pattern-variables with the same symbol should be under a consistent number of ellipses. For example, in pattern \texttt{(((n\_1 ...) n\_1) ...)} the pattern variable \texttt{n\_1} is not under a consistent number of ellipses - one ellipses has an \textit{ellipsis depth} of one, whereas the other is two. Such invalid patterns should be reported during the compilation process.
+Pattern-variables with the same symbol should be under a consistent number of ellipses. For example, in pattern \texttt{(((n\_1 ...)\ n\_1)\ ...)} the pattern variable \texttt{n\_1} is not under a consistent number of ellipses - one ellipses has an \textit{ellipsis depth} of one, whereas the other is two. Such invalid patterns should be reported during the compilation process.
 
 In addition, after pattern matching, the pattern-variables are plugged into term-templates and the ellipsis depth of each pattern-variable is needed to ensure that a given term-template is well-formed.
 
@@ -19,9 +19,9 @@ Let $n$ be \textbf{number of ellipses} on the path from the root of the pattern 
 
 Given some pattern $p$, \Visit{$p$}. The following kinds of $p$ are of interest.
 \begin{itemize}
-\item $p=$\PatternRepeat. Let $n=n+1$, \Visit{$p_r$}, and then let $n=n-1$.
-\item $p$=\BuiltInPattern Check if there exists a pair $(pv, d) \in E$. If it does not, $E = E \cup \{ (pv, d) \}$. Otherwise, if $n \neq d$, then $pv$ has inconsistent ellipsis depth and an Exception is raised.
-\item $p$=\NonTerminal is handled in the same way as \BuiltInPatternNoArg.
+\item $p=$\space \PatternRepeat. Let $n=n+1$, \Visit{$p_r$}, and then let $n=n-1$.
+\item $p=$\space \BuiltInPattern. Check if there exists a pair $(pv, d) \in E$. If it does not, $E = E \cup \{ (pv, d) \}$. Otherwise, if $n \neq d$, then $pv$ has inconsistent ellipsis depth and an Exception is raised.
+\item $p=$\space \NonTerminal \space is handled in the same way as \BuiltInPatternNoArg.
 \end{itemize}
 
 Finally, the pattern $p$ has to be annotated with $E$ - \MakeAnnotation{$p$}{"EllipsisDepths"}{$E$}.

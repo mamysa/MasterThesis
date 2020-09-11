@@ -22,10 +22,10 @@ PltRedex doesn't allow language definitions such as the one in Figure \ref{dl-nt
 	\label{dl-ntcyclegraph}
 \end{figure}
 
-The problem with the language above (aside from it being completely useless) is a cycle of non-terminals $n \rightarrow p \rightarrow e$. When testing if some term is a non-terminal, a term is matched against every pattern in a non-terminal definition. For example, given term \texttt{String("hello world")} it is matched against non-terminal \texttt{e}. Since  the term doesn't match pattern \texttt{(e e)}, non-terminal \texttt{n} is then matched. Since the term doesn't match any patterns here either, non-terminal \texttt{p} is then matched. Similarly, the term doesn't match any patterns here either, \texttt{e} is then matched, but that's where the matching has started and thus \textit{infinite recursion} becomes an issue. Languages need to be analyzed for presence of non-terminal cycles.
+The problem with the language above (aside from it being completely useless) is a cycle of non-terminals $n \rightarrow p \rightarrow e$. When testing if some term is a non-terminal, a term is matched against every pattern in a non-terminal definition. For example, given term \texttt{String("hello world")}, it is matched against non-terminal \texttt{e}. Since  the term doesn't match the pattern \texttt{(e e)}, non-terminal \texttt{n} is then matched. Since the term doesn't match any patterns here either, non-terminal \texttt{p} is then matched. Similarly, the term doesn't match any patterns here either, \texttt{e} is then matched, but that's where the matching has started and thus \textit{infinite recursion} becomes an issue. Languages need to be analyzed for presence of non-terminal cycles.
 
 \subsection{Algorithm}
-To detect such cycles, \DefineLanguageNoArg needs to be interpreted as a directed graph and some cycle-detecting algorithm must be used. The graph is constructed in the following manner.
+To detect such cycles, \DefineLanguageNoArg \space needs to be interpreted as a directed graph and some cycle-detecting algorithm must be used. The graph is constructed in the following manner.
 
 \begin{enumerate}
 \item
@@ -40,17 +40,17 @@ To detect cycles, depth-first-search is employed. Vertices in the graph can be a
 \begin{itemize}
 \item
 
-\textbf{White} meaning the vertex hasn't been visited before. All vertices are initially assigned this color.
+\textbf{White} - meaning the vertex hasn't been visited before. All vertices are initially assigned this color.
 
 \item
-\textbf{Gray} meaning successors of the vertex $v$ are still being visited. When $v$ is visited for the first time, $color(v)$ becomes \textbf{Gray}.
+\textbf{Gray} - meaning successors of the vertex $v$ are still being visited. When $v$ is visited for the first time, $color(v)$ becomes \textbf{Gray}.
 \item
-\textbf{Black} meaning all successors of the vertex $v$ have been explored.
+\textbf{Black} - meaning all successors of the vertex $v$ have been explored.
 \end{itemize}
 
 
 
-The detection of cycles is done through vertex coloring. For example, if during depth-first-traversal vertex $v$ is encountered with \DFSColor{$v$}{Gray}, this means that there's a \textbf{back-edge} in the tree created by depth-first traversal. That is, back-edge $u \rightarrow v$ connects vertex $u$ to its predecessor in depth-first-search tree $v$. Once such cycle is found, the error is reported and the compilation aborts.
+The detection of cycles is done through vertex coloring. For example, if during depth-first-traversal vertex $v$ is encountered with \DFSColor{$v$}{Gray}, this means that there's a \textbf{back-edge} in the tree created by depth-first traversal. That is, back-edge $u \rightarrow v$ connects vertex $u$ to its predecessor in the depth-first-search tree $v$. Once such cycle is found, the error is reported and the compilation aborts.
 
 To report a path of non-terminals that make up the cycle, a path of non-terminals has to be maintained. The path can be represented as a stack. Given starting vertex $v$, depth-first-search proceeds as follows:
 
@@ -65,7 +65,7 @@ Since the resulting non-terminal graphs may be disjoint, we need to keep track o
 
 \begin{enumerate}
 \item
-Pick a random vertex $u$ from set $U$. Create empty set $V$. Starting from $u$ perform depth-first-search as described above. Compute set difference - $U = U-V$.
+Pick a random vertex $u$ from set $U$. Create empty set $V$. Starting from $u$, perform depth-first-search as described above. Compute set difference - $U = U-V$.
 \item
 Continue until $U$ is empty.
 \end{enumerate}
@@ -91,7 +91,7 @@ Since $V = \{ s \}$, $U=\{p,n,e\}$. Pick vertex $p$ for expansion and color it \
 	\centering
 	\includegraphics[scale=0.18]{transformation-pattern-ntgraph-example-3.png}
 \end{subfigure}
-
+\newline
 \begin{subfigure}{0.32\linewidth}
 	\centering
 	\includegraphics[scale=0.18]{transformation-pattern-ntgraph-example-4.png}

@@ -2,9 +2,9 @@
 
 \subsection{Motivation}
 
-Immediately after parsing the PLTRedex specification, it is unknown whether certain elements of a term-template are pattern-variables or just literal variables. These elements are represented with \UnresolvedSymbol \space instances. Since pattern-variables may be under ellipsis, all occurrences of the pattern-variable must have consistent \textit{ellipsis depths}. Finally, since ellipses produce lists of terms, it has to be decided how and where these sub-terms are to be extracted from the last and plugged into the term-template. Ellipsis depth of each pattern-variable is assumed to be known - it comes from \textbf{EllipsisDepths} annotation of related pattern $p$.
+Immediately after parsing the PLTRedex specification, it is unknown whether certain elements of a term-template are pattern-variables or just literal variables. These elements are represented with \UnresolvedSymbol \space instances. Since pattern-variables may be under ellipsis, all occurrences of the pattern-variable must have consistent \textit{ellipsis depths}. Finally, since ellipses produce lists of terms, it has to be decided how and where these sub-terms are to be extracted from the last and plugged into the term-template. An ellipsis depth of each pattern-variable is assumed to be known - it comes from \textbf{EllipsisDepths} annotation of related pattern $p$.
 
-These goals are achieved by introducing the following term-template annotations. for term-template $t$,
+These goals are achieved by introducing the following term-template annotations. For term-template $t$,
 
 \begin{itemize}
 \item
@@ -17,35 +17,35 @@ These goals are achieved by introducing the following term-template annotations.
 
 \subsection{Term-Template Traversal}
 
-To perform annotation, a \textbf{path} of term-templates must be maintained to be able to count all occurrences of ellipsis on the path to the root term-template. The path is represented using a stack. When new term-template $t$ is visited, it is added to the top of the stack, child term-templates of $t$ are visited recursively and $t$ is popped from the stack. Now, \Visit{$t$}.
+To perform annotation, a \textbf{path} of term-templates must be maintained to be able to count all occurrences of ellipsis on the path to the root term-template. The path is represented using a stack. When the term-template $t$ is visited, it is added to the top of the stack, child term-templates of $t$ are visited recursively and $t$ is popped from the stack. Now, \Visit{$t$}.
 \begin{itemize}
 
 \item
-$t=$\TermUnresolvedSymbol. First, check if the pattern-variable $\mathit{sym}$ is present in the provided \texttt{Match} instance. If it is not, then $sym$ is just a literal variable and is resolved to \TermLiteral[Variable][$sym$]{false}.
-Otherwise, $sym$ is a pattern-variable with \textit{expected ellipsis depth} $d_e$. Let $d_a$ be \textit{actual ellipsis depth}, initially zero. Let $d_p$ be a number of \RepeatNoArg term-templates on the \texttt{path}. In the end it must be true that $d_p \geq d_e$ and $d_a = d_e$. There is a number of cases to consider. Let $x$ be a fresh symbol.
+	$t=$\TermUnresolvedSymbol. First, check if the pattern-variable $\mathit{sym}$ is present in the set \textbf{EllipsisDepths}. If it is not, then $sym$ is just a literal variable and is resolved to \TermLiteral[Variable][$sym$][false].
+Otherwise, $sym$ is a pattern-variable with \textit{expected ellipsis depth} $d_e$. Let $d_a$ be the \textit{actual ellipsis depth}, initially zero. Let $d_p$ be a number of \RepeatNoArg \space term-templates on the \texttt{path}. In the end it must be true that $d_p \geq d_e$ and $d_a = d_e$. There is a number of cases to consider. Let $x$ be a fresh symbol.
 	\begin{itemize}
 	\item
 	$d_e=0$. Add the following annotation to $t$: \MakeAnnotation{$t$}{"MatchRead"}{$(n, sym)$} and return.
 	\item
-	$d_e>0$. Add the following annotation to $t$: \MakeAnnotation{$t$}{"InArg"}{$n$}. Now, contents of the \texttt{path} has to be inspected to be able to determine $d_a$. The top-most element of the \texttt{path} is $t$; iterate over the \texttt{path} in reverse order ignoring the topmost term-template. Let $t^{\prime}$ be a term-template on the \texttt{path}.
+	$d_e>0$. Add the following annotation to $t$: \MakeAnnotation{$t$}{"InArg"}{$n$}. Now, contents of the \texttt{path} has to be inspected to be able to determine $d_a$. The topmost element of the \texttt{path} is $t$; iterate over the \texttt{path} in reverse order ignoring the topmost term-template. Let $t^{\prime}$ be a term-template on the \texttt{path}.
 		\begin{enumerate}
 		\item
-		$t^{\prime}=$\texttt{TermSequence} or $t^{\prime}=$\texttt{InHole}; and $d_a \neq d_e$. Add the following annotation to $t^{\prime}$: \MakeAnnotation{$t^{\prime}$}{"InArg"}{$n$}.
+		$t^{\prime}=$\space \texttt{TermSequence} or $t^{\prime}=$\space \texttt{InHole}; and $d_a \neq d_e$. Add the following annotation to $t^{\prime}$: \MakeAnnotation{$t^{\prime}$}{"InArg"}{$n$}.
 		\item
-		$t^{\prime}=$\texttt{TermSequence} or $t^{\prime}=$\texttt{InHole}; and $d_a = d_e$.  Add the following annotation to $t^{\prime}$: \MakeAnnotation{$t^{\prime}$}{"MatchRead"}{$(n, sym)$} and return.
+		$t^{\prime}=$\space \texttt{TermSequence} or $t^{\prime}=$\space \texttt{InHole}; and $d_a = d_e$.  Add the following annotation to $t^{\prime}$: \MakeAnnotation{$t^{\prime}$}{"MatchRead"}{$(n, sym)$} and return.
 		\item
-		$t^{\prime}=$\RepeatNoArg. $d_a = d_a + 1$ and add the following annotation to $t^{\prime}$: \MakeAnnotation{$t^{\prime}$}{"ForEach"}{$n$}.
+		$t^{\prime}=$\space \RepeatNoArg. $d_a = d_a + 1$ and add the following annotation to $t^{\prime}$: \MakeAnnotation{$t^{\prime}$}{"ForEach"}{$n$}.
 		\item
-		$t^{\prime}=$\texttt{PythonCall}. This case doesn't happen.
+		$t^{\prime}=$\space \texttt{PythonCall}. This case doesn't happen.
 		\end{enumerate}
 	  Otherwise, all elements of the \texttt{path} have been inspected with $d_a \neq d_e$, meaning $d_p < d_e$. An \texttt{Exception} is raised.
 	\end{itemize}
 \item
-$t=$\TermRepeat. Recursively \Visit{$t_r$}. By now $t$ must contain at least one \texttt{ForEach} annotation indicating that there's at least one pattern-variable under ellipsis. Raise \texttt{Exception} if that's not the case.
+$t=$\space \TermRepeat. Recursively \Visit{$t_r$}. By now $t$ must contain at least one \texttt{ForEach} annotation indicating that there's at least one pattern-variable under ellipsis. Raise \texttt{Exception} if that's not the case.
 \item
-$t=$\TermSequence. For $t_i$, recursively \Visit{$t_i$}.
+$t=$\space \TermSequence. For $t_i$, recursively \Visit{$t_i$}.
 \item
-$t=$\TermInHole. \\ Recursively \Visit{$t_1$} and \Visit{$t_2$}.
+$t=$\space \TermInHole. \\ Recursively \Visit{$t_1$} and \Visit{$t_2$}.
 \item
-$t=$\PythonCall. Remove all elements $p_1, ..., p_m$ from \texttt{path} and recursively \Visit{$t_i$}. Push elements $p_1, ..., p_m$ to the \texttt{path}. Since \texttt{PythonCall} emulates escape to Racket, all term-templates $t_i$ must be self-contained and have valid ellipsis depths.
+$t=$\space \PythonCall. Remove all elements $p_1, ..., p_m$ from \texttt{path} and recursively \Visit{$t_i$}. Push elements $p_1, ..., p_m$ to the \texttt{path}. Since \texttt{PythonCall} emulates escape to Racket, all term-templates $t_i$ must be self-contained and have valid ellipsis depths.
 \end{itemize}

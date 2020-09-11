@@ -5,15 +5,15 @@
 Since \texttt{Match} instances are initialized with pattern-variables, all pattern-variables used by some pattern $p$ need to be known. 
 
 \subsection{Term Traversal}
-The algorithm recursively traverses the pattern and at each step returns a set of pattern-variables $V$. Given some pattern $p$, $V=$\Visit{$p$}. The following kinds of $p$ are of interest.
+The algorithm recursively traverses the pattern and at each step returns a set of pattern-variables $V$. Given some pattern $p$, $V=$\space \Visit{$p$}. The following kinds of $p$ are of interest.
 
 \begin{itemize}
-\item $p=$\NonTerminal. Return $V = \{ pv \}$.
-\item $p$=\BuiltInPattern. Return $V=\{ pv \}$.
-\item $p$=\LiteralPattern. Return $V=\emptyset$.
-\item $p$ = \PatternSequence. Return $V=\bigcup_{i=1}^{n}$\Visit{$p_i$}.
-\item $p$ = \PatternRepeat. Let $V_r=$\Visit{$p_r$}. Need to annotate $p$ with $V_r$: \MakeAnnotation{$p$}{"PatternVariables"}{$V_r$}.
-\item $p$ = \PatternInHole. Let $V_1=$\Visit{$p_1$} and  $V_2=$\Visit{$p_2$}. Annotate $p_1$ and $p_2$ with corresponding pattern-variable sets: \MakeAnnotation{$p_1$}{"PatternVariables"}{$V_1$} and \\ \MakeAnnotation{$p_2$}{"PatternVariables"}{$V_2$}. Return $V = V_1 \cup V_2$.
+\item $p=$\space \NonTerminal. Return $V = \{ pv \}$.
+\item $p=$\space \BuiltInPattern. Return $V=\{ pv \}$.
+\item $p=$\space \LiteralPattern. Return $V=\emptyset$.
+\item $p=$\space \PatternSequence. Return $V=\bigcup_{i=1}^{n}$\Visit{$p_i$}.
+\item $p=$\space \PatternRepeat. Let $V_r=$\Visit{$p_r$}. Need to annotate $p$ with $V_r$: \MakeAnnotation{$p$}{"PatternVariables"}{$V_r$}.
+\item $p=$\space \PatternInHole. Let $V_1=$\Visit{$p_1$} and  $V_2=$\Visit{$p_2$}. Annotate $p_1$ and $p_2$ with corresponding pattern-variable sets: \MakeAnnotation{$p_1$}{"PatternVariables"}{$V_1$} and \\ \MakeAnnotation{$p_2$}{"PatternVariables"}{$V_2$}. Return $V = V_1 \cup V_2$.
 \end{itemize}
 
 Finally, \MakeAnnotation{$p$}{"PatternVariables"}{$V$}.

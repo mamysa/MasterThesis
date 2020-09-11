@@ -3,7 +3,7 @@
 
 \subsection{Motivation}
 
-For patterns in the \DefineLanguageNoArg \space constraint-checking is not performed. This means that in this context, patterns \texttt{(+ e e)} as \texttt{(+ e\_1 e\_1)} are equivalent. Due to design of \texttt{Match} class described in Section \ref{section:Match}, PyPltRedex needs to modify all such pattern-variables to be unique. Given the pattern variable $pv$, $\mathit{prefix_{pv}}$ (defined in Section \ref{section:pv-resolve}) is extracted and concatenated with some previously unused integer - $\mathit{freshint()}$.
+For patterns in the \DefineLanguageNoArg \space constraint checking is not performed. This means that in this context, patterns \texttt{(+ e e)} and \texttt{(+ e\_1 e\_1)} are equivalent. Due to design of \texttt{Match} class described in Section \ref{section:Match}, PyPltRedex needs to modify all such pattern-variables to be unique. Given the pattern-variable $pv$, $\mathit{prefix_{pv}}$ (defined in Section \ref{section:pv-resolve}) is extracted and concatenated with some previously unused integer - $\mathit{freshint()}$.
 
 \subsection{Algorithm}
 Given \LetDefineLanguage{$l$}, each pattern $p_i$ in \NtDefinitionN \space is visited recursively.
@@ -14,7 +14,7 @@ Given \LetDefineLanguage{$l$}, each pattern $p_i$ in \NtDefinitionN \space is vi
 
 \subsection{Example}
 
-Figure \ref{id-rewrite-example} shows an example of the transformation on the \DefineLanguage form. To all non-terminals \texttt{e}, \texttt{n} and built-in pattern \texttt{number} numerical suffixes are added.
+Figure \ref{id-rewrite-example} shows an example of the transformation on the \DefineLanguage form. Numerical suffixes are added to each occurrence non-terminal \texttt{e}, \texttt{n} and built-in pattern \texttt{number}.
 
 \begin{figure}[h]
 	\begin{minipage}{0.5\linewidth}
