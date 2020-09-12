@@ -204,7 +204,7 @@ mathescape=true}
 	{\mintinline{text}{Repeat}}}
 
 \newcommandx{\TlDefineLanguage}[3][1=$n$, 2=$nt_1$, 3=$nt_m$]{%
-\mintinline{text}{DefineLanguage(|#1|: string, [|#2|, |$...$|,|#3|]: NtDefinition)}}
+\mintinline{text}{DefineLanguage(|#1|: str, [|#2|, |$...$|,|#3|]: NtDefinition)}}
 
 \newcommandx{\TlDefineMetafunction}[7][1=$n$, 2=$l$, 3=$domain$, 4=$codomain$, 5=$mc_1$, 6=$mc_n$, 7=true]{%
 	\ifthenelse{\boolean{#7}}
@@ -231,7 +231,7 @@ mathescape=true}
 
 \newcommandx{\Match}[5][1=$s_1$, 2=$t_1$, 3=$s_n$, 4=$t_n$, 5=true]{%
 	\ifthenelse{\boolean{#5}}
-	{\mintinline{text}{Match([(|#1|, |#2|), |$...$|, (|#3|, |#4|)]: Tuple(string, TermTemplate)?)}}
+	{\mintinline{text}{Match([(|#1|, |#2|), |$...$|, (|#3|, |#4|)]: Tuple(str, TermTemplate)?)}}
 	{\mintinline{text}{Match([(|#1|, |#2|), |$...$|, (|#3|, |#4|)])}}}
 
 \newcommandx{\RedexMatchAssertEqual}[6][1=$l$, 2=$p$, 3=$t$, 4=$m_1$, 5=$m_n$, 6=true]{%
@@ -241,7 +241,7 @@ mathescape=true}
 
 \newcommandx{\TermLetAssertEqual}[9][1=$v_1$, 2=$n_1$, 3=$t_1$, 4=$v_m$, 5=$n_m$, 6=$t_m$, 7=$t$, 8=$e$, 9=true]{%
 	\ifthenelse{\boolean{#9}}
-	{\mintinline{text}{TermLetAssertEqual([(|#1|, |#2|, |#3|), |$...$|, (|#4|, |#5|, |#6|)]: Tuple(string, natural, TermTemplate)?, |#7|: TermTemplate, |#8|: TermTemplate)}}
+	{\mintinline{text}{TermLetAssertEqual([(|#1|, |#2|, |#3|), |$...$|, (|#4|, |#5|, |#6|)]: Tuple(str, natural, TermTemplate)?, |#7|: TermTemplate, |#8|: TermTemplate)}}
 	{\mintinline{text}{TermLetAssertEqual([(|#1|, |#2|, |#3|), |$...$|, (|#4|, |#5|, |#6|)], |#7|, |#8|)}}}
 
 
@@ -267,10 +267,10 @@ mathescape=true}
 
 \newcommand{\DefineReductionRelation}{bfgfgf}
 
-\newcommand{\DefineLanguage}{\lstinline[mathescape]!DefineLanguage($name$: string, \[$nt_1, ..., nt_m$\]: NtDefinition)! } 
+\newcommand{\DefineLanguage}{\lstinline[mathescape]!DefineLanguage($name$: str, \[$nt_1, ..., nt_m$\]: NtDefinition)! } 
 \newcommand{\NtDefinition}{\lstinline[mathescape]!NtDefinition($nt$: Nt, \[$p_1, ..., p_n$\]: Pattern)! } 
 
-\newcommand{\DefineMetafunction}{\lstinline[mathescape]!DefineMetafunction($name$: string, $domain$: Pattern, $codomain$: Pattern, \[$c_1, ..., c_n$\]: MetafunctionCase)! } 
+\newcommand{\DefineMetafunction}{\lstinline[mathescape]!DefineMetafunction($name$: str, $domain$: Pattern, $codomain$: Pattern, \[$c_1, ..., c_n$\]: MetafunctionCase)! } 
 %\newcommand{\MetafunctionCase}{\lstinline[mathescape]!MetafunctionCase($p$: Pattern, $t$: Term)! } 
 
 %\newcommand{\ReductionCase}{\lstinline[mathescape]!ReductionCase($p$: Pattern, $t$: Term, $n$: string)! } 

@@ -17,12 +17,12 @@ Callgraph for the function matching the pattern \texttt{((n ...) ...)} can be se
 \item function for pattern \texttt{n}
 \end{enumerate}
 
-Figure \ref{ellipsis-example-fig-a} show the state of the \texttt{Match} object before beginning to match a term (red nodes) against a pattern (blue nodes). Outlined pattern nodes represent the current sub-pattern being matched; and since matching hasn't begun yet the entire pattern is outlined. The same applies to the term. Initially, the \texttt{Binding} instance assigned to the pattern-variable \texttt{n} in the \texttt{Match} instance has an empty stack.
+Figure \ref{ellipsis-example-fig-a} shows the state of the \texttt{Match} object before beginning to match a term (red nodes) against a pattern (blue nodes). Outlined pattern nodes represent the current sub-pattern being matched; and since matching hasn't begun yet the entire pattern is outlined. The same applies to the term. Initially, the \texttt{Binding} instance assigned to the pattern-variable \texttt{n} in the \texttt{Match} instance has an empty stack.
 
-Figure \ref{ellipsis-example-fig-b} shows the state of the \texttt{Match} object after entering generated function for \textit{outer} ellipsis and calling \texttt{increasedepth("n")} method. This pushes an empty \texttt{Sequence} onto the stack.
+Figure \ref{ellipsis-example-fig-b} shows the state of the \texttt{Match} object after entering the function for \textit{outer} ellipsis and calling the \texttt{increasedepth("n")} method. This pushes an empty \texttt{Sequence} onto the stack.
 
 
-Figure \ref{ellipsis-example-fig-c} shows the state of \texttt{Match} object after entering the generated function for \textit{inner} ellipsis and calling \texttt{increasedepth("n")} method. This pushes an empty \texttt{Sequence} onto the stack. The \texttt{Binding} for pattern-variable $n$ now contains two \texttt{Sequence} instances on the stack.
+Figure \ref{ellipsis-example-fig-c} shows the state of the \texttt{Match} object after entering the generated function for \textit{inner} ellipsis and calling the \texttt{increasedepth("n")} method. This pushes an empty \texttt{Sequence} onto the stack. The \texttt{Binding} for pattern-variable $n$ now contains two \texttt{Sequence} instances on the stack.
 
 Figure \ref{ellipsis-example-fig-d} shows the matching of term \texttt{Integer(1)}. \texttt{addtobinding} method is called with \texttt{"n"} and \texttt{Integer(1)} as arguments. Since the topmost term on the stack is \texttt{Sequence}, \texttt{Integer(1)} is appended to it.
 
@@ -38,17 +38,17 @@ Since the term sequence is empty, the function for the \texttt{number} pattern c
 
 Finally, there are no more terms to match in the outermost sequence and \texttt{decreasedepth("n")} has to be called, as shown in Figure \ref{ellipsis-example-fig-k}. Since the stack only contains a single term, no action is performed. The \texttt{Match} contains assignment \texttt{n = ((1 2 3)())}, as expected.
 
+One may notice that this example doesn't cover non-determinism when matching patterns under ellipsis. When matching term \texttt{(1 2 3)} against pattern \texttt{n ...} (as shown in Figures \ref{ellipsis-example-fig-d}, \ref{ellipsis-example-fig-e}, \ref{ellipsis-example-fig-f}), the matches shown in Figure \ref{ellipsis-example-matches-1} are returned. To obtain these matches, the \texttt{(n ...)} pattern has to be "entered" first, thus setting values of \texttt{head} and \texttt{tail} to zero and the length of \texttt{Sequence}, respectively. Then, pattern \texttt{n ...} is matched in the way explained above (i.e. \texttt{increasedepth}, match pattern \texttt{n}, \texttt{decreasedepth}), resulting in matches in Figure \ref{ellipsis-example-matches-1}.  Now, when exiting the function for the pattern \texttt{(n ...)}, the only acceptable match among the four is the one whose \texttt{head=tail}.
 
+After matching pattern \texttt{(n\ ...)}, the control flow (see callgraph in Figure \ref{ellipsis-example-callgraph}) returns to the function that matches pattern \texttt{(n\ ...)\ ...}, and the only returned match is added to the queue. The queue at this point contains a single match. This match is dequeued, and the function for pattern \texttt{(n\ ...)} is called with term \texttt{()}. \texttt{head} and \text{tail} are set to zero and the function for pattern \texttt{n\ ...} is called. \texttt{increasedepth} is called. Since term \texttt{()} contains no numbers, the only possible match returned by this function is shown in Figure \ref{ellipsis-example-matches-2}.
 
-One may notice that this example doesn't cover non-determinism when matching patterns under ellipsis. When matching term \texttt{(1 2 3)} against pattern \texttt{n ...} (as shown in Figures \ref{ellipsis-example-fig-d}, \ref{ellipsis-example-fig-e}, \ref{ellipsis-example-fig-f}), the matches shown in Figure \ref{ellipsis-example-matches-1} are returned. To obtain these matches, the \texttt{(n ...)} pattern has to be "entered" first, thus setting values of \texttt{head} and \texttt{tail} to zero and the length of \texttt{Sequence}, respectively.Then, pattern \texttt{n ...} is matched in the way explained above (i.e. \texttt{increasedepth}, match pattern \texttt{n}, \texttt{decreasedepth}), resulting in matches in Figure \ref{ellipsis-example-matches-1}.  Now, when exiting function for the pattern \texttt{(n ...)}, the only acceptable match among the four is the one whose \texttt{head=tail}.
-
-After matching pattern \texttt{(n ...)}, the control flow (see callgraph in Figure \ref{ellipsis-example-callgraph}) returns to the function that matches pattern \texttt{(n ...) ...}, and the only returned match is added to the queue. The queue at this point contains a single match. This match is dequeued, and the function for pattern \texttt{(n ...)} is called with term \texttt{()}. \texttt{head} and \text{tail} are set to zero and the function for pattern \texttt{n ...} is called. \texttt{increasedepth} is called. Since term \texttt{()} contains no numbers, the only possible match returned by this function is shown in Figure \ref{ellipsis-example-matches-2}.
-
-Finally, the \textit{outer} ellipsis produces matches shown in Figure \ref{ellipsis-example-matches-3} When returning from the function for pattern \texttt{((n ...) ...)}, two of the matches are discarded because \texttt{head != tail}.
+Finally, the \textit{outer} ellipsis produces matches shown in Figure \ref{ellipsis-example-matches-3}. When returning from the function for pattern \texttt{((n\ ...)\ ...)}, two of the matches are discarded because \texttt{head != tail}.
 
 
 \begin{figure}[!htb]
-\includegraphics[scale=0.152]{ellipsis-example-matches-1.png}
+\makebox[\textwidth][c] { 
+	\includegraphics[scale=0.152]{ellipsis-example-matches-1.png}
+}
 \caption{Matches returned after matching term \texttt{(1 2 3)} against pattern \texttt{n ...}}
 \label{ellipsis-example-matches-1}
 \end{figure}
@@ -56,79 +56,94 @@ Finally, the \textit{outer} ellipsis produces matches shown in Figure \ref{ellip
 \begin{figure}[H]
 \caption{Lifetime of \texttt{Match} object}
 %\begin{adjustwidth}{-1cm}{1cm}
-\fbox{
-	\begin{subfigure}{0.5\linewidth}
-		\raisebox{5mm}{
-			\includegraphics[scale=0.152]{ellipsis-example-fig-a.png}
-		}
-		\caption{Before matching the pattern.}
-		\label{ellipsis-example-fig-a}
-	\end{subfigure}
-	\begin{subfigure}{0.5\linewidth}
-		\includegraphics[scale=0.152]{ellipsis-example-fig-b.png}
-		\caption{Enter outer ellipsis and \texttt{increasedepth("n")}.}
-		\label{ellipsis-example-fig-b}
-	\end{subfigure}
+
+\makebox[\textwidth][c] { 
+	\fbox{
+		\begin{subfigure}{0.5\linewidth}
+			\raisebox{5mm}{
+				\includegraphics[scale=0.152]{ellipsis-example-fig-a.png}
+			}
+			\caption{Before matching the pattern.}
+			\label{ellipsis-example-fig-a}
+		\end{subfigure}
+		\begin{subfigure}{0.5\linewidth}
+			\includegraphics[scale=0.152]{ellipsis-example-fig-b.png}
+			\vspace*{+11mm}
+			\caption{Enter outer ellipsis and \texttt{increasedepth("n")}.}
+			\label{ellipsis-example-fig-b}
+		\end{subfigure}
+	}
 }
 
-\fbox{
-	\begin{subfigure}{0.5\linewidth}
-		\raisebox{19mm}{
-			\includegraphics[scale=0.152]{ellipsis-example-fig-c.png}
-		}
-		\caption{Enter inner ellipsis and \texttt{increasedepth("n")}.}
-		\label{ellipsis-example-fig-c}
-	\end{subfigure}
-	\begin{subfigure}{0.5\linewidth}
-		\includegraphics[scale=0.152]{ellipsis-example-fig-d.png}
-		\caption{\texttt{addtobinding("n", Integer(1))}}
-		\label{ellipsis-example-fig-d}
-	\end{subfigure}
+\makebox[\textwidth][c] { 
+	\fbox{
+		\begin{subfigure}{0.5\linewidth}
+			\raisebox{19mm}{
+				\includegraphics[scale=0.152]{ellipsis-example-fig-c.png}
+			}
+			\caption{Enter inner ellipsis and \texttt{increasedepth("n")}.}
+			\label{ellipsis-example-fig-c}
+		\end{subfigure}
+		\begin{subfigure}{0.5\linewidth}
+			\includegraphics[scale=0.152]{ellipsis-example-fig-d.png}
+			\caption{\texttt{addtobinding("n", Integer(1))}}
+			\label{ellipsis-example-fig-d}
+		\end{subfigure}
+	}
 }
 
 %\end{adjustwidth}
 \end{figure}
 
 \begin{figure}[H]\ContinuedFloat
-\fbox{
-	\begin{subfigure}{0.5\linewidth}
-		\includegraphics[scale=0.152]{ellipsis-example-fig-e.png}
-		\caption{\texttt{addtobinding("n", Float(2.01))}}
-		\label{ellipsis-example-fig-e}
-	\end{subfigure}
-	\begin{subfigure}{0.5\linewidth}
-		\includegraphics[scale=0.152]{ellipsis-example-fig-f.png}
-		\caption{\texttt{addtobinding("n", Integer(3))}}
-		\label{ellipsis-example-fig-f}
-	\end{subfigure}
+
+\makebox[\textwidth][c] { 
+	\fbox{
+		\begin{subfigure}{0.5\linewidth}
+			\includegraphics[scale=0.152]{ellipsis-example-fig-e.png}
+			\caption{\texttt{addtobinding("n", Float(2.01))}}
+			\label{ellipsis-example-fig-e}
+		\end{subfigure}
+		\begin{subfigure}{0.5\linewidth}
+			\includegraphics[scale=0.152]{ellipsis-example-fig-f.png}
+			\caption{\texttt{addtobinding("n", Integer(3))}}
+			\label{ellipsis-example-fig-f}
+		\end{subfigure}
+	}
 }
-\fbox{
-\begin{subfigure}{0.5\linewidth}
-	\includegraphics[scale=0.152]{ellipsis-example-fig-g.png}
-	\caption{\texttt{decreasedepth("n")} and leave inner ellipsis.}
-	\label{ellipsis-example-fig-g}
-\end{subfigure}
-\begin{subfigure}{0.5\linewidth}
-	\includegraphics[scale=0.152]{ellipsis-example-fig-h.png}
-	\caption{Start processing the next term in the sequence.}
-	\label{ellipsis-example-fig-h}
-\end{subfigure}
+
+\makebox[\textwidth][c] { 
+	\fbox{
+	\begin{subfigure}{0.5\linewidth}
+		\includegraphics[scale=0.152]{ellipsis-example-fig-g.png}
+		\caption{\texttt{decreasedepth("n")} and leave inner ellipsis.}
+		\label{ellipsis-example-fig-g}
+	\end{subfigure}
+	\begin{subfigure}{0.5\linewidth}
+		\includegraphics[scale=0.152]{ellipsis-example-fig-h.png}
+		\caption{Start processing the next term in the sequence.}
+		\label{ellipsis-example-fig-h}
+	\end{subfigure}
+	}
 }
 \end{figure}
 \begin{figure}[H]\ContinuedFloat
-\fbox{
-	\begin{subfigure}{0.5\linewidth}
-		\includegraphics[scale=0.152]{ellipsis-example-fig-i.png}
-		\caption{\texttt{increasedepth("n")} after entering inner ellipsis.}
-		\label{ellipsis-example-fig-i}
-	\end{subfigure}
-	\begin{subfigure}{0.5\linewidth}
-		\includegraphics[scale=0.152]{ellipsis-example-fig-j.png}
-		\caption{\texttt{decreasedepth("n")} and leave inner ellipsis.}
-		\label{ellipsis-example-fig-j}
-	\end{subfigure}
-}
 
+\makebox[\textwidth][c] { 
+	\fbox{
+		\begin{subfigure}{0.5\linewidth}
+			\includegraphics[scale=0.152]{ellipsis-example-fig-i.png}
+			\caption{\texttt{increasedepth("n")} after entering inner ellipsis.}
+			\label{ellipsis-example-fig-i}
+		\end{subfigure}
+		\begin{subfigure}{0.5\linewidth}
+			\includegraphics[scale=0.152]{ellipsis-example-fig-j.png}
+			\caption{\texttt{decreasedepth("n")} and leave inner ellipsis.}
+			\label{ellipsis-example-fig-j}
+		\end{subfigure}
+	}
+}
+\centering
 \fbox{
 	\begin{subfigure}{0.5\linewidth}
 		\includegraphics[scale=0.152]{ellipsis-example-fig-k.png}
@@ -140,13 +155,18 @@ Finally, the \textit{outer} ellipsis produces matches shown in Figure \ref{ellip
 \end{figure}
 
 \begin{figure}[H]
-\includegraphics[scale=0.152]{ellipsis-example-matches-2.png}
+\centering
+\makebox[\textwidth][c] { 
+	\includegraphics[scale=0.152]{ellipsis-example-matches-2.png}
+}
 \caption{Matches returned after matching term \texttt{()} against pattern \texttt{n ...}}
 \label{ellipsis-example-matches-2}
 \end{figure}
 
 \begin{figure}[H]
-\includegraphics[scale=0.152]{ellipsis-example-matches-3.png}
+\makebox[\textwidth][c] { 
+	\includegraphics[scale=0.152]{ellipsis-example-matches-3.png}
+}
 \caption{Matches returned after matching term \texttt{((1 2 3)())} against pattern \texttt{(n ...) ...} }
 \label{ellipsis-example-matches-3}
 \end{figure}
