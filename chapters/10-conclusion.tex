@@ -7,7 +7,7 @@ The ellipsis (\RepeatNoArg) matching algorithm that was described in Section \re
 \subsection{\texttt{in-hole} Hole Count}
 Recall that pattern $p_1$ in \PatternInHole \space may only contain a single hole. In fact, PyPltRedex provides two analysis passes to solve this problem: \texttt{HoleReachabilitySolver} and \texttt{InHoleChecker}. \texttt{HoleReachabilitySolver}, given some \DefineLanguageNoArg, computes the minimum/maximum number of holes for all non-terminals of the language. \texttt{InHoleChecker} locates \PatternInHoleNoArg patterns, and computes the minimum and maximum number of holes for $p_1$ and raises an Exception accordingly. While the implementation seems to work fine for most cases, for certain kind of languages it produces very strange results and hence the description of algorithms used was omitted.
 
-\subsection{\texttt{localehole} function}
+\subsection{\texttt{localehole} Function}
 While matching \texttt{in-hole} pattern, a path to \texttt{hole} is maintained. It should be possible to store a path of pointers to the \texttt{hole} in the \texttt{Match} instance instead of traversing the term every time looking for a \texttt{hole}, like \texttt{localehole} does.
 
 Such implementation stemmed from confusion of how PLTRedex handles \texttt{hole} - while reduction-relations may only match a single hole, terms still may contain additional multiple \texttt{hole}. PyPltRedex disallows this at runtime (i.e. the \texttt{hole} variable is reserved), making it possible to optimize this further.
@@ -18,13 +18,13 @@ One of the more important performance-related features that was left out due to 
 When applying reduction-relations, these annotations would have to be discarded (1) before replacing some term with \texttt{hole} and (2) while replacing \texttt{hole} with some term for every term on the path from the root.
 
 
-\subsection{\texttt{define-metafunction} and \texttt{define-reduction-relation} pattern merging.}
+\subsection{\texttt{define-metafunction} and \texttt{define-reduction-relation} Pattern Merging}
 
 Algorithms for application of reduction-relation and metafunctions match each pattern separately. However, it may be the case that patterns in reduction-cases are similar and bind terms to the same pattern-variables in the same positions within the pattern. In such cases, it would be possible to merge such patterns together producing a single \texttt{Match} instance up to the point where patterns are no longer similar; and then creating deep copies of the \texttt{Match} instances for separate branches of the pattern.
 
 This merging of patterns would allow for handling of \PatternInHoleNoArg \space patterns in a much better way. Instead of traversing the term and finding a single redex at a time, multiple redexes would be located instead and appropriate pattern-variable assignments would be made in appropriate \texttt{Match} instances.
 
-\subsection{\texttt{where} and \texttt{side-condition} clauses}
+\subsection{\texttt{where} and \texttt{side-condition} Clauses}
 While describing code-generation for the \texttt{define-metafunction} form, it was mentioned that PyPltRedex doesn't support \texttt{where} and \texttt{side-condition} clauses. Implementing an actual language without these clauses becomes more tricky and dropping an assumption that user-defined Python functions must return a \texttt{Term} doesn't result in clean solution.
 
 \subsection{Evaluation}
