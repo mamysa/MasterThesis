@@ -1,4 +1,4 @@
-\section{Term Template: Ellipsis Depth Checking}
+\section{Term-Template: Ellipsis Depth Checking}
 
 \subsection{Motivation}
 
@@ -15,7 +15,7 @@ These goals are achieved by introducing the following term-template annotations.
 \texttt{ForEach(parameter\_name)} annotation is added to \TermRepeat \\ term-templates. Assuming the term assigned to \texttt{parameter\_name} is a list, each term of that list is plugged into term-template $t_r$.
 \end{itemize}
 
-\subsection{Term-Template Traversal}
+\subsection{Algorithm}
 
 To perform annotation, a \textbf{path} of term-templates must be maintained to be able to count all occurrences of ellipsis on the path to the root term-template. The path is represented using a stack. When the term-template $t$ is visited, it is added to the top of the stack, child term-templates of $t$ are visited recursively and $t$ is popped from the stack. Now, \Visit{$t$}.
 \begin{itemize}

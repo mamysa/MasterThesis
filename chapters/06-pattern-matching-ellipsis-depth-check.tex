@@ -1,4 +1,4 @@
-\section{Ellipsis Depth Checking}
+\section{Pattern: Ellipsis Depth Checking}
 
 \subsection{Motivation}
 
@@ -6,7 +6,7 @@ Pattern-variables with the same symbol should be under a consistent number of el
 
 In addition, after pattern matching, the pattern-variables are plugged into term-templates and the ellipsis depth of each pattern-variable is needed to ensure that a given term-template is well-formed.
 
-\subsection{Pattern Traversal}
+\subsection{Algorithm}
 
 During pattern traversal, the following need to be maintained:
 

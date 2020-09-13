@@ -4,11 +4,11 @@ Given \RedexMatchAssertEqual, code generation proceeds in the following manner.
 \begin{enumerate}
 \item First, generate a list of expected matches \texttt{expectedmatches}. For each $m_i =$ \Match,
 \begin{enumerate}
-\item Generate the function $f_{t_i}$ for $t_i$ and let resulting the term be $tt_i = f_{t_i}(Match())$
+\item Generate the function $f_{t_i}$ for $t_i$ and let resulting the term be $tt_i = f_{t_i}(\texttt{Match()})$
 \item Create an empty \texttt{Match} instance \texttt{match}, call \texttt{match.AddBinding}$(s_i)$ and \newline \texttt{match.AddToBinding}$(tt_i)$ methods, and then append \texttt{match} to \texttt{matches}.
 \end{enumerate}
 \item Generate the top-level matching function $f_p^{top}$ for pattern $p$ and the term-generating function $f_t$ for term-template $t$.
-\item Let \texttt{actualmatches} = $f_p(f_t(Match()))$ and then call \texttt{assert\_compare\_match\_lists} with \texttt{expectedmatches} and \texttt{actualmatches}.
+\item Let \texttt{actualmatches} = $f_p(f_t(\texttt{Match()}))$ and then call \texttt{assert\_compare\_match\_lists} with \texttt{expectedmatches} and \texttt{actualmatches}.
 \end{enumerate}
 
 \begin{figure}[h]

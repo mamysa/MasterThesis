@@ -1,4 +1,4 @@
-\section{Constraint Check Insertion}
+\section{Pattern: Constraint Check Insertion}
 \label{section:constraint-check}
 \subsection{Motivation}
 As mentioned before, Redex supports a few different forms of constraint checking; however, for the initial PyRedex implementation only the "equality of terms" constraint check is supported. For example, in the pattern \texttt{(number\_1 number\_1)} both terms bound to \texttt{number\_1} must be the same, meaning the term \texttt{(1 1)} does match the pattern but \texttt{(1 2)} does not.
@@ -16,7 +16,7 @@ Finally, actual equality checks have to be inserted. There are two obvious strat
 \subsection{Pattern-Variable Renaming}
 Pattern variable $pv$ is renamed in the following manner: $\mathit{pv + \# + freshint()}$, $\mathit{freshint()}$ if $\mathit{freshint() > 0}$ otherwise $pv$. $\mathit{freshint}$ operation was defined previously in Section \ref{section:id-rewrite}. For example, assuming $\mathit{freshint()=0}$, renaming \texttt{m} results in \texttt{m}. Successive application of the renaming operation results in \texttt{$m\#1$}.
 
-\subsection{Pattern Transformation}
+\subsection{Algorithm}
 Since the algorithm is based in renaming (or modification) of pattern-variables, let $v^{\prime}$ be a new pattern-variable after modifying $v$. The pairs $(pv, pv^{\prime})$ need to be maintained in order to decide where to insert equality checks. Let $M$ be a set containing such pairs. Furthermore, to remove renamed pattern-variables after matching, the set $R$ containing such pattern-variables has to be maintained.
 
 Given some pattern $p$, \Visit{$p$}. The following kinds of $p$ are of interest.

@@ -2,7 +2,7 @@
 
 Since metafunction applications have the following shape - \texttt{(metafunction-name\ term-template\ ...)} these can be detected quite trivially given a list of defined metafunctions. 
 
-\subsection{Rewriting Algorithm}
+\subsection{Algorithm}
 Let $Mf$ be the set of metafunction names. Let $t$ be some term-template, \Visit{$t$}. 
 \begin{itemize}
 \item $t=$\space \TermSequence. Check if $t_1$ is \TermLiteral\space with $kind=$\space Variable and $v \in Mf$. Return \\ \ApplyMetafunction[$v$][$t$][false] if that is the case, handling annotations as described below; otherwise return $t$. 

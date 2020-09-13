@@ -292,7 +292,7 @@ if len(|$matches_i$|) == 0: return []
 \label{codegen-pattern-seq-3}
 \end{figure}
 
-\item Any other pattern kind $p_i$, given a list of matches $matches_{i-1}$, call $f_{p_i}$ for each \texttt{(m, h, t)} in $match_{i-1}$ with term at position \texttt{h} and accumulate resulting matches into new list $match_{i}$. If $match_{i}$ is empty, matching \texttt{TermSequence} has failed and empty list is returned. Figure \ref{codegen-pattern-seq-3} demonstrates this.
+\item Any other pattern kind $p_i$, given a list of matches $matches_{i-1}$, call $f_{p_i}$ for each \texttt{(m, h, t)} in $match_{i-1}$ with term at position \texttt{h} and accumulate resulting matches into new list $match_{i}$. If $match_{i}$ is empty, matching \texttt{TermSequence} has failed and empty list is returned. Figure \ref{codegen-pattern-seq-4} demonstrates this.
 
 \begin{figure}[htb]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{pythoncomplexer.py:PythonCompLexer -x}
@@ -305,7 +305,7 @@ if len(|$matches_i$|) == 0: return []
 {% endif %}
 \end{minted}
 \caption{Handling any another pattern in \PatternSequenceNoArg \space while matching \texttt{Sequence}.}
-\label{codegen-pattern-seq-3}
+\label{codegen-pattern-seq-4}
 \end{figure}
 \end{itemize}
 
