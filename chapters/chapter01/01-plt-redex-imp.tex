@@ -83,7 +83,7 @@ To be able to sequence single-step evaluation steps, a reflexive transitive clos
 \label{02-evaluation-context}
 As it can be seen above, inference rules above are quite verbose. PLTRedex uses \texttt{evaluation contexts}, originally introduced in ~\cite{felleisen1992revised}. Evaluation contexts are usually specified using a context free grammar, as seen in Figure \ref{infer-evaluation}.
 
-An evaluation context $E[\bullet]$ is an expression containing a single occurence of special symbol $\bullet$ called "hole". Given some term $t$ (abstract syntax tree of a program being evaluated), the goal is to decompose the term into some context $E$ and some expression $r$ that can be rewritten in some way; in other words, $t=E[r]$. Once such $r$ is found, expression $r$ is replaced with the hole: $E[\bullet]$. Then, the expression $r$ is reduced using some local reduction rule in one step obtaining expression $r^\prime$. Finally, $\bullet$ in $E[\bullet]$ gets replaced with $r^\prime$; $E[r^\prime]$ is the resulting expression. This way, only a single global general inference rule is required, as seen in Figure \ref{infer-evaluation}. 
+An evaluation context $E[\bullet]$ is an expression containing a single occurrence of special symbol $\bullet$ called "hole". Given some term $t$ (abstract syntax tree of a program being evaluated), the goal is to decompose the term into some context $E$ and some expression $r$ that can be rewritten in some way; in other words, $t=E[r]$. Once such $r$ is found, expression $r$ is replaced with the hole: $E[\bullet]$. Then, the expression $r$ is reduced using some local reduction rule in one step obtaining expression $r^\prime$. Finally, $\bullet$ in $E[\bullet]$ gets replaced with $r^\prime$; $E[r^\prime]$ is the resulting expression. This way, only a single global general inference rule is required, as seen in Figure \ref{infer-evaluation}. 
 
 \begin{figure}[htbp]
 \input{chapters/chapter02/02-evalcontext.tex}
@@ -135,16 +135,16 @@ First, the grammar of the language needs to be defined. PLTRedex provides \textt
 
 \texttt{Loc} non-terminal represents locations and is modelled as a list containing zero or more variable-integer pairs.
 
-\texttt{Program} non-terminal models $\langle c, \sigma \rangle$; that is, locations and potenially empty list of commands.
+\texttt{Program} non-terminal models $\langle c, \sigma \rangle$; that is, locations and potentially empty list of commands.
 
 Non-terminals \texttt{P} and \texttt{E} specify evaluation contexts $E$, as described in Section \ref{02-evaluation-context}. \texttt{hole} represents hole $\bullet$.
 
 
 Now, operations $\sigma(X)$ and $\sigma[X \mapsto n]$ that retrieve from and store integers in provided locations need to be implemented. PLTRedex provides \textit{metafunctions}; that is, functions that act on terms and produce terms by rewriting them in some way. Definitions of two metafunctions can be seen in Figure \ref{imp-define-mf}. Metafunctions essentially consist of pattern-term clauses. A provided term is matched against the pattern. Upon successful matching appropriate terms get assigned to pattern-variables such as \texttt{var\_1} or \texttt{int\_2}, and they get plugged into the term. If matching is unsuccessful, the next clause is matched. An error is raised if none of the clauses match the provided term. All non-terminals in patterns are resolved with respect to the language - \texttt{Imp}.
 
-Finally, all terms provided as arguments and all terms that are produced by metafunctions must satisfy the contract. In case of the first metafunction, the contract is \texttt{var-lookup : Loc var -> int}. \texttt{var-lookup} is the name of the function. Following the colon, provided argument terms must match patterns \texttt{Loc} and \texttt{var}, otherwise it is an error. Similarly, all resulting terms produced by the \texttt{var-lookup} metafunction must match the pattern \texttt{int} which is preceeded by the symbol \texttt{->}.
+Finally, all terms provided as arguments and all terms that are produced by metafunctions must satisfy the contract. In case of the first metafunction, the contract is \texttt{var-lookup : Loc var -> int}. \texttt{var-lookup} is the name of the function. Following the colon, provided argument terms must match patterns \texttt{Loc} and \texttt{var}, otherwise it is an error. Similarly, all resulting terms produced by the \texttt{var-lookup} metafunction must match the pattern \texttt{int} which is preceded by the symbol \texttt{->}.
 
-Careful readers might notice that the pattern of the first clause in \texttt{var-lookup} has two occurrences of the pattern-variable \texttt{var}. This means that both terms bound to both occurences after pattern-matching must be exactly the same.
+Careful readers might notice that the pattern of the first clause in \texttt{var-lookup} has two occurrences of the pattern-variable \texttt{var}. This means that both terms bound to both occurrences after pattern-matching must be exactly the same.
 
 \begin{figure}[htb]
 \begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{racket}
@@ -164,11 +164,11 @@ Careful readers might notice that the pattern of the first clause in \texttt{var
 \label{imp-define-mf}
 \end{figure}
 
-Finally, evaluation relation needs to be specified. PLTRedex utilizes evaluation contexts as described in Section \ref{02-evaluation-context}. Reduction relation can be seen in Figure \ref{imp-define-red} and is defined using the \texttt{reduction-relation} form. Similarly to metafunctions, it contains a series of reduction cases, each consting of a pattern and a term. It may be the case that multiple reduction cases may apply to the provided term, indicating non-deterministic behavior of a language.
+Finally, evaluation relation needs to be specified. PLTRedex utilizes evaluation contexts as described in Section \ref{02-evaluation-context}. Reduction relation can be seen in Figure \ref{imp-define-red} and is defined using the \texttt{reduction-relation} form. Similarly to metafunctions, it contains a series of reduction cases, each consisting of a pattern and a term. It may be the case that multiple reduction cases may apply to the provided term, indicating non-deterministic behavior of a language.
 
-The \texttt{(in-hole pattern1 pattern2)} pattern and \texttt{(in-hole term1 term2)} term implements evaluation contexts as described in Section \ref{02-evaluation-context}. The term is recursively traversed to find the redex matching \texttt{pattern2}. Once it has been found, it is replaced with \texttt{hole} and the term is matched against \texttt{pattern1} to ensure that it is indeed a valid evaluation context. After matching of redex and context, redex is rewritten according to local inference rules. They can be implented through metafunctions or by calling Racket functions, like it is done for addition and multiplication operations. Finally, after reducing the term \texttt{term2}, it is plugged back into the context \texttt{term1}, thus replacing the \texttt{hole}.
+The \texttt{(in-hole pattern1 pattern2)} pattern and \texttt{(in-hole term1 term2)} term implements evaluation contexts as described in Section \ref{02-evaluation-context}. The term is recursively traversed to find the redex matching \texttt{pattern2}. Once it has been found, it is replaced with \texttt{hole} and the term is matched against \texttt{pattern1} to ensure that it is indeed a valid evaluation context. After matching of redex and context, redex is rewritten according to local inference rules. They can be implemented through metafunctions or by calling Racket functions, like it is done for addition and multiplication operations. Finally, after reducing the term \texttt{term2}, it is plugged back into the context \texttt{term1}, thus replacing the \texttt{hole}.
 
-All terms that are arguments to the \texttt{reduction-relation} and all resuling terms after applying \texttt{reduction-relation} must match the pattern \texttt{Program}.
+All terms that are arguments to the \texttt{reduction-relation} and all resulting terms after applying \texttt{reduction-relation} must match the pattern \texttt{Program}.
 
 
 \begin{figure}[H]

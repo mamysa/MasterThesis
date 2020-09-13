@@ -151,7 +151,7 @@ Generated code does the following:
 
 \subsection{Matching Functions: Repeat}
 \label{section:pattern-repeat}
-Recall that patterns under ellipsis match lists of terms and can only be contained in pattern sequences and thus the \texttt{term} argument is always to be expected to be \newline \PatternSequence. Given $p=$ \PatternRepeat \space pattern, non-deterministic matching repetition of terms is handled in the following way. Let $pv_1^{(p)}, ..., pv_n^{(p)}$ be a set of pattern-variables assigned in $p_r$. These are read from the \newline \texttt{PatternVariables} annotation.  Let $f_p$ be the matching function for $p$ with usual parameters. Generate the matching function for $p_r$, $f_{p_r}$.
+Recall that patterns under ellipsis match lists of terms and can only be contained in pattern sequences and thus the \texttt{term} argument is always to be expected to be \newline \PatternSequence. Given $p=$ \PatternRepeat \space pattern, non-deterministic matching repetition of terms is handled in the following way. Let $pv_1^{(p)}, ..., pv_n^{(p)}$ be a set of pattern-variables assigned in $p_r$. These are read from the \newline \texttt{PatternVariables} annotation.  Let $f_p$ be the matching function for $p$ with usual parameters. Generate the matching function for $p_r$, $f_{p_r}$. Figure \ref{codegen-pattern-ellipsis-1} demonstrates this.
 
 \begin{enumerate}
 \item
