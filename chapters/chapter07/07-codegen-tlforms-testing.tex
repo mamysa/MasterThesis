@@ -12,7 +12,7 @@ Given \RedexMatchAssertEqual, code generation proceeds in the following manner.
 \end{enumerate}
 
 \begin{figure}[h]
-\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{pythoncomplexer.py:PythonCompLexer -x}
 {% def codegenRedexMatchAssertEqual(|$rm$|): %}
 	{% |$f_{rm}$| = symgen("redexmatchassertequal") %}
 		{% |$f_p^{top}$| = codegenTopLevelPattern(|$rm$|[|$p$|]) %}
@@ -52,7 +52,7 @@ Given $tl=$ \TermLetAssertEqual, code generation proceeds in the following manne
 \end{enumerate}
 
 \begin{figure}[htb]
-\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{pythoncomplexer.py:PythonCompLexer -x}
 {% def codegenTermLetAssertEqual(|$tl$|): %}
 	{% |$f_{tl}$| = symgen("termletassertequal") %}
 	{% |$f_t$| = codegenTermTemplate(|$tl$|[|$t$|]) %}
@@ -68,7 +68,7 @@ def |$f_{tl}$|():
 	expected = |$f_e$|(Match())
 	actual = |$f_t$|(match)
 	asserttermsequal(expected, actual)
-{% return |$f_{tl}$|  %}
+{% return |$f_{tl}$| %}
 {% enddef %}
 \end{minted}
 \caption{Code generation for \TermLetAssertEqualNoArgs \space form.}
@@ -91,7 +91,7 @@ Given \ApplyReductionRelationAssertEqual:
 \end{enumerate}
 
 \begin{figure}[htb]
-\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{pythoncomplexer.py:PythonCompLexer -x}
 {% def codegenApplyReductionRelationAssertEqual(|$tl$|): %}
 	{% |$f_{tl}$| = symgen("applyreductionrelationassertequal") %}
 	{% |$f_{red}$| = get_reduction_relation(|$tl$|[|$r$|]) %}

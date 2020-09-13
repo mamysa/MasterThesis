@@ -9,16 +9,16 @@ Given \DefineLanguage, the only thing left to do here is to generate an \texttt{
 Figure \ref{codegen-ntdef} demonstrates this.
 
 \begin{figure}
-\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{pythoncomplexer.py:PythonCompLexer -x}
 {% def codegenNtDefinition(|$nt_i$|): %}
 	{% |$f_{nt_i}$| =  symgen("isa_nt") %}
 def |$f_{nt_i}$|(term):
 	{% for |$p_i$| in |$nt_i$|[|$p_1, ..., p_n$|]: %}
-		{% |$f_{p_i}^{top}$| = codegenTopLevel(|$p_i$|)
+		{% |$f_{p_i}^{top}$| = codegenTopLevel(|$p_i$|) %}
 	matches = |$f_{p_i}^{top}$|(term)
 	if len(matches) > 0:
 		return True
-	{% endfor %]
+	{% endfor %}
 	return False
 	{% return |$f_{nt_i}$| %}
 {% enddef %}
@@ -46,10 +46,11 @@ Given $mf=$ \DefineMetafunction, generate a function $f_{mf}$ that accepts a sin
 
 Code generated for \DefineMetafunctionNoArgs \space can be seen in Figure \ref{codegen-define-metafunc}.
 \begin{figure}
-\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{pythoncomplexer.py:PythonCompLexer -x}
 {% def codegenDefineMetafunction(|$domain$, $codomain$, $c_1, ..., c_n$|): %}
 	{% |$f_{mf}$| =  symgen("metafunction") %}
-	{% |$f_d^{top}$, $f_c^{top}$| = codegenTopLevel(|$domain$|), codegenTopLevel(|$codomain$|) %}
+	{% |$f_d^{top}$| = codegenTopLevel(|$domain$|) %}
+	{% |$f_c^{top}$| = codegenTopLevel(|$codomain$|) %}
 def |$f_{mf}$|(term):
 	if len(|$f_d^{top}$|) == 0:
 		raise Exception("domain check failed")
@@ -104,7 +105,7 @@ Given $red=$ \TlDefineReductionRelation, generate the function $f_{red}$ accepti
 Code generated for \DefineReductionRelationNoArgs \space can be seen in Figure \ref{codegen-define-red}.
 
 \begin{figure}
-\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{python}
+\begin{minted}[tabsize=2,obeytabs,escapeinside=||,mathescape=true,fontsize=\normalsize]{pythoncomplexer.py:PythonCompLexer -x}
 {% def codegenDefineReductionRelation(|$red$|): %}
 	{% |$f_{red}$| =  symgen("reductionrelation") %}
 	{% |$f_d^{top}$| = codegenTopLevel(|$domain(r)$|) %}
