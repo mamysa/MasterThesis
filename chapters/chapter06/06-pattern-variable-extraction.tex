@@ -12,8 +12,8 @@ The algorithm recursively traverses the pattern and at each step returns a set o
 \item $p=$\space \BuiltInPattern. Return $V=\{ pv \}$.
 \item $p=$\space \LiteralPattern. Return $V=\emptyset$.
 \item $p=$\space \PatternSequence. Return $V=\bigcup_{i=1}^{n}$\Visit{$p_i$}.
-\item $p=$\space \PatternRepeat. Let $V_r=$\Visit{$p_r$}. Need to annotate $p$ with $V_r$: \MakeAnnotation{$p$}{"PatternVariables"}{$V_r$}.
-\item $p=$\space \PatternInHole. Let $V_1=$\Visit{$p_1$} and  $V_2=$\Visit{$p_2$}. Annotate $p_1$ and $p_2$ with corresponding pattern-variable sets: \MakeAnnotation{$p_1$}{"PatternVariables"}{$V_1$} and \\ \MakeAnnotation{$p_2$}{"PatternVariables"}{$V_2$}. Return $V = V_1 \cup V_2$.
+\item $p=$\space \PatternRepeat. Let $V_r=$\space\Visit{$p_r$}. Need to annotate $p$ with $V_r$: \MakeAnnotation{$p$}{"PatternVariables"}{$V_r$}.
+\item $p=$\space \PatternInHole. Let $V_1=$\space\Visit{$p_1$} and  $V_2=$\space\Visit{$p_2$}. Annotate $p_1$ and $p_2$ with corresponding pattern-variable sets: \MakeAnnotation{$p_1$}{"PatternVariables"}{$V_1$} and \\ \MakeAnnotation{$p_2$}{"PatternVariables"}{$V_2$}. Return $V = V_1 \cup V_2$.
 \end{itemize}
 
 Finally, \MakeAnnotation{$p$}{"PatternVariables"}{$V$}.

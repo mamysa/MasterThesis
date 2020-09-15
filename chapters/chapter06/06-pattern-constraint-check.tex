@@ -24,7 +24,7 @@ Given some pattern $p$, \Visit{$p$}. The following kinds of $p$ are of interest.
 \item $p=$\space \BuiltInPattern. Let $pv^{\prime}$ be a renamed variable and let $M=\{(pv, pv^{\prime})\}$. If $pv \neq pv^{\prime}$, $R=R \cup \{pv^{\prime}\}$. Return \BuiltInPattern[$tag$][$pv^{\prime}$][false] and $M$.
 \item $p=$\space \NonTerminal. Let $pv^{\prime}$ be a renamed variable and let $M=\{(pv, pv^{\prime})\}$. If $pv \neq pv^{\prime}$, $R=R \cup \{pv^{\prime}\}$. Return \NonTerminal[$nt$][$pv^{\prime}$][false] and $M$.
 \item $p=$\space \LiteralPattern \space contains no pattern-variables and thus $p$ and $\emptyset$ are returned.
-\item $p=$\space \PatternRepeat. Let $p_r^{\prime}, M =$\Visit{$p_r$}. Return \PatternRepeat[$p_r^{\prime}$], $M$.
+\item $p=$\space \PatternRepeat. Let $p_r^{\prime}, M=$\space\Visit{$p_r$}. Return \PatternRepeat[$p_r^{\prime}$], $M$.
 \item
 $p=$\space \PatternSequence. If the sequence contains no child patterns, return $p$, $\emptyset$. Define \texttt{merge} operation that, given two sets $M_i, M_j$ returns two sets $M_k$ and $M_r$; this operation will be discussed below.
 Let $p^{\prime}$ be the pattern sequence that replaces $p$.
