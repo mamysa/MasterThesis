@@ -1,6 +1,6 @@
 \section{Term-Template: Rewriting Metafunction Applications}
 
-Since metafunction applications have the following shape - \texttt{(metafunction-name\ term-template\ ...)} these can be detected quite trivially given a list of defined metafunctions. 
+Since metafunction applications have the following shape:\newline \texttt{(metafunction-name\ term-template\ ...)} these can be detected quite trivially given a list of defined metafunctions. 
 
 \subsection{Algorithm}
 Let $Mf$ be the set of metafunction names. Let $t$ be some term-template, \Visit{$t$}. 
@@ -18,7 +18,7 @@ $t$ may contain \texttt{InArg} and \texttt{MatchRead} annotations and they are m
 \subsection{Example}
 The example shown in Figure \ref{transformation-term-mfapply} displays the transformation described above given a set of meta-function names only containing a single \texttt{set-contains?}. Since the first element of \texttt{TermSequence} is a \texttt{Variable} term-template with suitable name, an additional \texttt{MetafunctionApplication} term is added.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
 \includegraphics[scale=0.20]{transformation-term-mfapply.png}
 \caption{Term-template before and after applying metafunctions.}
 \label{transformation-term-mfapply}

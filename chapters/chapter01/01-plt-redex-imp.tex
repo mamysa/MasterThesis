@@ -23,7 +23,7 @@ c &= \textbf{skip} \text{ | } x = a \text{ | } c1; c2 \text{ | } \textbf{if } b 
 
 
 \section{Structural Operational Semantics}
-To be able to prove properties of programs, languages need to be described formally. Operational semantics describe the behavior of programming languages in terms of the execution of programs on abstract machines. Structural operational semantics that was first introduced in ~\cite{plotkin}, represents computation using deductive systems meaning execution of programs on abstract machines turns into system of logical inferences. To define a language, inference rules are used such as ones seen in Figures \ref{infer-arith}, \ref{infer-bool}, \ref{infer-comm}.
+To be able to prove properties of programs, languages need to be described formally. Operational semantics describe the behavior of programming languages in the terms of the execution of programs on abstract machines. Structural operational semantics that were first introduced in ~\cite{plotkin}, represents computation using deductive systems meaning the execution of programs on abstract machines turns into a system of logical inferences. To define a language, inference rules are used such as ones seen in Figures \ref{infer-arith}, \ref{infer-bool}, \ref{infer-comm}.
 
 \begin{figure}[htb]
 \input{chapters/chapter02/02-imp-smallstep-arith.tex}
@@ -36,7 +36,7 @@ To be able to prove properties of programs, languages need to be described forma
 \label{infer-bool}
 \end{figure}
 
-For arithmetic expressions in Imp, define evaluation relation $\langle a, \sigma \rangle \rightarrow \langle a^\prime, \sigma  \rangle$; meaning evaluation of $a$ under state $\sigma$ in single step yields $a^\prime$. Figure \ref{infer-arith} shows seven distinct inference rules, with rules $[\text{Aexp-}\oplus]$, etc created for each operator in $\{+, \times \}$, and all operators having usual semantics w.r.t. $\mathbb{Z}$. These rules are specified in a way that ensures that all arithmetic expressions will be evaluated from left to right.
+For arithmetic expressions in Imp, define evaluation relation $\langle a, \sigma \rangle \rightarrow \langle a^\prime, \sigma  \rangle$; meaning the evaluation of $a$ under state $\sigma$ in single step yields $a^\prime$. Figure \ref{infer-arith} shows seven distinct inference rules, with rules $[\text{Aexp-}\oplus]$, etc created for each operator in $\{+, \times \}$, and all operators having usual semantics w.r.t. $\mathbb{Z}$. These rules are specified in a way that ensures that all arithmetic expressions will be evaluated from left to right.
 
 
 Similarly, for boolean expressions single-step evaluation relation $\langle b, \sigma \rangle \rightarrow \langle b^\prime, \sigma  \rangle$ is defined and related inference rules can be seen in Figure \ref{infer-bool}. Rules [$\text{BExp-}\oslash]$, etc, created for each operators $\land$ and $\lor$, as above.
@@ -81,7 +81,7 @@ To be able to sequence single-step evaluation steps, a reflexive transitive clos
 
 \section{Evaluation Contexts}
 \label{02-evaluation-context}
-As it can be seen above, inference rules above are quite verbose. PLTRedex uses \texttt{evaluation contexts}, originally introduced in ~\cite{felleisen1992revised}. Evaluation contexts are usually specified using a context free grammar, as seen in Figure \ref{infer-evaluation}.
+As seen above, inference rules are quite verbose. PLTRedex uses \texttt{evaluation contexts}, originally introduced in ~\cite{felleisen1992revised}. Evaluation contexts are usually specified using a context free grammar, like in Figure \ref{infer-evaluation}.
 
 An evaluation context $E[\bullet]$ is an expression containing a single occurrence of special symbol $\bullet$ called "hole". Given some term $t$ (abstract syntax tree of a program being evaluated), the goal is to decompose the term into some context $E$ and some expression $r$ that can be rewritten in some way; in other words, $t=E[r]$. Once such $r$ is found, expression $r$ is replaced with the hole: $E[\bullet]$. Then, the expression $r$ is reduced using some local reduction rule in one step obtaining expression $r^\prime$. Finally, $\bullet$ in $E[\bullet]$ gets replaced with $r^\prime$; $E[r^\prime]$ is the resulting expression. This way, only a single global general inference rule is required, as seen in Figure \ref{infer-evaluation}. 
 
@@ -92,7 +92,7 @@ An evaluation context $E[\bullet]$ is an expression containing a single occurren
 \end{figure}
 
 \section{PLTRedex: Term Rewriting}
-PLTRedex provides a domain-specific language for specification of (1) a syntax of a language and (2) a series of term-rewriting rules based on contextual operational semantics described in Section \ref{02-evaluation-context}. By applying generalized small-step inference rule seen in Figure \ref{infer-evaluation} where applicable, and by transitivity (Figure \ref{transitive-closure}), a series of rewritten terms is obtained.
+PLTRedex provides a domain-specific language for specification of (1) a syntax of a language and (2) a series of term-rewriting rules based on the contextual operational semantics described in Section \ref{02-evaluation-context}. By applying the generalized small-step inference rule seen in Figure \ref{infer-evaluation} where applicable, and by transitivity (Figure \ref{transitive-closure}), a series of rewritten terms is obtained.
 
 It is worth noting that these term-rewriting rules are not necessarily deterministic; that is, multiple reducible expressions may be found resulting in multiple rewritten terms.
 
@@ -129,7 +129,7 @@ First, the grammar of the language needs to be defined. PLTRedex provides \textt
 \end{figure}
 
 
-\texttt{Aexp}, \texttt{Bexpr}, \texttt{Com} non-terminal definitions are equivalent to the grammar shown in Figure \ref{imp-grammar}. The only main difference is that \texttt{Com} does not model command sequencing as described in the grammar but utilizes so-called ellipsis (\texttt{...}) - patterns under ellipsis such as \texttt{Com ...} which match zero or more terms that match \texttt{Com} pattern.
+\texttt{Aexp}, \texttt{Bexpr}, \texttt{Com} non-terminal definitions are equivalent to the grammar shown in Figure \ref{imp-grammar}. The only main difference is that \texttt{Com} does not model command sequencing as described in the grammar but utilizes so-called ellipsis (\texttt{...}) - patterns under ellipsis such as \texttt{Com ...} which match zero or more terms that match the \texttt{Com} pattern.
 
 \texttt{var}, \texttt{int}, \texttt{bool} patterns match built-in patterns provided by PLTRedex - \texttt{integer} that matches integers, \texttt{boolean} that matches booleans and \texttt{variable-not-otherwise-mentioned} that matches any variable not used in the language definition such as \texttt{+} or \texttt{<=}.
 
@@ -140,9 +140,9 @@ First, the grammar of the language needs to be defined. PLTRedex provides \textt
 Non-terminals \texttt{P} and \texttt{E} specify evaluation contexts $E$, as described in Section \ref{02-evaluation-context}. \texttt{hole} represents hole $\bullet$.
 
 
-Now, operations $\sigma(X)$ and $\sigma[X \mapsto n]$ that retrieve from and store integers in provided locations need to be implemented. PLTRedex provides \textit{metafunctions}; that is, functions that act on terms and produce terms by rewriting them in some way. Definitions of two metafunctions can be seen in Figure \ref{imp-define-mf}. Metafunctions essentially consist of pattern-term clauses. A provided term is matched against the pattern. Upon successful matching appropriate terms get assigned to pattern-variables such as \texttt{var\_1} or \texttt{int\_2}, and they get plugged into the term. If matching is unsuccessful, the next clause is matched. An error is raised if none of the clauses match the provided term. All non-terminals in patterns are resolved with respect to the language - \texttt{Imp}.
+Now, the operations $\sigma(X)$ and $\sigma[X \mapsto n]$ that retrieve from and store integers in provided locations need to be implemented. PLTRedex provides \textit{metafunctions}; that is, functions that act on terms and produce terms by rewriting them in some way. Definitions of two metafunctions can be seen in Figure \ref{imp-define-mf}. Metafunctions essentially consist of pattern-term clauses. A provided term is matched against the pattern. Upon successful matching appropriate terms get assigned to pattern-variables such as \texttt{var\_1} or \texttt{int\_2}, and they get plugged into the term. If matching is unsuccessful, the next clause is matched. An error is raised if none of the clauses match the provided term. All non-terminals in patterns are resolved with respect to the language - \texttt{Imp}.
 
-Finally, all terms provided as arguments and all terms that are produced by metafunctions must satisfy the contract. In case of the first metafunction, the contract is \texttt{var-lookup : Loc var -> int}. \texttt{var-lookup} is the name of the function. Following the colon, provided argument terms must match patterns \texttt{Loc} and \texttt{var}, otherwise it is an error. Similarly, all resulting terms produced by the \texttt{var-lookup} metafunction must match the pattern \texttt{int} which is preceded by the symbol \texttt{->}.
+Finally, all terms provided as arguments and all terms that are produced by metafunctions must satisfy the contract. In case of the first metafunction, the contract is \texttt{var-lookup : Loc var -> int}. \texttt{var-lookup} is the name of the function. Following the colon, provided argument terms must match the patterns \texttt{Loc} and \texttt{var}, otherwise it is an error. Similarly, all resulting terms produced by the \texttt{var-lookup} metafunction must match the pattern \texttt{int} which is preceded by the symbol \texttt{->}.
 
 Careful readers might notice that the pattern of the first clause in \texttt{var-lookup} has two occurrences of the pattern-variable \texttt{var}. This means that both terms bound to both occurrences after pattern-matching must be exactly the same.
 
