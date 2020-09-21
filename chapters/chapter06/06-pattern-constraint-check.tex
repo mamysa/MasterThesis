@@ -1,7 +1,7 @@
 \section{Pattern: Constraint Check Insertion}
 \label{section:constraint-check}
 \subsection{Motivation}
-As mentioned before, Redex supports a few different forms of constraint checking; however, for the initial PyRedex implementation only the "equality of terms" constraint check is supported. For example, in the pattern \texttt{(number\_1 number\_1)} both terms bound to \texttt{number\_1} must be the same, meaning the term \texttt{(1 1)} does match the pattern but \texttt{(1 2)} does not.
+As mentioned before, PLTRedex supports a few different forms of constraint checking; however, for the initial PyPltRedex implementation only the "equality of terms" constraint check is supported. For example, in the pattern \texttt{(number\_1 number\_1)} both terms bound to \texttt{number\_1} must be the same, meaning the term \texttt{(1 1)} does match the pattern but \texttt{(1 2)} does not.
 
 However, since the current design of the \texttt{Match} class, explained in Section \ref{section:Match}, does not allow assigning multiple terms to the same pattern-variable, certain pattern-variables have to be renamed. Given $n$ occurrences of a pattern-variable, $n-1$ occurrences are to be renamed. After completion of pattern matching these $n-1$ pattern-variables must be removed from all returned \texttt{Match} instances.
 
@@ -17,7 +17,7 @@ Finally, actual equality checks have to be inserted. There are two obvious strat
 Pattern variable $pv$ is renamed in the following manner: $\mathit{pv + \# + freshint()}$, $\mathit{freshint()}$ if $\mathit{freshint() > 0}$ otherwise $pv$. $\mathit{freshint}$ operation was defined previously in Section \ref{section:id-rewrite}. For example, assuming $\mathit{freshint()=0}$, renaming \texttt{m} results in \texttt{m}. Successive application of the renaming operation results in \texttt{$m\#1$}.
 
 \subsection{Algorithm}
-Since the algorithm is based in renaming (or modification) of pattern-variables, let $v^{\prime}$ be a new pattern-variable after modifying $v$. The pairs $(pv, pv^{\prime})$ need to be maintained in order to decide where to insert equality checks. Let $M$ be a set containing such pairs. Furthermore, to remove renamed pattern-variables after matching, the set $R$ containing such pattern-variables has to be maintained.
+Since the algorithm is based on renaming (or modification) of pattern-variables, let $v^{\prime}$ be a new pattern-variable after modifying $v$. The pairs $(pv, pv^{\prime})$ need to be maintained in order to decide where to insert equality checks. Let $M$ be a set containing such pairs. Furthermore, to remove renamed pattern-variables after matching, the set $R$ containing such pattern-variables has to be maintained.
 
 Given some pattern $p$, \Visit{$p$}. The following kinds of $p$ are of interest.
 \begin{itemize}
@@ -60,7 +60,7 @@ Before proceeding with pattern traversal, \texttt{merge} operation needs to be d
 
 \begin{figure}[htp]
 	\centering
-	\makebox[\textwidth][c] { \includegraphics[scale=0.14]{transformation-pattern-constraintcheck.png} }
+	\makebox[\textwidth][c] { \includegraphics[scale=0.135]{transformation-pattern-constraintcheck.png} }
 \caption{Applying transformation to pattern \texttt{((n\_1\ ...)\ ...\ (in-hole\ ((n\_1\ ...)\ hole\ (n\_1\ ...))\ (n\_1\ ...))\ ...)}, before and after.}
 \label{transformation-pattern-constraintcheck}
 \end{figure}

@@ -374,8 +374,8 @@ def |$f_p$|(term, match, head, tail):
 		{% for |$c_i$ = CheckConstraint($s_1$, $s_2$)| in |$c_1, ..., c_n$|: %}
 	if not m.comparekeys(|$s_1$|, |$s_2$|):
 		continue
-	nmatches.append((m, h, t))
 		{% endfor %}
+	nmatches.append((m, h, t))
 	return nmatches
 	{% else %}
 	return matches
