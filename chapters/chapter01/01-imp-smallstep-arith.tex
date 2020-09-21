@@ -15,8 +15,8 @@
 	\langle a_1^\prime, \sigma \rangle 
 } 
 \infer1{
-	\langle a_1 \oplus a_2, \sigma \rangle \rightarrow  
-	\langle a_1^\prime \oplus a_2, \sigma \rangle
+	\langle a_1 \oplus a_1, \sigma \rangle \rightarrow  
+	\langle a_1^\prime \oplus a_1, \sigma \rangle
 }
 \end{prooftree} \; \oplus = \{+,\times\} \; \; \; [\text{AExp-Lhs-}\oplus]
 \]
@@ -24,12 +24,12 @@
 \[
 \begin{prooftree}
 \hypo{
-	\langle a_2, \sigma \rangle \rightarrow
-	\langle a_2^\prime, \sigma \rangle 
+	\langle a_1, \sigma \rangle \rightarrow
+	\langle a_1^\prime, \sigma \rangle 
 } 
 \infer1{
-	\langle n_1 \oplus a_2, \sigma \rangle \rightarrow  
-	\langle n_1 \oplus a_2^\prime, \sigma \rangle
+	\langle n_1 \oplus a_1, \sigma \rangle \rightarrow  
+	\langle n_1 \oplus a_1^\prime, \sigma \rangle
 }
 \end{prooftree} \; \oplus = \{+,\times\} \; \; \; [\text{AExp-Rhs-}\oplus]
 \]
@@ -37,9 +37,9 @@
 \[
 \begin{prooftree}
 \infer0{
-	\langle n_1 \oplus n_2, \sigma \rangle \rightarrow  
+	\langle n_1 \oplus n_1, \sigma \rangle \rightarrow  
 	\langle n_3,  \sigma \rangle
 }
-\end{prooftree} \; \; \; \; \oplus = \{+,\times\}, n_1, n_2, n_3 \in \mathbb{Z} \; \; \; [\text{AExp-}\oplus]
+\end{prooftree} \; \; \; \; \oplus = \{+,\times\}, n_1, n_1, n_3 \in \mathbb{Z} \; \; \; [\text{AExp-}\oplus]
 \]
 

@@ -1,6 +1,6 @@
 \begin{align*}
-E = \bullet &\text{ | } E + a_2 \text{ | } n_1 + E \text{ | } E \times a_2 \text{ | } n_1 \times E \\
-  &\text{ | } E \land b_2 \text{ | } t_1 \land E  \text{ | } E \lor b_2 \text{ | } t_1 \lor E \text{ | } \neg E \text{ | } E \leq a_2 \text{ | } n_1 \leq E  \\
+E = \bullet &\text{ | } E + a_1 \text{ | } n_1 + E \text{ | } E \times a_1 \text{ | } n_1 \times E \\
+  &\text{ | } E \land b_1 \text{ | } t_1 \land E  \text{ | } E \lor b_1 \text{ | } t_1 \lor E \text{ | } \neg E \text{ | } E \leq a_1 \text{ | } n_1 \leq E  \\
   &\text{ | } x = E \text{ | } E;c \text{ | } \textbf{if } E \textbf{ then } c \textbf{ else } c
 \end{align*}
 
@@ -17,16 +17,16 @@ E = \bullet &\text{ | } E + a_2 \text{ | } n_1 + E \text{ | } E \times a_2 \text
 \[
 \begin{prooftree}
 \infer0{
-	\langle n_1 \oplus n_2, \sigma \rangle \rightarrow  
+	\langle n_1 \oplus n_1, \sigma \rangle \rightarrow  
 	\langle n_3,  \sigma \rangle
 }
-\end{prooftree} \; \; \; \; \oplus = \{+,\times\}, n_1, n_2, n_3 \in \mathbb{Z} \; \; \; [\text{AExp-}\oplus]
+\end{prooftree} \; \; \; \; \oplus = \{+,\times\}, n_1, n_1, n_3 \in \mathbb{Z} \; \; \; [\text{AExp-}\oplus]
 \]
 
 \[
 \begin{prooftree}
 \infer0{
-	\langle n_1 \leq n_2, \sigma \rangle \rightarrow  
+	\langle n_1 \leq n_1, \sigma \rangle \rightarrow  
 	\langle t, \sigma \rangle
 }
 \end{prooftree} \; \; \; \; t \in \{ \textbf{true}, \textbf{false} \} \; \; \; [\text{BExp-}\leq]
@@ -35,19 +35,19 @@ E = \bullet &\text{ | } E + a_2 \text{ | } n_1 + E \text{ | } E \times a_2 \text
 \[
 \begin{prooftree}
 \infer0{
-	\langle t_1 \oslash t_2, \sigma \rangle \rightarrow  
+	\langle t_1 \oslash t_1, \sigma \rangle \rightarrow  
 	\langle t_3,  \sigma \rangle
 }
-\end{prooftree} \; \; \; \; \oslash = \{\land,\lor\}, t_1, t_2, t_3 \in \{ \textbf{true}, \textbf{false} \}  \; \; \; [\text{BExp-}\oslash]
+\end{prooftree} \; \; \; \; \oslash = \{\land,\lor\}, t_1, t_1, t_3 \in \{ \textbf{true}, \textbf{false} \}  \; \; \; [\text{BExp-}\oslash]
 \]
 
 \[
 \begin{prooftree}
 \infer0{
 	\langle \neg t_1, \sigma \rangle \rightarrow  
-	\langle t_2,  \sigma \rangle
+	\langle t_1,  \sigma \rangle
 }
-\end{prooftree} \; \; \; \; t_1, t_2 \in \{ \textbf{true}, \textbf{false} \}  \; \; \; [\text{BExp-}\neg]
+\end{prooftree} \; \; \; \; t_1, t_1 \in \{ \textbf{true}, \textbf{false} \}  \; \; \; [\text{BExp-}\neg]
 \]
 
 \[

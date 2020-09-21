@@ -26,12 +26,12 @@ c &= \textbf{skip} \text{ | } x = a \text{ | } c1; c2 \text{ | } \textbf{if } b 
 To be able to prove properties of programs, languages need to be described formally. Operational semantics describe the behavior of programming languages in the terms of the execution of programs on abstract machines. Structural operational semantics that were first introduced in ~\cite{plotkin}, represent computation using deductive systems meaning the execution of programs on abstract machines turns into a system of logical inferences. To define a language, inference rules are used such as ones seen in Figures \ref{infer-arith}, \ref{infer-bool}, \ref{infer-comm}.
 
 \begin{figure}[htb]
-\input{chapters/chapter02/02-imp-smallstep-arith.tex}
+\input{chapters/chapter01/01-imp-smallstep-arith.tex}
 \caption{Evaluation of arithmetic expressions.}
 \label{infer-arith}
 \end{figure}
 \begin{figure}[htb]
-\input{chapters/chapter02/02-imp-smallstep-bool.tex}
+\input{chapters/chapter01/01-imp-smallstep-bool.tex}
 \caption{Evaluation of boolean expressions.}
 \label{infer-bool}
 \end{figure}
@@ -44,7 +44,7 @@ Similarly, for boolean expressions single-step evaluation relation $\langle b, \
 Finally, a single-step evaluation relation for commands is defined: $\langle c, \sigma \rangle \rightarrow \langle c^\prime, \sigma^\prime \rangle$. Inference rules can been seen in Figure \ref{infer-comm}.
 
 \begin{figure}[htb]
-\input{chapters/chapter02/02-imp-smallstep-com.tex}
+\input{chapters/chapter01/01-imp-smallstep-com.tex}
 \caption{Inference rules for evaluation of commands.}
 \label{infer-comm}
 \end{figure}
@@ -80,24 +80,24 @@ To be able to sequence single-step evaluation steps, a reflexive transitive clos
 
 
 \section{Evaluation Contexts}
-\label{02-evaluation-context}
+\label{01-evaluation-context}
 As seen above, inference rules are quite verbose. PLTRedex uses \texttt{evaluation contexts}, originally introduced in ~\cite{felleisen1992revised}. Evaluation contexts are usually specified using a context free grammar, like in Figure \ref{infer-evaluation}.
 
 An evaluation context $E[\bullet]$ is an expression containing a single occurrence of special symbol $\bullet$ called "hole". Given some term $t$ (abstract syntax tree of a program being evaluated), the goal is to decompose the term into some context $E$ and some expression $r$ that can be rewritten in some way; in other words, $t=E[r]$. Once such $r$ is found, expression $r$ is replaced with the hole: $E[\bullet]$. Then, the expression $r$ is reduced using some local reduction rule in one step obtaining expression $r^\prime$. Finally, $\bullet$ in $E[\bullet]$ gets replaced with $r^\prime$; $E[r^\prime]$ is the resulting expression. This way, only a single global general inference rule is required, as seen in Figure \ref{infer-evaluation}. 
 
 \begin{figure}[htbp]
-\input{chapters/chapter02/02-evalcontext.tex}
+\input{chapters/chapter01/01-evalcontext.tex}
 \caption{Evaluation contexts, local reductions and generalized inference rule.}
 \label{infer-evaluation}
 \end{figure}
 
 \section{PLTRedex: Term Rewriting}
-PLTRedex provides a domain-specific language for specification of (1) a syntax of a language and (2) a series of term-rewriting rules based on the contextual operational semantics described in Section \ref{02-evaluation-context}. By applying the generalized small-step inference rule seen in Figure \ref{infer-evaluation} where applicable, and by transitivity (Figure \ref{transitive-closure}), a series of rewritten terms is obtained.
+PLTRedex provides a domain-specific language for specification of (1) a syntax of a language and (2) a series of term-rewriting rules based on the contextual operational semantics described in Section \ref{01-evaluation-context}. By applying the generalized small-step inference rule seen in Figure \ref{infer-evaluation} where applicable, and by transitivity (Figure \ref{transitive-closure}), a series of rewritten terms is obtained.
 
 It is worth noting that these term-rewriting rules are not necessarily deterministic; that is, multiple reducible expressions may be found resulting in multiple rewritten terms.
 
 \section{The Imp Language: PLTRedex Implementation}
-\label{02-pltredex}
+\label{01-pltredex}
 This section describes how Imp could be implemented using PLTRedex ~\cite{redexreference}. 
 
 First, the grammar of the language needs to be defined. PLTRedex provides \texttt{define-language} form to do that, as seen in Figure \ref{imp-define-language}. Grammar is specified in EBNF-like manner. \texttt{define-language} consists of several \textit{non-terminal definitions}. Each non-terminal definition contains a number of \textit{patterns} that are matched against a term. 
@@ -137,7 +137,7 @@ First, the grammar of the language needs to be defined. PLTRedex provides \textt
 
 \texttt{Program} non-terminal models $\langle c, \sigma \rangle$; that is, locations and potentially empty list of commands.
 
-Non-terminals \texttt{P} and \texttt{E} specify evaluation contexts $E$, as described in Section \ref{02-evaluation-context}. \texttt{hole} represents hole $\bullet$.
+Non-terminals \texttt{P} and \texttt{E} specify evaluation contexts $E$, as described in Section \ref{01-evaluation-context}. \texttt{hole} represents hole $\bullet$.
 
 
 Now, the operations $\sigma(X)$ and $\sigma[X \mapsto n]$ that retrieve from and store integers in provided locations need to be implemented. PLTRedex provides \textit{metafunctions}; that is, functions that act on terms and produce terms by rewriting them in some way. Definitions of two metafunctions can be seen in Figure \ref{imp-define-mf}. Metafunctions essentially consist of pattern-term clauses. A provided term is matched against the pattern. Upon successful matching appropriate terms get assigned to pattern-variables such as \texttt{var\_1} or \texttt{int\_2}, and they get plugged into the term. If matching is unsuccessful, the next clause is matched. An error is raised if none of the clauses match the provided term. All non-terminals in patterns are resolved with respect to the language - \texttt{Imp}.
@@ -164,9 +164,9 @@ Careful readers might notice that the pattern of the first clause in \texttt{var
 \label{imp-define-mf}
 \end{figure}
 
-Finally, evaluation relation needs to be specified. PLTRedex utilizes evaluation contexts as described in Section \ref{02-evaluation-context}. Reduction relation can be seen in Figure \ref{imp-define-red} and is defined using the \texttt{reduction-relation} form. Similarly to metafunctions, it contains a series of reduction cases, each consisting of a pattern and a term. It may be the case that multiple reduction cases may apply to the provided term, indicating non-deterministic behavior of a language.
+Finally, evaluation relation needs to be specified. PLTRedex utilizes evaluation contexts as described in Section \ref{01-evaluation-context}. Reduction relation can be seen in Figure \ref{imp-define-red} and is defined using the \texttt{reduction-relation} form. Similarly to metafunctions, it contains a series of reduction cases, each consisting of a pattern and a term. It may be the case that multiple reduction cases may apply to the provided term, indicating non-deterministic behavior of a language.
 
-The \texttt{(in-hole pattern1 pattern2)} pattern and \texttt{(in-hole term1 term2)} term implements evaluation contexts as described in Section \ref{02-evaluation-context}. The term is recursively traversed to find the redex matching \texttt{pattern2}. Once it has been found, it is replaced with \texttt{hole} and the term is matched against \texttt{pattern1} to ensure that it is indeed a valid evaluation context. After matching of redex and context, redex is rewritten according to local inference rules. They can be implemented through metafunctions or by calling Racket functions, like it is done for addition and multiplication operations. Finally, after reducing the term \texttt{term2}, it is plugged back into the context \texttt{term1}, thus replacing the \texttt{hole}.
+The \texttt{(in-hole pattern1 pattern2)} pattern and \texttt{(in-hole term1 term2)} term implements evaluation contexts as described in Section \ref{01-evaluation-context}. The term is recursively traversed to find the redex matching \texttt{pattern2}. Once it has been found, it is replaced with \texttt{hole} and the term is matched against \texttt{pattern1} to ensure that it is indeed a valid evaluation context. After matching of redex and context, redex is rewritten according to local inference rules. They can be implemented through metafunctions or by calling Racket functions, like it is done for addition and multiplication operations. Finally, after reducing the term \texttt{term2}, it is plugged back into the context \texttt{term1}, thus replacing the \texttt{hole}.
 
 All terms that are arguments to the \texttt{reduction-relation} and all resulting terms after applying \texttt{reduction-relation} must match the pattern \texttt{Program}.
 
